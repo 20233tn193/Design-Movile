@@ -5,7 +5,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     setTimeout(() => {
       navigation.replace('Torneos');
-    }, 2000);
+    }, 6000);
   }, []);
 
   return (
