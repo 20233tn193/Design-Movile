@@ -23,6 +23,7 @@ import ModalConfirmacion from './src/modules/arbitro/ModalConfirmacion';
 import CuentaDuenoScreen from './src/modules/dueno/CuentaDuenoScreen';
 import CuentaDuenoEquipoScreen from './src/modules/dueno/CuentaDuenoEquipoScreen';
 import DetalleTorneoDuenoScreen from './src/modules/dueno/DetalleTorneoDuenoScreen';
+//import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
 import JugadoresRegistradosDuenoScreen from './src/modules/dueno/JugadoresRegistradosDuenoScreen';
 import RegistroDuenoScreen from './src/modules/dueno/RegistroDuenoScreen';
 import RegistroEquipoDueno from './src/modules/dueno/RegistroEquipoDueno';
@@ -35,7 +36,7 @@ import InscripcionAprobadoScreen from './src/modules/dueno/InscripcionAprobadoSc
 import ConfirmarInscripcionScreen from './src/modules/dueno/ConfirmarInscripcionScreen';
 import ConfirmarPagoScreen from './src/modules/dueno/ConfirmarPagoScreen';
 import PagoStripeScreen from './src/modules/dueno/PagoStripeScreen';
-import ModalInformacionCredencialesScreen from './src/modules/dueno/ModalInformacionCredenciales';
+import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
 import ModalStripeRedirect from './src/modules/dueno/ModalStripeRedirect';
@@ -87,7 +88,7 @@ export default function App() {
         <Stack.Screen name="ConfirmarInscripcion" component={ConfirmarInscripcionScreen} />
         <Stack.Screen name="ConfirmarPago" component={ConfirmarPagoScreen} />
         <Stack.Screen name="PagoStripe" component={PagoStripeScreen} />
-        <Stack.Screen name="ModalInformacionCredenciales" component={ModalInformacionCredencialesScreen} />
+        <Stack.Screen name="ModalInforCredenciales" component={ModalInfoCredenciales} />
         <Stack.Screen name="ModalConfirmarDescargaCredenciales" component={ModalConfirmarDescargaCredenciales} />
         <Stack.Screen name="ModalConfirmarEliminacion" component={ModalConfirmarEliminacion} />
         <Stack.Screen name="ModalStripeRedirect" component={ModalStripeRedirect} />

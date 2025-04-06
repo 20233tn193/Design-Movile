@@ -18,7 +18,7 @@ export default function JugadoresRegistradosDuenoScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalConfirmarVisible, setModalConfirmarVisible] = useState(false);
 
-  // ⚠️ Estado del torneo (puedes reemplazar esto con props o datos reales)
+  // ⚠ Estado del torneo (puedes reemplazar esto con props o datos reales)
   const torneoCerrado = true;
 
   return (

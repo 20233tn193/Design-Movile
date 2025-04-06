@@ -9,7 +9,7 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import ModalInformacionCredenciales from './ModalInformacionCredenciales';
+import ModalInformacionCredenciales from './ModalInfoCredenciales';
 
 const { width } = Dimensions.get('window');
 

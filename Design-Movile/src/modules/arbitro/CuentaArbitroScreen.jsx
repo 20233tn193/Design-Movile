@@ -12,18 +12,18 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-export default function CuentaArbitroScreen() {
+export default function CuentaDuenoScreen() {
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
-      {/* Triángulos y franjas */}
+      {/* Franjas decorativas */}
       <View style={styles.triangleTopRed} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
       <View style={[styles.franja, styles.franjaGrisBottom]} />
 
-      {/* Encabezado */}
+      {/* Header */}
       <View style={styles.header}>
         <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Cuenta</Text>
@@ -31,34 +31,41 @@ export default function CuentaArbitroScreen() {
 
       {/* Contenido centrado */}
       <View style={styles.content}>
-        {/* Perfil */}
         <View style={styles.profileContainer}>
-          <Image
-            source={require('../../../assets/arbitro.jpg')}
-            style={styles.profileImage}
-          />
-          <TouchableOpacity style={styles.rolBadge}>
-            <Text style={styles.rolText}>Árbitro</Text>
-          </TouchableOpacity>
+          <View style={styles.avatarPlaceholder} />
+          <View style={styles.estadoEquipo}>
+            <Text style={styles.estadoTexto}>Sin equipo</Text>
+          </View>
         </View>
 
-        {/* Info tarjeta */}
         <View style={styles.cardInfo}>
           <Text style={styles.name}>Juan Chavez</Text>
           <Text style={styles.text}>20233tn152@utez.edu.mx</Text>
           <Text style={styles.text}>7772074581</Text>
         </View>
 
-        {/* Botón cerrar sesión */}
-        <TouchableOpacity style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        <TouchableOpacity style={styles.createButton} onPress={() => navigation.navigate('RegistroEquipoDueno')}>
+          <Text style={styles.buttonText}>Crear Equipo</Text>
         </TouchableOpacity>
 
-        {/* Logo */}
-        <Image
-          source={require('../../../assets/manhattan_logo.jpg')}
-          style={styles.logo}
-        />
+        <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.replace('LoginScreen')}>
+          <Text style={styles.logoutText}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+
+        <Image source={require('../../../assets/manhattan_logo.jpg')} style={styles.logo} />
+      </View>
+
+      {/* Bottom Tabs */}
+      <View style={styles.bottomTabs}>
+        <TouchableOpacity onPress={() => navigation.navigate('TorneoScreen')}>
+          <Icon name="trophy" type="font-awesome" color="#fff" size={22} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+          <Icon name="user" type="font-awesome" color="#fff" size={22} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Estadisticas')}>
+          <Icon name="bar-chart" type="font-awesome" color="#fff" size={22} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -128,22 +135,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
-  profileImage: {
+  avatarPlaceholder: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    backgroundColor: '#ccc',
+    borderRadius: 10,
     marginRight: 15,
   },
-  rolBadge: {
-    backgroundColor: '#0e1b39',
-    paddingHorizontal: 20,
+  estadoEquipo: {
+    backgroundColor: '#001F4E',
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 12,
   },
-  rolText: {
-    color: 'white',
+  estadoTexto: {
+    color: '#FDBA12',
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: 12,
   },
   cardInfo: {
     backgroundColor: '#fff',
@@ -165,6 +173,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
+  createButton: {
+    backgroundColor: '#001F4E',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
   logoutButton: {
     backgroundColor: '#d80027',
     paddingVertical: 12,
@@ -182,5 +202,17 @@ const styles = StyleSheet.create({
     height: 50,
     resizeMode: 'contain',
     alignSelf: 'center',
+  },
+  bottomTabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    height: 60,
+    backgroundColor: '#1a1a1a',
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
   },
 });

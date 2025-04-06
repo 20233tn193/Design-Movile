@@ -53,7 +53,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
 
       {/* Tarjeta 1 */}
       <View style={styles.cardDisponible}>
-        <Image source={require('../../../assets/Dortmund.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/barcelona.png')} style={styles.logo} />
         <View>
           <Text style={styles.cardTitle}>Torneo Rápido</Text>
           <Text style={styles.estadoActivo}>ACTIVO</Text>

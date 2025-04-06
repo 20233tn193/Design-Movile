@@ -1,78 +1,61 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
 
-console.log('🎯 RegistroEquipoDueno cargado');
 export default function RegistroEquipoDueno({ navigation }) {
-  console.log('🎯 RegistroEquipoDueno cargado');
-
   const [nombreEquipo, setNombreEquipo] = useState('');
 
   const handleCrear = () => {
-  console.log('🟢 Botón CREAR presionado');
+    navigation.navigate('CuentaDueno'); // Redirige sin pasar datos (pantalla sin equipo)
+  };
 
-  if (!nombreEquipo.trim()) {
-    alert('Por favor ingresa el nombre del equipo');
-    return;
-  }
-
-  navigation.navigate('CuentaDueno', {
-    nombreEquipo: nombreEquipo,
-    escudo: require('../../../assets/barcelona.png'), // o tu imagen real
-  });
-}
-  
   const handleCancelar = () => {
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      {/* Decoración */}
+      {/* Triángulo y Franjas decorativas */}
       <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaNegra]} />
+      <View style={[styles.franja, styles.franjaGris]} />
 
-      {/* Header */}
+      {/* Encabezado */}
       <View style={styles.header}>
-        <Icon name="users" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
+        <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Registro de Equipo</Text>
       </View>
 
-      <Text style={styles.titulo}>Datos del Equipo</Text>
+      {/* Título */}
+      <Text style={styles.title}>Datos del Equipo</Text>
 
-      {/* Imagen placeholder */}
-      <View style={styles.imagenBox}>
-        <View style={styles.placeholder} />
-        <TouchableOpacity style={styles.btnCargar}>
-          <Text style={styles.btnCargarTexto}>Cargar imagen</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Imagen placeholder en línea */}
+      <Image
+        source={{ uri: 'https://placehold.co/120x120?text=Logo' }}
+        style={styles.image}
+      />
 
-      {/* Campo Nombre */}
+      <TouchableOpacity style={styles.uploadBtn}>
+        <Text style={styles.uploadText}>Cargar imagen</Text>
+      </TouchableOpacity>
+
+      {/* Campo de texto */}
       <TextInput
-        style={styles.input}
         placeholder="Nombre del Equipo"
-        placeholderTextColor="#555"
+        placeholderTextColor="#888"
+        style={styles.input}
         value={nombreEquipo}
         onChangeText={setNombreEquipo}
       />
 
       {/* Botones */}
-      <TouchableOpacity style={styles.btnCrear} onPress={handleCrear}>
+      <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
         <Text style={styles.btnTexto}>Crear</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.btnCancelar} onPress={handleCancelar}>
+      <TouchableOpacity style={styles.botonCancelar} onPress={handleCancelar}>
         <Text style={styles.btnTexto}>Cancelar</Text>
       </TouchableOpacity>
     </View>
@@ -80,68 +63,102 @@ export default function RegistroEquipoDueno({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', alignItems: 'center', paddingHorizontal: 20 },
+  container: { flex: 1, alignItems: 'center', backgroundColor: '#fff' },
   triangleTopRed: {
-    position: 'absolute', top: 0, left: 0, width: 0, height: 0,
-    borderTopWidth: 100, borderRightWidth: width * 2,
-    borderTopColor: '#d80027', borderRightColor: 'transparent', zIndex: 1,
+    position: 'absolute',
+    top: 0, left: 0,
+    width: 0, height: 0,
+    borderTopWidth: 100,
+    borderRightWidth: width * 2,
+    borderTopColor: '#d80027',
+    borderRightColor: 'transparent',
+    zIndex: 1,
   },
   franja: {
-    position: 'absolute', width: width * 2, height: 50, zIndex: 0,
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: 0,
   },
-  franjaNegraTop: {
-    top: 80, left: -width, backgroundColor: '#1a1a1a', transform: [{ rotate: '-10deg' }],
+  franjaNegra: {
+    top: 80,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
   },
-  franjaGrisTop: {
-    top: 110, left: -width, backgroundColor: '#e6e6e6', transform: [{ rotate: '-10deg' }],
+  franjaGris: {
+    top: 110,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
   },
   header: {
-    flexDirection: 'row', backgroundColor: '#000', padding: 12, alignItems: 'center',
-    width: '100%', paddingTop: 30, zIndex: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    padding: 12,
+    paddingTop: 30,
+    width: '100%',
   },
   headerText: {
-    color: '#FDBA12', fontSize: 18, fontWeight: 'bold',
+    color: '#FDBA12',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
-  titulo: {
-    fontSize: 18, fontWeight: 'bold', color: '#fff',
-    backgroundColor: '#0e1b39', paddingHorizontal: 20, paddingVertical: 10,
-    borderRadius: 10, overflow: 'hidden', marginTop: 20,
+  title: {
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: 'bold',
+    backgroundColor: '#0e1b39',
+    color: '#fff',
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+    borderRadius: 6,
   },
-  imagenBox: { marginTop: 20, alignItems: 'center' },
-  placeholder: {
-    width: 160, height: 160, backgroundColor: '#ccc', borderRadius: 10, marginBottom: 10,
+  image: {
+    width: 120,
+    height: 120,
+    resizeMode: 'cover',
+    backgroundColor: '#ddd',
+    borderRadius: 8,
+    marginVertical: 12,
   },
-  btnCargar: {
-    backgroundColor: '#000', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 10,
+  uploadBtn: {
+    backgroundColor: '#000',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 4,
   },
-  btnCargarTexto: {
-    color: '#FDBA12', fontWeight: 'bold',
+  uploadText: {
+    color: '#FDBA12',
+    fontWeight: 'bold',
   },
   input: {
-    backgroundColor: '#f1f1f1',
-    borderRadius: 10,
-    padding: 12,
-    marginTop: 20,
-    width: '100%',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+    width: '80%',
+    marginTop: 16,
     color: '#000',
   },
-  btnCrear: {
+  botonCrear: {
     backgroundColor: '#d80027',
-    paddingVertical: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 40,
     borderRadius: 10,
-    alignItems: 'center',
-    width: '100%',
     marginTop: 20,
   },
-  btnCancelar: {
-    backgroundColor: '#000',
-    paddingVertical: 14,
+  botonCancelar: {
+    backgroundColor: '#333',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
     borderRadius: 10,
-    alignItems: 'center',
-    width: '100%',
     marginTop: 10,
   },
   btnTexto: {
-    color: '#fff', fontWeight: 'bold', fontSize: 14,
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });

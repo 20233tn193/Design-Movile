@@ -1,42 +1,72 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
 
-export default function ConfirmarPagoScreen({ navigation }) {
-  const handleAceptar = () => {
-    navigation.navigate('StripePaymentScreen');
-  };
-
+export default function CuentaDuenoEquipoScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* Triángulo rojo y franjas superiores */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-
+      {/* Cabecera */}
       <View style={styles.header}>
-        <Icon name="trophy" type="font-awesome" color="#FDBA12" size={20} />
-        <Text style={styles.headerText}> Detalles del Torneo</Text>
+        <Icon name="user" type="font-awesome" color="#FDBA12" size={18} />
+        <Text style={styles.headerText}>  Cuenta</Text>
       </View>
 
-      {/* Contenedor de confirmación */}
-      <View style={styles.confirmCard}>
-        <Text style={styles.title}>Confirmar</Text>
-        <Text style={styles.message}>
-          <Text style={{ fontWeight: 'bold' }}>Será redirigido a Stripe</Text> para realizar su pago
-        </Text>
+      {/* Franjas decorativas */}
+      <View style={styles.franjaRoja} />
+      <View style={styles.franjaNegra} />
+      <View style={styles.franjaGris} />
 
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.acceptButton} onPress={handleAceptar}>
-            <Text style={styles.acceptText}>ACEPTAR</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.cancelText}>CANCELAR</Text>
-          </TouchableOpacity>
+      {/* Card de equipo */}
+      <View style={styles.card}>
+        <View style={styles.equipoContainer}>
+          <Image
+            source={{ uri: 'https://placehold.co/60x60?text=ESC' }}
+            style={styles.logoEquipo}
+          />
+          <View style={styles.etiquetaEquipo}>
+            <Text style={styles.textoEtiqueta}>Barcelona</Text>
+            <TouchableOpacity style={styles.btnEditarEscudo}>
+              <Icon name="pencil" type="font-awesome" color="#fff" size={12} />
+            </TouchableOpacity>
+          </View>
         </View>
+
+        <Text style={styles.nombre}>Juan Chavez</Text>
+        <Text style={styles.info}>20233tn152@utez.edu.mx</Text>
+        <Text style={styles.info}>7772074581</Text>
+
+        <TouchableOpacity style={styles.btnEditarDatos}>
+          <Icon name="pencil" type="font-awesome" color="#000" size={14} />
+        </TouchableOpacity>
       </View>
+
+      {/* Botones */}
+      <TouchableOpacity
+        style={styles.btnPrimario}
+        onPress={() => navigation.navigate('InscripcionesDueno')}
+      >
+        <Text style={styles.btnTexto}>Torneos Inscritos</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.btnSecundario}>
+        <Text style={styles.btnTexto}>Cerrar Sesión</Text>
+      </TouchableOpacity>
+
+      {/* Logo inferior */}
+      <Image
+        source={require('../../../assets/manhattan_logo.jpg')}
+        style={styles.logoManhattan}
+        resizeMode="contain"
+      />
     </View>
   );
 }
@@ -44,103 +74,134 @@ export default function ConfirmarPagoScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    position: 'relative',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 120,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 10,
-    left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 70,
-    borderRightWidth: width * 2,
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: 1,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 40,
-    zIndex: 0,
-  },
-  franjaNegraTop: {
-    top: 80,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
   },
   header: {
-    position: 'absolute',
-    top: 35,
-    left: 10,
     flexDirection: 'row',
+    backgroundColor: '#000',
+    width: '100%',
+    padding: 12,
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    position: 'absolute',
+    top: 0,
     zIndex: 10,
   },
   headerText: {
     color: '#FDBA12',
     fontWeight: 'bold',
-    fontSize: 18,
-    marginLeft: 5,
+    fontSize: 16,
   },
-  confirmCard: {
+  franjaRoja: {
+    position: 'absolute',
+    top: 50,
+    left: -width,
+    width: width * 2,
+    height: 40,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegra: {
+    position: 'absolute',
+    top: 75,
+    left: -width,
+    width: width * 2,
+    height: 40,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGris: {
+    position: 'absolute',
+    top: 100,
+    left: -width,
+    width: width * 2,
+    height: 40,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
+  },
+  card: {
     backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    marginHorizontal: 20,
-    alignItems: 'center',
-    elevation: 5,
+    borderRadius: 16,
+    padding: 16,
+    width: '100%',
+    marginBottom: 20,
+    marginTop: 30,
     shadowColor: '#000',
+    shadowOffset: { width: 2, height: 4 },
     shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    width: '85%',
+    shadowRadius: 4,
+    elevation: 5,
+    position: 'relative',
   },
-  title: {
+  equipoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoEquipo: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    marginRight: 12,
+  },
+  etiquetaEquipo: {
+    backgroundColor: '#0e1b39',
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textoEtiqueta: {
     color: '#FDBA12',
     fontWeight: 'bold',
+    marginRight: 6,
+  },
+  nombre: {
+    fontWeight: 'bold',
     fontSize: 16,
-    marginBottom: 10,
+    marginTop: 10,
   },
-  message: {
+  info: {
     fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 20,
+    color: '#333',
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  btnEditarDatos: {
+    position: 'absolute',
+    top: 85,
+    right: 12,
+    backgroundColor: '#f1f1f1',
+    padding: 6,
+    borderRadius: 20,
+  },
+  btnEditarEscudo: {
+    marginLeft: 6,
+  },
+  btnPrimario: {
+    backgroundColor: '#0e1b39',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 10,
     width: '100%',
+    alignItems: 'center',
   },
-  acceptButton: {
-    backgroundColor: 'green',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  btnSecundario: {
+    backgroundColor: '#d80027',
+    padding: 12,
     borderRadius: 10,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
   },
-  acceptText: {
-    color: 'white',
+  btnTexto: {
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 14,
   },
-  cancelButton: {
-    backgroundColor: '#333',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  cancelText: {
-    color: 'white',
-    fontWeight: 'bold',
+  logoManhattan: {
+    width: 160,
+    height: 40,
+    marginTop: 10,
   },
 });
