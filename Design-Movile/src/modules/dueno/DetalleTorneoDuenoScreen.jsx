@@ -32,7 +32,7 @@ export default function DetalleTorneoDuenoScreen({ navigation }) {
 
       {/* Tarjeta de torneo */}
       <View style={styles.card}>
-        <Image source={require('../../../assets/Madrid.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
         <View style={styles.cardInfo}>
           <Text style={styles.cardTitle}>Torneo Infantil</Text>
           <Text style={styles.estado}>ACTIVO</Text>

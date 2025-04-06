@@ -7,7 +7,6 @@ import {
   FlatList,
   Dimensions,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 
@@ -36,7 +35,7 @@ export default function ArbitroHomeScreen({ navigation }) {
 
       {/* Encabezado */}
       <View style={styles.header}>
-        <Image source={require('../../../assets/ProximosPartidos.jpg')} style={styles.iconoHeader} />
+        <Icon name="calendar" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Partidos Asignados</Text>
       </View>
 
@@ -52,6 +51,7 @@ export default function ArbitroHomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
+      {/* Lista de partidos */}
       <FlatList
         data={partidos}
         keyExtractor={(_, i) => i.toString()}
@@ -66,12 +66,30 @@ export default function ArbitroHomeScreen({ navigation }) {
                 <Text style={styles.cardSubText}>{item.cancha}</Text>
                 <Text style={styles.cardSubText}>{item.fecha}    {item.hora}</Text>
               </View>
-              <Image source={require('../../../assets/ubicacion.jpg')} style={styles.ubicacionIcon} />
+              <Icon
+                name="map-marker"
+                type="font-awesome"
+                color="#ff4d4d"
+                size={28}
+                containerStyle={{ marginLeft: 10 }}
+              />
             </View>
           </TouchableOpacity>
         )}
       />
 
+      {/* Barra inferior */}
+      <View style={styles.bottomTabs}>
+        <TouchableOpacity onPress={() => navigation.replace('BottomTabs')}>
+          <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.replace('CuentaArbitro')}>
+          <Icon name="user" type="font-awesome" color="#fff" size={24} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.replace('Estadisticas')}>
+          <Icon name="bar-chart" type="font-awesome" color="#fff" size={24} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -91,12 +109,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 10,
-  },
-  iconoHeader: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
-    marginRight: 8,
   },
   headerText: {
     color: '#FDBA12',
@@ -151,12 +163,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 2,
   },
-  ubicacionIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginLeft: 10,
-  },
   triangleTopRed: {
     position: 'absolute',
     top: 10,
@@ -204,5 +210,16 @@ const styles = StyleSheet.create({
     left: -width,
     backgroundColor: '#d80027',
     transform: [{ rotate: '10deg' }],
+  },
+  bottomTabs: {
+    position: 'absolute',
+    bottom: 0,
+    height: 60,
+    backgroundColor: '#1a1a1a',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 5,
   },
 });

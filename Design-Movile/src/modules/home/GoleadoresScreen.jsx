@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
+
 import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
@@ -8,7 +9,7 @@ const datos = Array(5).fill({
   nombre: 'Hanna Perez',
   equipo: 'Madrid',
   goles: 23,
-  logo: require('../../../assets/Madrid.jpg'),
+  logo: require('../../../assets/madrid.png'),
 });
 
 export default function GoleadoresScreen() {
@@ -25,8 +26,8 @@ export default function GoleadoresScreen() {
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
-      <Image source={require('../../../assets/Goleadores.jpg')} style={styles.icono} />  
-      <Text style={styles.title}> Goleadores</Text>
+        <Image source={require('../../../assets/Goleadores.png')} style={styles.icono} />
+        <Text style={styles.title}> Goleadores</Text>
       </View>
 
       <View style={styles.tableHeader}>
@@ -50,6 +51,8 @@ export default function GoleadoresScreen() {
           </View>
         )}
       />
+
+    
     </View>
   );
 }

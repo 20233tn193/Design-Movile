@@ -1,91 +1,170 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View, Text, TextInput, StyleSheet,
+  TouchableOpacity, Modal, Image, Dimensions
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import RegistroModal from './RegistroModal';
 
-const LoginScreen = () => {
+const { width } = Dimensions.get('window');
+
+export default function LoginScreen() {
+  const [correo, setCorreo] = useState('');
+  const [password, setPassword] = useState('');
+  const [mostrarModal, setMostrarModal] = useState(false);
   const navigation = useNavigation();
 
-  const handlePress = (rol) => {
-    switch (rol) {
-      case 'publico':
-        navigation.replace('Torneos');
-        break;
-      case 'arbitro':
-        navigation.replace('LoginArbitro');
-        break;
-      case 'dueno':
-        navigation.replace('LoginDueno');
-        break;
-      default:
-        break;
+  const handleLogin = () => {
+    if (correo === 'arbitro@gmail.com') {
+      navigation.replace('ArbitroHome');
+    } else if (correo === 'dueno@gmail.com') {
+      navigation.replace('CuentaDueno');
+    } else {
+      alert('Correo no válido');
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Selecciona tu Rol</Text>
+    <View style={styles.container}>
+      {/* Franjas decorativas */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-        <TouchableOpacity style={styles.button} onPress={() => handlePress('publico')}>
-          <Text style={styles.buttonText}>Público</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => handlePress('arbitro')}>
-          <Text style={styles.buttonText}>Árbitro</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => handlePress('dueno')}>
-          <Text style={styles.buttonText}>Dueño</Text>
-        </TouchableOpacity>
-
+      <View style={styles.content}>
         <Image source={require('../../assets/logo.jpg')} style={styles.logo} />
+        <Text style={styles.titulo}>Inicio de Sesión</Text>
+
+        <TextInput
+          placeholder="Correo electrónico"
+          value={correo}
+          onChangeText={setCorreo}
+          style={styles.input}
+          placeholderTextColor="#555"
+        />
+        <TextInput
+          placeholder="Contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+          placeholderTextColor="#555"
+        />
+
+        <TouchableOpacity style={styles.botonIngresar} onPress={handleLogin}>
+          <Text style={styles.botonTexto}>Ingresar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.botonRegistrar} onPress={() => setMostrarModal(true)}>
+          <Text style={styles.botonTextoSecundario}>Registrarse</Text>
+        </TouchableOpacity>
       </View>
-    </ScrollView>
+
+      <Modal visible={mostrarModal} animationType="slide">
+        <RegistroModal cerrarModal={() => setMostrarModal(false)} />
+      </Modal>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#1E1E2F',
-    alignItems: 'center',
+    backgroundColor: '#fff',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 26,
-    marginBottom: 50,
-    fontWeight: 'bold',
-  },
-  button: {
-    backgroundColor: '#2C3E50',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    marginBottom: 20,
-    width: '80%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  buttonText: {
-    color: '#ECF0F1',
-    fontSize: 18,
+    paddingHorizontal: 25,
+    zIndex: 10,
   },
   logo: {
-    marginTop: 40,
-    width: 120,
-    height: 120,
-    resizeMode: 'contain',
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 30,
+    borderRadius: 50,
+  },
+  titulo: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 25,
+    color: '#0e1b39',
+  },
+  input: {
+    backgroundColor: '#e6e6e6',
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 15,
+    fontSize: 14,
+  },
+  botonIngresar: {
+    backgroundColor: '#c8102e',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  botonRegistrar: {
+    backgroundColor: '#0e1b39',
+    padding: 15,
+    borderRadius: 10,
+  },
+  botonTexto: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  botonTextoSecundario: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  franja: {
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: 1,
+  },
+  franjaGrisTop: {
+    top: 120,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegraTop: {
+    top: 90,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaRojaTop: {
+    top: 60,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
 });
-
-export default LoginScreen;

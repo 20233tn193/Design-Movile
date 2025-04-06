@@ -24,7 +24,7 @@ export default function CuentaDuenoScreen({ route, navigation }) {
       <View style={styles.card}>
         <View style={styles.cardTop}>
         <Image
-         source={escudo ? escudo : require('../../../assets/Barcelona.jpg')}
+         source={escudo ? escudo : require('../../../assets/barcelona.png')}
           style={styles.escudo}
         />
 
@@ -35,7 +35,7 @@ export default function CuentaDuenoScreen({ route, navigation }) {
         </View>
 
         <Text style={styles.nombre}>Juan Chavez</Text>
-        <Text style={styles.dato}>20233tn152@utez.edu.mx</Text>
+        <Text style={styles.dato}>Juan_dueño@utez.edu.mx</Text>
         <Text style={styles.dato}>7772074581</Text>
         <Icon name="pencil" type="font-awesome" size={12} color="#000" containerStyle={styles.editIconAbajo} />
       </View>

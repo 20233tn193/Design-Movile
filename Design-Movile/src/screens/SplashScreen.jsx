@@ -1,17 +1,24 @@
 import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-export default function SplashScreen({ navigation }) {
+export default function SplashScreen() {
+  const navigation = useNavigation();
+
   useEffect(() => {
-    setTimeout(() => {
-      navigation.replace('LoginScreen'); // ahora redirige a selección de rol
-    }, 6000);
+    const timer = setTimeout(() => {
+      console.log("⏩ Redirigiendo a BottomTabs...");
+      navigation.replace('BottomTabs');
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <View style={styles.container}>
+      {/* Franjas decorativas */}
       <View style={styles.triangleTopRed} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -19,10 +26,11 @@ export default function SplashScreen({ navigation }) {
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
+      {/* Contenido */}
       <View style={styles.content}>
         <Image source={require('../../assets/logo.jpg')} style={styles.logo} />
-        <Text style={styles.title}>GTF</Text>
-        <Text style={styles.subtitle}>Sistema de Gestión{"\n"}de Torneos de Fútbol</Text>
+        <Text style={styles.titulo}>GTF</Text>
+        <Text style={styles.subtitulo}>Sistema de Gestión{'\n'}de Torneos de Fútbol</Text>
       </View>
     </View>
   );
@@ -40,19 +48,26 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 140,
+    height: 140,
+    borderRadius: 70, // Circular
     marginBottom: 20,
+    borderWidth: 4,
+    borderColor: '#0e1b39',
   },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
+  titulo: {
+    fontSize: 40,
+    fontWeight: '900',
     color: '#d80027',
+    fontFamily: 'sans-serif-condensed',
+    marginBottom: 8,
   },
-  subtitle: {
-    fontSize: 16,
+  subtitulo: {
+    fontSize: 17,
     textAlign: 'center',
-    color: '#333',
+    color: '#0e1b39',
+    fontFamily: 'sans-serif',
+    fontWeight: 'bold',
   },
   triangleTopRed: {
     position: 'absolute',

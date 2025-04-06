@@ -35,10 +35,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-  },
+    width: 40,
+    height: 40,
+    resizeMode: 'contain', // para mantener proporción
+    borderRadius: 60, // opcional si quieres dar forma circular suave
+    backgroundColor: 'transparent', // por si acaso
+  }
+  ,
   details: {
     marginLeft: 15,
     flex: 1,

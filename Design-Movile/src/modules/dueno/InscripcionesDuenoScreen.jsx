@@ -40,7 +40,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
       {/* Torneos inscritos */}
       <Text style={styles.subtitulo}>Torneos inscritos</Text>
       <View style={styles.cardInscrito}>
-        <Image source={require('../../../assets/Madrid.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
         <View>
           <Text style={styles.cardTitle}>Torneo Infantil</Text>
           <Text style={styles.estadoProceso}>Pago en PROCESO</Text>
@@ -63,7 +63,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
 
       {/* Tarjeta 2 */}
       <View style={styles.cardDisponible}>
-        <Image source={require('../../../assets/Barcelona.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/barcelona.png')} style={styles.logo} />
         <View>
           <Text style={styles.cardTitle}>Torneo Veteranos</Text>
           <Text style={styles.estadoActivo}>ACTIVO</Text>
@@ -73,7 +73,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
 
       {/* Tarjeta 3 */}
       <View style={styles.cardDisponible}>
-        <Image source={require('../../../assets/Paris.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/paris.png')} style={styles.logo} />
         <View>
           <Text style={styles.cardTitle}>Campeones</Text>
           <Text style={styles.estadoActivo}>ACTIVO</Text>

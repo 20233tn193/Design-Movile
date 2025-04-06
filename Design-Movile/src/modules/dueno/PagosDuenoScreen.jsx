@@ -31,7 +31,7 @@ export default function PagosDuenoScreen({ navigation }) {
 
       {/* Tarjeta de torneo */}
       <View style={styles.torneoCard}>
-        <Image source={require('../../../assets/Madrid.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
         <View style={styles.torneoInfo}>
           <Text style={styles.nombreTorneo}>Torneo Infantil</Text>
           <Text style={styles.estado}>CERRADO</Text>

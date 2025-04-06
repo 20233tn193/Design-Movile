@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import { Icon } from '@rneui/themed';
 
+
 const { width } = Dimensions.get('window');
 
 const datos = Array(6).fill({
@@ -51,6 +52,8 @@ export default function TarjetasScreen() {
           </View>
         )}
       />
+
+     
     </View>
   );
 }

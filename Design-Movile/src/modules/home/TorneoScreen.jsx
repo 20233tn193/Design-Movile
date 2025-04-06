@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import CardListTorneos from '../../kernel/components/CardListTorneos';
 import { Icon } from '@rneui/themed';
 
@@ -21,14 +21,14 @@ const torneos = [
     clubes: 10,
   },
   {
-    logo: require('../../../assets/TorneoInfantil.jpg'),
+    logo: require('../../../assets/madrid.png'),
     nombre: 'Torneo Infantil',
     estado: 'ACTIVO',
     fecha: '05/03/2025',
     clubes: 10,
   },
   {
-    logo: require('../../../assets/TorneoVeteranos.jpg'),
+    logo: require('../../../assets/barcelona.png'),
     nombre: 'Torneo Veteranos',
     estado: 'FINALIZADO',
     fecha: '05/03/2025',
@@ -39,12 +39,10 @@ const torneos = [
 export default function TorneoScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      {/* Franjas superiores */}
+      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Franjas inferiores */}
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
@@ -77,7 +75,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f2f2f2',
     position: 'relative',
-    paddingHorizontal: 0,
     overflow: 'hidden',
   },
   headerFull: {
@@ -98,8 +95,7 @@ const styles = StyleSheet.create({
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
+    marginVertical: 10,
     paddingHorizontal: 15,
   },
   searchBox: {
@@ -108,12 +104,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingVertical: 4,
     paddingHorizontal: 10,
-    justifyContent: 'center',
   },
   input: {
     fontSize: 14,
     color: '#000',
-    paddingVertical: 4,
   },
   button: {
     backgroundColor: '#d80027',

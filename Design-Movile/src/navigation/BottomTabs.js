@@ -1,25 +1,18 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TorneoScreen from '../modules/home/TorneoScreen';
-import PartidosScreen from '../modules/home/PartidosScreen';
+import Estadisticas from '../modules/home/Estadisticas';
 import { Icon } from '@rneui/themed';
 
-const Tab = createBottomTabNavigator();
-
-// 👉 Al presionar el tab, redirige al LoginArbitro
 function PerfilScreen({ navigation }) {
   React.useEffect(() => {
-    navigation.replace('LoginArbitro');
+    navigation.replace('Login'); // 🔁 Aquí corregido
   }, []);
 
   return null;
 }
 
-function EstadisticasScreen() {
-  return (
-    <></> // Puedes reemplazar esto con una futura pantalla real
-  );
-}
+const Tab = createBottomTabNavigator();
 
 export default function BottomTabs() {
   return (
@@ -31,8 +24,8 @@ export default function BottomTabs() {
         tabBarStyle: {
           backgroundColor: '#1a1a1a',
           borderTopWidth: 0,
-          paddingBottom: 5,
           height: 60,
+          paddingBottom: 5,
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -40,15 +33,6 @@ export default function BottomTabs() {
         },
       }}
     >
-      <Tab.Screen
-        name="Partidos"
-        component={PartidosScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Icon name="fire" type="font-awesome" color={color} size={20} />
-          ),
-        }}
-      />
       <Tab.Screen
         name="Torneos"
         component={TorneoScreen}
@@ -59,7 +43,7 @@ export default function BottomTabs() {
         }}
       />
       <Tab.Screen
-        name="Perfil" // cambiado para mayor claridad
+        name="Perfil"
         component={PerfilScreen}
         options={{
           tabBarIcon: ({ color }) => (
@@ -69,7 +53,7 @@ export default function BottomTabs() {
       />
       <Tab.Screen
         name="Estadísticas"
-        component={EstadisticasScreen}
+        component={Estadisticas}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="bar-chart" type="font-awesome" color={color} size={20} />

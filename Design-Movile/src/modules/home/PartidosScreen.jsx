@@ -2,11 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Dimensions } from 'react-native';
 import { Icon } from '@rneui/themed';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const partidos = [
   {
-    local: { nombre: 'Madrid', logo: require('../../../assets/Madrid.jpg') },
+    local: { nombre: 'Madrid', logo: require('../../../assets/madrid.png') },
     visitante: { nombre: 'Juventus', logo: require('../../../assets/Juventus.jpg') },
     resultado: '1 : 0',
     cancha: 'Los Tamales - Verde',
@@ -14,8 +14,8 @@ const partidos = [
     arbitro: 'Juan Chavez'
   },
   {
-    local: { nombre: 'Paris', logo: require('../../../assets/Paris.jpg') },
-    visitante: { nombre: 'Barcelona', logo: require('../../../assets/Barcelona.jpg') },
+    local: { nombre: 'Paris', logo: require('../../../assets/paris.png') },
+    visitante: { nombre: 'Barcelona', logo: require('../../../assets/barcelona.png') },
     resultado: '2 : 1',
     cancha: 'Los Tamales - Rojo',
     hora: '12:00 pm',
@@ -38,7 +38,7 @@ export default function PartidosScreen() {
 
       {/* Encabezado */}
       <View style={styles.header}>
-      <Image source={require('../../../assets/ProximosPartidos.jpg')} style={styles.icono} />      
+        <Image source={require('../../../assets/ProximosPartidos.png')} style={styles.icono} />
         <Text style={styles.headerText}> Partidos</Text>
       </View>
 
@@ -79,6 +79,8 @@ export default function PartidosScreen() {
           </View>
         )}
       />
+
+  
     </View>
   );
 }

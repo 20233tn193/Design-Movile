@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Dimensions } from 'react-native';
+
 import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
 
 const datos = Array(6).fill({
   equipo: 'Madrid',
-  logo: require('../../../assets/Madrid.jpg'),
+  logo: require('../../../assets/madrid.png'),
   pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0
 });
 
@@ -24,11 +25,9 @@ export default function TablaPosiciones() {
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
-      <Image source={require('../../../assets/Posiciones.jpg')} style={styles.icono} />      
-       <Text style={styles.headerText}> Tabla de Posiciones</Text>
+        <Image source={require('../../../assets/Posiciones .png')} style={styles.icono} />
+        <Text style={styles.headerText}> Tabla de Posiciones</Text>
       </View>
-
-      
 
       <View style={styles.tableHeader}>
         <Text style={[styles.columnHeader, { width: 100 }]}>Equipo</Text>
@@ -61,6 +60,8 @@ export default function TablaPosiciones() {
           </View>
         )}
       />
+
+     
     </View>
   );
 }
@@ -86,20 +87,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     marginLeft: 10,
-  },
-  jornadaContainer: {
-    backgroundColor: '#0e1b39',
-    marginTop: 15,
-    marginHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  jornadaText: {
-    fontSize: 15,
-    color: '#FDBA12',
-    fontWeight: 'bold',
   },
   tableHeader: {
     flexDirection: 'row',

@@ -22,7 +22,7 @@ export default function InscripcionProcesoScreen({ navigation }) {
       <Text style={styles.sectionTitle}>Torneos inscritos</Text>
 
       <View style={styles.cardTorneo}>
-        <Image source={require('../../../assets/Madrid.jpg')} style={styles.logo} />
+        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
         <View>
           <Text style={styles.nombre}>Torneo Infantil</Text>
           <Text style={styles.estadoProceso}>Pago en PROCESO</Text>

@@ -7,10 +7,10 @@ export default function TournamentDetail({ route, navigation }) {
   const { nombre } = route.params;
 
   const buttons = [
-    { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones.jpg'), ruta: 'TablaPosiciones' },
-    { label: 'Próximos Partidos', icon: require('../../../assets/ProximosPartidos.jpg'), ruta: 'Partidos' },
-    { label: 'Maximos Goleadores', icon: require('../../../assets/Goleadores.jpg'), ruta: 'Goleadores' },
-    { label: 'Tarjetas', icon: require('../../../assets/Tarjetas.jpg'), ruta: 'Tarjetas' },
+    { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones .png'), ruta: 'TablaPosiciones' },
+    { label: 'Próximos Partidos', icon: require('../../../assets/ProximosPartidos.png'), ruta: 'Partidos' },
+    { label: 'Maximos Goleadores', icon: require('../../../assets/Goleadores.png'), ruta: 'Goleadores' },
+    { label: 'Tarjetas', icon: require('../../../assets/Tarjetas.png'), ruta: 'Tarjetas' },
   ];
 
   return (
@@ -42,6 +42,8 @@ export default function TournamentDetail({ route, navigation }) {
           </TouchableOpacity>
         ))}
       </View>
+
+      
     </View>
   );
 }

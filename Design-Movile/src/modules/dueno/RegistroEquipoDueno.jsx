@@ -27,7 +27,7 @@ export default function RegistroEquipoDueno({ navigation }) {
 
   navigation.navigate('CuentaDueno', {
     nombreEquipo: nombreEquipo,
-    escudo: require('../../../assets/Barcelona.jpg'), // o tu imagen real
+    escudo: require('../../../assets/barcelona.png'), // o tu imagen real
   });
 }
   

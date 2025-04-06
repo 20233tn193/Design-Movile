@@ -27,7 +27,7 @@ export default function InscripcionAprobadoScreen() {
         <View style={styles.seccion}>
           <Text style={styles.seccionTitulo}>Torneos inscritos</Text>
           <View style={styles.cardTorneo}>
-            <Image source={require('../../../assets/Madrid.jpg')} style={styles.logo} />
+            <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
             <View>
               <Text style={styles.nombreTorneo}>Torneo Infantil</Text>
               <Text style={styles.estadoAprobado}>Pago APROBADO</Text>

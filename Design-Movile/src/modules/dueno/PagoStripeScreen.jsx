@@ -26,7 +26,7 @@ export default function PagoStripeScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       {/* Logo */}
       <Image
-        source={require('../../../assets/Madrid.jpg')}
+        source={require('../../../assets/madrid.png')}
         style={styles.logo}
         resizeMode="contain"
       />
