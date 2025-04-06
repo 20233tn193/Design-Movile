@@ -8,100 +8,99 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
+import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
 
 export default function InscripcionesDuenoScreen({ navigation }) {
   return (
-    <ScrollView style={styles.container}>
-      {/* Encabezado */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>🏆 <Text style={{ fontWeight: 'bold' }}>Inscripciones</Text></Text>
-      </View>
-
-      {/* Franjas superiores */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Buscador */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          placeholder="Buscar..."
-          placeholderTextColor="#888"
-          style={styles.input}
-        />
-        <TouchableOpacity style={styles.btnBuscar}>
-          <Text style={styles.btnBuscarTexto}>Buscar</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Torneos inscritos */}
-      <Text style={styles.subtitulo}>Torneos inscritos</Text>
-      <View style={styles.cardInscrito}>
-        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
-        <View>
-          <Text style={styles.cardTitle}>Torneo Infantil</Text>
-          <Text style={styles.estadoProceso}>Pago en PROCESO</Text>
-          <Text style={styles.cardText}>05/03/2025   · 10 clubs</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        {/* Encabezado */}
+        <View style={styles.header}>
+          <Icon name="trophy" type="font-awesome" color="#FDBA12" size={18} style={{ marginRight: 8 }} />
+          <Text style={styles.headerText}>Inscripciones</Text>
         </View>
-      </View>
 
-      {/* Torneos disponibles */}
-      <Text style={styles.subtituloDisponible}>Torneos Disponibles</Text>
+        {/* Franjas superiores */}
+        <View style={styles.triangleTopRed} />
+        <View style={[styles.franja, styles.franjaNegraTop]} />
+        <View style={[styles.franja, styles.franjaGrisTop]} />
 
-      {/* Tarjeta 1 */}
-      <View style={styles.cardDisponible}>
-        <Image source={require('../../../assets/barcelona.png')} style={styles.logo} />
-        <View>
-          <Text style={styles.cardTitle}>Torneo Rápido</Text>
-          <Text style={styles.estadoActivo}>ACTIVO</Text>
-          <Text style={styles.cardText}>05/03/2025   · 10 clubs</Text>
+        {/* Buscador */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            placeholder="Buscar torneos..."
+            placeholderTextColor="#888"
+            style={styles.input}
+          />
+          <TouchableOpacity style={styles.btnBuscar}>
+            <Text style={styles.btnBuscarTexto}>Buscar</Text>
+          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Tarjeta 2 */}
-      <View style={styles.cardDisponible}>
-        <Image source={require('../../../assets/barcelona.png')} style={styles.logo} />
-        <View>
-          <Text style={styles.cardTitle}>Torneo Veteranos</Text>
-          <Text style={styles.estadoActivo}>ACTIVO</Text>
-          <Text style={styles.cardText}>05/03/2025   · 10 clubs</Text>
+        {/* Torneos inscritos */}
+        <Text style={styles.subtitulo}>Torneos inscritos</Text>
+        <View style={styles.cardInscrito}>
+          <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
+          <View>
+            <Text style={styles.cardTitle}>Torneo Infantil</Text>
+            <Text style={styles.estadoProceso}>Pago en PROCESO</Text>
+            <Text style={styles.cardText}>05/03/2025 · 10 clubes</Text>
+          </View>
         </View>
-      </View>
 
-      {/* Tarjeta 3 */}
-      <View style={styles.cardDisponible}>
-        <Image source={require('../../../assets/paris.png')} style={styles.logo} />
-        <View>
-          <Text style={styles.cardTitle}>Campeones</Text>
-          <Text style={styles.estadoActivo}>ACTIVO</Text>
-          <Text style={styles.cardText}>05/03/2025   · 10 clubs</Text>
-        </View>
-      </View>
-    </ScrollView>
+        {/* Torneos disponibles */}
+        <Text style={styles.subtituloDisponible}>Torneos Disponibles</Text>
+
+        {[ // Esto puedes mapearlo si es dinámico
+          { nombre: 'Torneo Rápido', img: require('../../../assets/barcelona.png') },
+          { nombre: 'Torneo Veteranos', img: require('../../../assets/barcelona.png') },
+          { nombre: 'Campeones', img: require('../../../assets/paris.png') },
+        ].map((torneo, index) => (
+          <View key={index} style={styles.cardDisponible}>
+            <Image source={torneo.img} style={styles.logo} />
+            <View>
+              <Text style={styles.cardTitle}>{torneo.nombre}</Text>
+              <Text style={styles.estadoActivo}>ACTIVO</Text>
+              <Text style={styles.cardText}>05/03/2025 · 10 clubes</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  container: {
     paddingHorizontal: 16,
-    paddingTop: 110,
+    paddingTop: 100,
   },
   header: {
     position: 'absolute',
     top: 0,
     width: '100%',
     backgroundColor: '#000',
-    padding: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
     zIndex: 10,
   },
   headerText: {
     color: '#FDBA12',
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   triangleTopRed: {
     position: 'absolute',
@@ -135,22 +134,24 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
+    alignItems: 'center',
+    marginBottom: 14,
+    gap: 10,
   },
   input: {
     flex: 1,
     backgroundColor: '#f1f1f1',
     borderRadius: 10,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
     fontSize: 14,
     color: '#000',
   },
   btnBuscar: {
     backgroundColor: '#d80027',
     paddingHorizontal: 14,
-    justifyContent: 'center',
-    borderRadius: 8,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   btnBuscarTexto: {
     color: '#fff',
@@ -158,11 +159,13 @@ const styles = StyleSheet.create({
   },
   subtitulo: {
     fontWeight: 'bold',
+    fontSize: 15,
     color: '#0e1b39',
     marginBottom: 6,
   },
   subtituloDisponible: {
     fontWeight: 'bold',
+    fontSize: 15,
     backgroundColor: '#0e1b39',
     color: '#FDBA12',
     padding: 10,
@@ -174,32 +177,41 @@ const styles = StyleSheet.create({
   cardInscrito: {
     backgroundColor: '#0e1b39',
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
     marginBottom: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
   cardDisponible: {
     backgroundColor: '#0e1b39',
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
     marginBottom: 10,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
   logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 6,
+    width: 50,
+    height: 50,
+    borderRadius: 10,
   },
   cardTitle: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 15,
   },
   cardText: {
-    color: '#fff',
+    color: '#ccc',
     fontSize: 12,
   },
   estadoProceso: {

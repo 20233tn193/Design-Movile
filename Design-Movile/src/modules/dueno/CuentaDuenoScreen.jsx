@@ -15,9 +15,13 @@ const { width } = Dimensions.get('window');
 export default function CuentaDuenoScreen() {
   const navigation = useNavigation();
 
+  const handleLogout = () => {
+    navigation.replace('LoginScreen');
+  };
+
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
+      {/* Triángulo y franjas decorativas */}
       <View style={styles.triangleTopRed} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -27,57 +31,60 @@ export default function CuentaDuenoScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Icon name="user" type="font-awesome" color="#FDBA12" size={20} />
-        <Text style={styles.headerText}> Cuenta</Text>
+        <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
+        <Text style={styles.headerText}>Cuenta</Text>
       </View>
 
-      {/* Card de información */}
-      <View style={styles.card}>
-        <View style={styles.cardTop}>
-          <View style={styles.avatarPlaceholder} />
-          <View style={styles.estado}>
-            <Text style={styles.estadoText}>Sin equipo</Text>
+      {/* Contenido */}
+      <View style={styles.content}>
+        <View style={styles.card}>
+          <View style={styles.rowTop}>
+            <View style={styles.fotoPlaceholder} />
+            <View style={styles.estadoEquipo}>
+              <Text style={styles.estadoTexto}>Sin equipo</Text>
+            </View>
           </View>
+
+          <Text style={styles.nombre}>Juan Chavez</Text>
+          <Text style={styles.dato}>20233tn152@utez.edu.mx</Text>
+          <Text style={styles.dato}>7772074581</Text>
+
+          {/* Botón de edición (navega a ActualizarEquipoScreen) */}
+          <TouchableOpacity
+            style={styles.editIcon}
+            onPress={() => navigation.navigate('ActualizarCuentaDueno')}
+          >
+            <Icon name="edit" type="feather" size={20} color="#000" />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.nombre}>Juan Chavez</Text>
-        <Text style={styles.info}>20233tn152@utez.edu.mx</Text>
-        <Text style={styles.info}>7772074581</Text>
-        <TouchableOpacity style={styles.iconoEditar}>
-          <Icon name="edit" type="feather" size={18} color="#000" />
+
+        {/* Botones */}
+        <TouchableOpacity style={styles.botonAzul} onPress={() => navigation.navigate('RegistroEquipoDueno')}>
+          <Text style={styles.botonTexto}>Crear Equipo</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.botonRojo} onPress={handleLogout}>
+          <Text style={styles.botonTexto}>Cerrar Sesión</Text>
+        </TouchableOpacity>
+
+        {/* Logo */}
+        <Image
+          source={require('../../../assets/manhattan_logo.jpg')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </View>
 
-      {/* Botones */}
-      <TouchableOpacity
-        style={styles.botonCrear}
-        onPress={() => navigation.navigate('RegistroEquipoDueno')}
-      >
-        <Text style={styles.textoBoton}>Crear Equipo</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.botonCerrar}
-        onPress={() => navigation.replace('LoginScreen')}
-      >
-        <Text style={styles.textoBoton}>Cerrar Sesión</Text>
-      </TouchableOpacity>
-
-      {/* Logo */}
-      <Image
-        source={require('../../../assets/manhattan_logo.jpg')}
-        style={styles.logo}
-      />
-
-      {/* Navegación inferior */}
+      {/* Bottom Navigation */}
       <View style={styles.bottomTabs}>
         <TouchableOpacity onPress={() => navigation.navigate('TorneoScreen')}>
-          <Icon name="trophy" type="font-awesome" color="#fff" size={22} />
+          <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-          <Icon name="user" type="font-awesome" color="#fff" size={22} />
+        <TouchableOpacity onPress={() => navigation.navigate('CuentaDuenoScreen')}>
+          <Icon name="user" type="font-awesome" color="#fff" size={24} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Estadisticas')}>
-          <Icon name="bar-chart" type="font-awesome" color="#fff" size={22} />
+          <Icon name="bar-chart" type="font-awesome" color="#fff" size={24} />
         </TouchableOpacity>
       </View>
     </View>
@@ -85,22 +92,7 @@ export default function CuentaDuenoScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', alignItems: 'center' },
-  header: {
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 30,
-    width: '100%',
-  },
-  headerText: {
-    color: '#FDBA12',
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginLeft: 10,
-  },
+  container: { flex: 1, backgroundColor: '#fff', position: 'relative' },
   triangleTopRed: {
     position: 'absolute',
     top: 0,
@@ -117,10 +109,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: width * 2,
     height: 40,
-    zIndex: -1,
+    zIndex: 0,
   },
   franjaNegraTop: {
-    top: 80,
+    top: 60,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
@@ -149,81 +141,97 @@ const styles = StyleSheet.create({
     backgroundColor: '#d80027',
     transform: [{ rotate: '10deg' }],
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    padding: 12,
+    paddingTop: 30,
+    width: '100%',
+    zIndex: 10,
+  },
+  headerText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 40,
+  },
   card: {
     backgroundColor: '#fff',
-    width: '85%',
-    borderRadius: 16,
+    width: '90%',
+    borderRadius: 20,
     padding: 20,
-    marginTop: 50,
+    elevation: 5,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 6,
+    marginBottom: 20,
     position: 'relative',
   },
-  cardTop: {
+  rowTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  avatarPlaceholder: {
-    width: 60,
-    height: 60,
+  fotoPlaceholder: {
+    width: 70,
+    height: 70,
     backgroundColor: '#ccc',
     borderRadius: 10,
   },
-  estado: {
+  estadoEquipo: {
     backgroundColor: '#001F4E',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
   },
-  estadoText: {
+  estadoTexto: {
     color: '#FDBA12',
     fontWeight: 'bold',
-    fontSize: 12,
   },
   nombre: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginTop: 10,
     textAlign: 'center',
-    marginTop: 12,
-    marginBottom: 6,
   },
-  info: {
+  dato: {
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
   },
-  iconoEditar: {
+  editIcon: {
     position: 'absolute',
     bottom: 12,
     right: 12,
   },
-  botonCrear: {
+  botonAzul: {
     backgroundColor: '#001F4E',
     paddingVertical: 12,
-    paddingHorizontal: 40,
     borderRadius: 10,
-    marginTop: 25,
+    width: '80%',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  botonCerrar: {
+  botonRojo: {
     backgroundColor: '#B80000',
     paddingVertical: 12,
-    paddingHorizontal: 40,
     borderRadius: 10,
-    marginTop: 15,
+    width: '80%',
+    alignItems: 'center',
   },
-  textoBoton: {
+  botonTexto: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 16,
   },
   logo: {
-    width: 140,
-    height: 50,
-    resizeMode: 'contain',
-    marginTop: 20,
+    width: 160,
+    height: 60,
+    marginTop: 25,
   },
   bottomTabs: {
     flexDirection: 'row',
@@ -231,8 +239,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 60,
     backgroundColor: '#1a1a1a',
-    borderTopWidth: 1,
-    borderTopColor: '#333',
     position: 'absolute',
     bottom: 0,
     width: '100%',

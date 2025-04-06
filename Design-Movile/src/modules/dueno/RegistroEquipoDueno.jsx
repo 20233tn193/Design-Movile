@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  Dimensions,
+} from 'react-native';
 import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
@@ -8,7 +16,7 @@ export default function RegistroEquipoDueno({ navigation }) {
   const [nombreEquipo, setNombreEquipo] = useState('');
 
   const handleCrear = () => {
-    navigation.navigate('CuentaDueno'); // Redirige sin pasar datos (pantalla sin equipo)
+    navigation.navigate('CuentaDuenoEquipo');
   };
 
   const handleCancelar = () => {
@@ -19,56 +27,60 @@ export default function RegistroEquipoDueno({ navigation }) {
     <View style={styles.container}>
       {/* Triángulo y Franjas decorativas */}
       <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegra]} />
-      <View style={[styles.franja, styles.franjaGris]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       {/* Encabezado */}
       <View style={styles.header}>
-        <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
-        <Text style={styles.headerText}>Registro de Equipo</Text>
+  <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
+  <Text style={styles.headerText}>Registro de Equipo</Text>
+</View>
+
+      {/* Contenido */}
+      <View style={styles.content}>
+        <Text style={styles.title}>Datos del Equipo</Text>
+
+        <Image
+          source={{ uri: 'https://placehold.co/120x120?text=Logo' }}
+          style={styles.image}
+        />
+
+        <TouchableOpacity style={styles.botonUniforme}>
+          <Text style={styles.botonTextoNegro}>Cargar imagen</Text>
+        </TouchableOpacity>
+
+        <TextInput
+          placeholder="Nombre del Equipo"
+          placeholderTextColor="#888"
+          style={styles.input}
+          value={nombreEquipo}
+          onChangeText={setNombreEquipo}
+        />
+
+        <TouchableOpacity style={styles.botonRojo} onPress={handleCrear}>
+          <Text style={styles.botonTexto}>Crear</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.botonGris} onPress={handleCancelar}>
+          <Text style={styles.botonTexto}>Cancelar</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* Título */}
-      <Text style={styles.title}>Datos del Equipo</Text>
-
-      {/* Imagen placeholder en línea */}
-      <Image
-        source={{ uri: 'https://placehold.co/120x120?text=Logo' }}
-        style={styles.image}
-      />
-
-      <TouchableOpacity style={styles.uploadBtn}>
-        <Text style={styles.uploadText}>Cargar imagen</Text>
-      </TouchableOpacity>
-
-      {/* Campo de texto */}
-      <TextInput
-        placeholder="Nombre del Equipo"
-        placeholderTextColor="#888"
-        style={styles.input}
-        value={nombreEquipo}
-        onChangeText={setNombreEquipo}
-      />
-
-      {/* Botones */}
-      <TouchableOpacity style={styles.botonCrear} onPress={handleCrear}>
-        <Text style={styles.btnTexto}>Crear</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.botonCancelar} onPress={handleCancelar}>
-        <Text style={styles.btnTexto}>Cancelar</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#fff' },
   triangleTopRed: {
     position: 'absolute',
-    top: 0, left: 0,
-    width: 0, height: 0,
-    borderTopWidth: 100,
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    borderTopWidth: 70,
     borderRightWidth: width * 2,
     borderTopColor: '#d80027',
     borderRightColor: 'transparent',
@@ -77,20 +89,38 @@ const styles = StyleSheet.create({
   franja: {
     position: 'absolute',
     width: width * 2,
-    height: 50,
+    height: 40,
     zIndex: 0,
   },
-  franjaNegra: {
-    top: 80,
+  franjaNegraTop: {
+    top: 60,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
-  franjaGris: {
-    top: 110,
+  franjaGrisTop: {
+    top: 100,
     left: -width,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
   header: {
     flexDirection: 'row',
@@ -99,14 +129,20 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingTop: 30,
     width: '100%',
+    zIndex: 10,
   },
   headerText: {
-    color: '#FDBA12',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 18,
   },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 40,
+  },
   title: {
-    marginTop: 16,
     fontSize: 16,
     fontWeight: 'bold',
     backgroundColor: '#0e1b39',
@@ -114,24 +150,15 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 20,
     borderRadius: 6,
+    marginBottom: 20,
   },
   image: {
-    width: 120,
-    height: 120,
+    width: 140,
+    height: 140,
     resizeMode: 'cover',
     backgroundColor: '#ddd',
-    borderRadius: 8,
-    marginVertical: 12,
-  },
-  uploadBtn: {
-    backgroundColor: '#000',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-  },
-  uploadText: {
-    color: '#FDBA12',
-    fontWeight: 'bold',
+    borderRadius: 12,
+    marginBottom: 12,
   },
   input: {
     backgroundColor: '#f0f0f0',
@@ -139,25 +166,40 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 6,
     width: '80%',
-    marginTop: 16,
+    marginBottom: 20,
     color: '#000',
+    textAlign: 'center',
   },
-  botonCrear: {
+  botonUniforme: {
+    backgroundColor: '#000',
+    paddingVertical: 12,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  botonRojo: {
     backgroundColor: '#d80027',
     paddingVertical: 12,
-    paddingHorizontal: 40,
     borderRadius: 10,
-    marginTop: 20,
+    width: '80%',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  botonCancelar: {
+  botonGris: {
     backgroundColor: '#333',
     paddingVertical: 12,
-    paddingHorizontal: 40,
     borderRadius: 10,
-    marginTop: 10,
+    width: '80%',
+    alignItems: 'center',
   },
-  btnTexto: {
+  botonTexto: {
     color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  botonTextoNegro: {
+    color: '#FDBA12',
     fontWeight: 'bold',
     fontSize: 14,
   },

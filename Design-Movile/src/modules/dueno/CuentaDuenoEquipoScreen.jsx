@@ -1,11 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { Icon } from '@rneui/themed';
-import BottomTabs from '../../navigation/BottomTabs';
+import { useNavigation } from '@react-navigation/native';
+
+const { width } = Dimensions.get('window');
 
 export default function CuentaDuenoEquipoScreen() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
+      {/* Encabezado */}
+      <View style={styles.header}>
+        <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
+        <Text style={styles.headerText}>Cuenta</Text>
+      </View>
+
       {/* Franjas decorativas superiores */}
       <View style={styles.decorativeTop}>
         <View style={[styles.franja, { backgroundColor: '#A00000' }]} />
@@ -13,14 +30,16 @@ export default function CuentaDuenoEquipoScreen() {
         <View style={[styles.franja, { backgroundColor: '#E8E8E8' }]} />
       </View>
 
-      {/* Contenido principal */}
+      {/* Contenido */}
       <View style={styles.content}>
         <View style={styles.card}>
           <View style={styles.profileRow}>
             <View style={styles.profileImage} />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>Sin equipo</Text>
-              <Icon name="edit" type="feather" size={14} color="white" />
+            <View style={styles.equipoRow}>
+              <Text style={styles.equipoTexto}>Sin equipo</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('ActualizarEquipoScreen')}>
+                <Icon name="edit" type="feather" size={18} color="#fff" style={styles.equipoIcono} />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -28,16 +47,22 @@ export default function CuentaDuenoEquipoScreen() {
           <Text style={styles.email}>20233tn152@utez.edu.mx</Text>
           <Text style={styles.phone}>7772074581</Text>
 
-          <TouchableOpacity style={styles.editBtn}>
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={() => navigation.navigate('ActualizarCuentaDueno')}
+          >
             <Icon name="edit" type="feather" size={18} color="black" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.btnBlue}>
-          <Text style={styles.btnText}>Crear Equipo</Text>
+        <TouchableOpacity
+          style={styles.btnBlue}
+          onPress={() => navigation.navigate('InscripcionesDueno')}
+        >
+          <Text style={styles.btnText}>Torneos inscritos</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnRed}>
+        <TouchableOpacity style={styles.btnRed} onPress={() => navigation.replace('Login')}>
           <Text style={styles.btnText}>Cerrar Sesión</Text>
         </TouchableOpacity>
 
@@ -54,15 +79,26 @@ export default function CuentaDuenoEquipoScreen() {
         <View style={[styles.franja, { backgroundColor: '#2D2D2D' }]} />
         <View style={[styles.franja, { backgroundColor: '#A00000' }]} />
       </View>
-
-      {/* Navegación inferior */}
-      <BottomTabs />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    padding: 12,
+    paddingTop: 50,
+    paddingLeft: 20,
+    zIndex: 10,
+  },
+  headerText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
   franja: { height: 20, transform: [{ rotate: '-6deg' }], marginTop: -6 },
   decorativeTop: { height: 60 },
   decorativeBottom: { height: 60, justifyContent: 'flex-end' },
@@ -82,20 +118,28 @@ const styles = StyleSheet.create({
   },
   profileRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   profileImage: {
-    width: 60, height: 60,
+    width: 60,
+    height: 60,
     backgroundColor: '#ccc',
     borderRadius: 12,
     marginRight: 10,
   },
-  badge: {
+  equipoRow: {
     flexDirection: 'row',
     backgroundColor: '#0C1A3E',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
     alignItems: 'center',
   },
-  badgeText: { color: '#FDBA12', fontWeight: 'bold', marginRight: 4 },
+  equipoTexto: {
+    color: '#FDBA12',
+    fontWeight: 'bold',
+    marginRight: 6,
+  },
+  equipoIcono: {
+    marginTop: 1,
+  },
   name: { fontSize: 18, fontWeight: 'bold', marginBottom: 4 },
   email: { fontSize: 14, color: '#555' },
   phone: { fontSize: 14, color: '#555' },

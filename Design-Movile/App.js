@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
@@ -23,7 +22,6 @@ import ModalConfirmacion from './src/modules/arbitro/ModalConfirmacion';
 import CuentaDuenoScreen from './src/modules/dueno/CuentaDuenoScreen';
 import CuentaDuenoEquipoScreen from './src/modules/dueno/CuentaDuenoEquipoScreen';
 import DetalleTorneoDuenoScreen from './src/modules/dueno/DetalleTorneoDuenoScreen';
-//import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
 import JugadoresRegistradosDuenoScreen from './src/modules/dueno/JugadoresRegistradosDuenoScreen';
 import RegistroDuenoScreen from './src/modules/dueno/RegistroDuenoScreen';
 import RegistroEquipoDueno from './src/modules/dueno/RegistroEquipoDueno';
@@ -41,7 +39,7 @@ import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirm
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
 import ModalStripeRedirect from './src/modules/dueno/ModalStripeRedirect';
 
-// 🔐 Nuevo Login único
+// 🔐 Login único
 import LoginScreen from './src/screens/LoginScreen';
 import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
 import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
@@ -52,6 +50,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+        {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
@@ -61,7 +60,7 @@ export default function App() {
         <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
         <Stack.Screen name="Estadisticas" component={Estadisticas} />
 
-        {/* 💻 Login único */}
+        {/* 🔐 Login único */}
         <Stack.Screen name="Login" component={LoginScreen} />
 
         {/* ⚖️ Árbitro */}
@@ -70,7 +69,6 @@ export default function App() {
         <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
         <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
         <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
-        
 
         {/* 📋 Dueño */}
         <Stack.Screen name="CuentaDueno" component={CuentaDuenoScreen} />
@@ -80,7 +78,7 @@ export default function App() {
         <Stack.Screen name="RegistroDueno" component={RegistroDuenoScreen} />
         <Stack.Screen name="RegistroEquipoDueno" component={RegistroEquipoDueno} />
         <Stack.Screen name="RegistroEquipo" component={RegistroEquipoScreen} />
-        <Stack.Screen name="ActualizarEquipo" component={ActualizarEquipoScreen} />
+        <Stack.Screen name="ActualizarEquipoScreen" component={ActualizarEquipoScreen} />
         <Stack.Screen name="ActualizarCuentaDueno" component={ActualizarCuentaDuenoScreen} />
         <Stack.Screen name="InscripcionesDueno" component={InscripcionesDuenoScreen} />
         <Stack.Screen name="InscripcionProceso" component={InscripcionProcesoScreen} />
@@ -93,6 +91,7 @@ export default function App() {
         <Stack.Screen name="ModalConfirmarEliminacion" component={ModalConfirmarEliminacion} />
         <Stack.Screen name="ModalStripeRedirect" component={ModalStripeRedirect} />
       </Stack.Navigator>
+
       <StatusBar style="light" />
     </NavigationContainer>
   );

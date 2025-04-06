@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,16 +9,28 @@ import {
   Dimensions,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
+import ModalConfirmarEliminacion from './ModalConfirmarEliminacion'; // Ajusta esta ruta si es necesario
 
 const { width } = Dimensions.get('window');
 
 export default function ActualizarEquipoScreen({ navigation }) {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleEliminar = () => {
+    setModalVisible(true);
+  };
+
+  const confirmarEliminacion = () => {
+    setModalVisible(false);
+    navigation.goBack(); // Puedes reemplazar esto con tu lógica de eliminación real
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header superior */}
+      {/* Encabezado */}
       <View style={styles.header}>
-        <Icon name="user" type="font-awesome" color="#FDBA12" size={18} />
-        <Text style={styles.headerText}>  Actualizar Equipo</Text>
+        <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
+        <Text style={styles.headerText}>Actualizar Equipo</Text>
       </View>
 
       {/* Franjas decorativas */}
@@ -44,20 +56,24 @@ export default function ActualizarEquipoScreen({ navigation }) {
         placeholderTextColor="#555"
       />
 
-      <TouchableOpacity style={styles.botonActualizar}>
+      <TouchableOpacity style={styles.botonNegro}>
         <Text style={styles.botonTexto}>Actualizar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.botonEliminar}>
+      <TouchableOpacity style={styles.botonRojo} onPress={handleEliminar}>
         <Text style={styles.botonTexto}>Eliminar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.botonCancelar}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={styles.botonGris} onPress={() => navigation.goBack()}>
         <Text style={styles.botonTexto}>Cancelar</Text>
       </TouchableOpacity>
+
+      {/* Modal */}
+      <ModalConfirmarEliminacion
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onEliminar={confirmarEliminacion}
+      />
     </View>
   );
 }
@@ -72,18 +88,20 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    backgroundColor: '#000',
-    width: '100%',
-    padding: 12,
     alignItems: 'center',
+    backgroundColor: '#000',
+    paddingVertical: 12,
+    paddingTop: 40,
+    paddingHorizontal: 20,
+    width: '100%',
     position: 'absolute',
     top: 0,
     zIndex: 10,
   },
   headerText: {
-    color: '#FDBA12',
+    color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   franjaRoja: {
     position: 'absolute',
@@ -142,38 +160,40 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#eee',
-    width: '100%',
+    width: '80%',
     borderRadius: 10,
     padding: 12,
     fontStyle: 'italic',
     color: '#000',
     marginBottom: 16,
+    textAlign: 'center',
   },
-  botonActualizar: {
+  botonNegro: {
     backgroundColor: '#000',
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 10,
-    width: '100%',
+    width: '80%',
     alignItems: 'center',
     marginBottom: 10,
   },
-  botonEliminar: {
+  botonRojo: {
     backgroundColor: '#d80027',
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 10,
-    width: '100%',
+    width: '80%',
     alignItems: 'center',
     marginBottom: 10,
   },
-  botonCancelar: {
+  botonGris: {
     backgroundColor: '#555',
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 10,
-    width: '100%',
+    width: '80%',
     alignItems: 'center',
   },
   botonTexto: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 14,
   },
 });
