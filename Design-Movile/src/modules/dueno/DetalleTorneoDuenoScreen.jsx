@@ -7,34 +7,36 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 
 import ModalConfirmarInscripcion from './ModalConfirmarInscripcion';
-import ModalStripeRedirect from './ModalStripeRedirect'; 
+import ModalStripeRedirect from './ModalStripeRedirect';
 
 const { width } = Dimensions.get('window');
 
-export default function DetalleTorneoDuenoScreen({ navigation }) {
+export default function DetalleTorneoDuenoScreen({ navigation, route }) {
   const [modalInscripcionVisible, setModalInscripcionVisible] = useState(false);
   const [modalStripeVisible, setModalStripeVisible] = useState(false);
 
+  const { nombre, imagen } = route.params || {
+    nombre: 'Torneo Infantil',
+    imagen: require('../../../assets/madrid.png'),
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Encabezado */}
+      {/* Encabezado limpio */}
       <View style={styles.header}>
         <Text style={styles.headerText}>🏆 Detalles del Torneo</Text>
       </View>
 
-      {/* Franjas decorativas */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Tarjeta de torneo */}
+      {/* Tarjeta del torneo */}
       <View style={styles.card}>
-        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
+        <Image source={imagen} style={styles.logo} />
         <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle}>Torneo Infantil</Text>
+          <Text style={styles.cardTitle}>{nombre}</Text>
           <Text style={styles.estado}>ACTIVO</Text>
           <Text style={styles.cardText}>Inicio: 05/03/2025</Text>
           <Text style={styles.cardText}>10 equipos</Text>
@@ -56,16 +58,19 @@ export default function DetalleTorneoDuenoScreen({ navigation }) {
       </View>
 
       {/* Botones */}
-      <View style={styles.buttons}>
+      <View style={styles.buttonRow}>
         <TouchableOpacity
-          style={styles.btnInscribirse}
+          style={styles.btnGreen}
           onPress={() => setModalInscripcionVisible(true)}
         >
-          <Text style={styles.btnTexto}>Inscribirse</Text>
+          <Text style={styles.btnText}>Inscribirse</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnRegresar} onPress={() => navigation.goBack()}>
-          <Text style={styles.btnTexto}>Regresar</Text>
+        <TouchableOpacity
+          style={styles.btnGray}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.btnText}>Regresar</Text>
         </TouchableOpacity>
       </View>
 
@@ -75,19 +80,118 @@ export default function DetalleTorneoDuenoScreen({ navigation }) {
         onClose={() => setModalInscripcionVisible(false)}
         onConfirm={() => {
           setModalInscripcionVisible(false);
-          setModalStripeVisible(true); // abre segundo modal
+          setModalStripeVisible(true);
         }}
-        torneo="Torneo Infantil"
+        torneo={nombre}
+        navigation={navigation}
       />
 
       <ModalStripeRedirect
         visible={modalStripeVisible}
         onClose={() => setModalStripeVisible(false)}
-        onConfirm={() => {
-          setModalStripeVisible(false);
-          navigation.navigate('PagoStripe'); // esta es la pantalla final con el pago real
-        }}
+        navigation={navigation} // ✅ navegación pasada correctamente
       />
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 80 : 80,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+  },
+  header: {
+    position: 'absolute',
+    top: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    width: '100%',
+    backgroundColor: '#000',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    zIndex: 10,
+  },
+  headerText: {
+    color: '#FDBA12',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  card: {
+    flexDirection: 'row',
+    backgroundColor: '#0e1b39',
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
+  logo: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+  },
+  cardInfo: {
+    flex: 1,
+  },
+  cardTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 17,
+  },
+  estado: {
+    color: 'limegreen',
+    fontWeight: 'bold',
+    fontSize: 13,
+    marginVertical: 2,
+  },
+  cardText: {
+    color: '#fff',
+    fontSize: 13,
+  },
+  infoBox: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 3 },
+    marginBottom: 20,
+  },
+  infoTitle: {
+    fontWeight: 'bold',
+    color: '#0e1b39',
+    marginBottom: 6,
+  },
+  infoText: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 10,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 40,
+  },
+  btnGreen: {
+    flex: 1,
+    backgroundColor: 'green',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  btnGray: {
+    flex: 1,
+    backgroundColor: '#999',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  btnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+});

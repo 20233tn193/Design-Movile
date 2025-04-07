@@ -1,19 +1,29 @@
 import React from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // 👉 IMPORTANTE
 
 const { width } = Dimensions.get('window');
 
 export default function ModalPagoComprobacion({ visible, onClose }) {
+  const navigation = useNavigation(); // 👉 obtener navegación aquí
+
+  const handleAceptar = () => {
+    onClose();
+    navigation.navigate('InscripcionAprobado'); // 👉 redirige correctamente
+  };
+
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <Text style={styles.titulo}>Información</Text>
           <Text style={styles.mensaje}>
-            <Text style={{ fontWeight: 'bold' }}>Su pago será comprobado por el Administrador</Text>
+            <Text style={{ fontWeight: 'bold' }}>
+              Una vez que su pago haya sido <Text style={{ color: 'limegreen', fontWeight: 'bold' }}>APROBADO</Text>, podrá registrar a sus jugadores al torneo.
+            </Text>
           </Text>
 
-          <TouchableOpacity style={styles.botonAceptar} onPress={onClose}>
+          <TouchableOpacity style={styles.botonAceptar} onPress={handleAceptar}>
             <Text style={styles.textoBoton}>ACEPTAR</Text>
           </TouchableOpacity>
         </View>

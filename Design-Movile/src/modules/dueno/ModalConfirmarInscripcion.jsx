@@ -16,13 +16,16 @@ export default function ModalConfirmarInscripcion({ visible, onClose, torneo, na
 
   const handleConfirmPago = () => {
     setModalPagoVisible(false);
-    onClose(); // Cerramos también el modal de inscripción
-    navigation.navigate('PagoStripe');
+    onClose(); // Cierra modal de inscripción
+    if (navigation && navigation.navigate) {
+      navigation.navigate('PagoStripe'); // ✅ Redirige si está definido
+    } else {
+      console.warn('navigation está indefinido');
+    }
   };
 
   return (
     <>
-      {/* Primer Modal - Confirmar Inscripción */}
       <Modal transparent animationType="fade" visible={visible}>
         <View style={styles.overlay}>
           <View style={styles.modalContainer}>
@@ -33,7 +36,10 @@ export default function ModalConfirmarInscripcion({ visible, onClose, torneo, na
             </Text>
 
             <View style={styles.botonesContainer}>
-              <TouchableOpacity onPress={() => setModalPagoVisible(true)} style={styles.btnRojo}>
+              <TouchableOpacity
+                onPress={() => setModalPagoVisible(true)}
+                style={styles.btnRojo}
+              >
                 <Text style={styles.textoBoton}>PAGAR INSCRIPCIÓN</Text>
               </TouchableOpacity>
 
@@ -45,7 +51,7 @@ export default function ModalConfirmarInscripcion({ visible, onClose, torneo, na
         </View>
       </Modal>
 
-      {/* Segundo Modal - Confirmar Pago */}
+      {/* Segundo Modal */}
       <ModalConfirmarPago
         visible={modalPagoVisible}
         onClose={() => setModalPagoVisible(false)}

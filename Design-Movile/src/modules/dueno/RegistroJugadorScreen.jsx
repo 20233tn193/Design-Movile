@@ -44,24 +44,28 @@ export default function RegistroJugadorScreen({ navigation }) {
       <TextInput
         placeholder="Nombre"
         style={styles.input}
+        placeholderTextColor="#444"
         value={nombre}
         onChangeText={setNombre}
       />
       <TextInput
         placeholder="Apellido"
         style={styles.input}
+        placeholderTextColor="#444"
         value={apellido}
         onChangeText={setApellido}
       />
       <TextInput
         placeholder="CURP"
         style={styles.input}
+        placeholderTextColor="#444"
         value={curp}
         onChangeText={setCurp}
       />
       <TextInput
         placeholder="Fecha de nacimiento"
         style={styles.input}
+        placeholderTextColor="#444"
         value={fechaNacimiento}
         onChangeText={setFechaNacimiento}
       />
@@ -95,7 +99,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     width: '100%',
-    padding: 12,
+    paddingHorizontal: 20,
+    paddingTop: 35,
+    paddingBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 10,
@@ -133,16 +139,18 @@ const styles = StyleSheet.create({
     transform: [{ rotate: '-10deg' }],
   },
   placeholderImage: {
-    width: 120,
-    height: 140,
+    width: 140,
+    height: 160,
     alignSelf: 'center',
     borderRadius: 12,
     marginBottom: 10,
+    backgroundColor: '#ccc',
   },
   btnCargarImagen: {
     backgroundColor: '#000',
-    padding: 8,
-    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 18,
+    borderRadius: 8,
     alignSelf: 'center',
     marginBottom: 20,
   },
@@ -151,11 +159,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   input: {
-    backgroundColor: '#eee',
+    backgroundColor: '#e6e6e6',
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
+    padding: 14,
+    marginBottom: 12,
     fontSize: 14,
+    color: '#000',
   },
   botones: {
     flexDirection: 'row',
@@ -165,15 +174,15 @@ const styles = StyleSheet.create({
   },
   btnCancelar: {
     flex: 1,
-    backgroundColor: '#333',
-    padding: 12,
+    backgroundColor: '#555',
+    padding: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
   btnAgregar: {
     flex: 1,
     backgroundColor: '#d80027',
-    padding: 12,
+    padding: 14,
     borderRadius: 10,
     alignItems: 'center',
   },
