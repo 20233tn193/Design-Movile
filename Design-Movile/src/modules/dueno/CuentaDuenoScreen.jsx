@@ -16,13 +16,16 @@ export default function CuentaDuenoScreen() {
   const navigation = useNavigation();
 
   const handleLogout = () => {
-    navigation.replace('LoginScreen');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   return (
     <View style={styles.container}>
-      {/* Triángulo y franjas decorativas */}
-      <View style={styles.triangleTopRed} />
+      {/* 🎨 Fondo decorativo (franjas como LoginScreen) */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
       <View style={[styles.franja, styles.franjaGrisBottom]} />
@@ -44,12 +47,10 @@ export default function CuentaDuenoScreen() {
               <Text style={styles.estadoTexto}>Sin equipo</Text>
             </View>
           </View>
-
           <Text style={styles.nombre}>Juan Chavez</Text>
           <Text style={styles.dato}>20233tn152@utez.edu.mx</Text>
           <Text style={styles.dato}>7772074581</Text>
 
-          {/* Botón de edición (navega a ActualizarEquipoScreen) */}
           <TouchableOpacity
             style={styles.editIcon}
             onPress={() => navigation.navigate('ActualizarCuentaDueno')}
@@ -58,7 +59,6 @@ export default function CuentaDuenoScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Botones */}
         <TouchableOpacity style={styles.botonAzul} onPress={() => navigation.navigate('RegistroEquipoDueno')}>
           <Text style={styles.botonTexto}>Crear Equipo</Text>
         </TouchableOpacity>
@@ -67,7 +67,6 @@ export default function CuentaDuenoScreen() {
           <Text style={styles.botonTexto}>Cerrar Sesión</Text>
         </TouchableOpacity>
 
-        {/* Logo */}
         <Image
           source={require('../../../assets/manhattan_logo.jpg')}
           style={styles.logo}
@@ -75,7 +74,7 @@ export default function CuentaDuenoScreen() {
         />
       </View>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Tabs */}
       <View style={styles.bottomTabs}>
         <TouchableOpacity onPress={() => navigation.navigate('TorneoScreen')}>
           <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
@@ -92,33 +91,32 @@ export default function CuentaDuenoScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', position: 'relative' },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 70,
-    borderRightWidth: width * 2,
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: 1,
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    position: 'relative',
+    overflow: 'hidden',
   },
   franja: {
     position: 'absolute',
     width: width * 2,
-    height: 40,
+    height: 50,
     zIndex: 0,
   },
-  franjaNegraTop: {
+  franjaRojaTop: {
     top: 60,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegraTop: {
+    top: 90,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaGrisTop: {
-    top: 100,
+    top: 120,
     left: -width,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
@@ -148,7 +146,7 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingTop: 30,
     width: '100%',
-    zIndex: 10,
+    zIndex: 2,
   },
   headerText: {
     color: '#fff',
@@ -159,8 +157,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 120, // ✅ más abajo y centrado
+    zIndex: 3,
   },
+  
   card: {
     backgroundColor: '#fff',
     width: '90%',
@@ -242,5 +242,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
+    zIndex: 5,
   },
 });
