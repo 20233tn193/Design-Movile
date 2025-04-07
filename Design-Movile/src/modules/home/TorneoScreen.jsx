@@ -1,42 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import CardListTorneos from '../../kernel/components/CardListTorneos';
 import { Icon } from '@rneui/themed';
+import API from '../../api/api'; // Asegúrate de que este path sea correcto
 
 const { width } = Dimensions.get('window');
 
-const torneos = [
-  {
-    logo: require('../../../assets/TorneoABC.jpg'),
-    nombre: 'Torneo ABC',
-    estado: 'ACTIVO',
-    fecha: '05/03/2025',
-    clubes: 10,
-  },
-  {
-    logo: require('../../../assets/TorneoEstatal.jpg'),
-    nombre: 'Torneo Estatal',
-    estado: 'FINALIZADO',
-    fecha: '05/03/2025',
-    clubes: 10,
-  },
-  {
-    logo: require('../../../assets/madrid.png'),
-    nombre: 'Torneo Infantil',
-    estado: 'ACTIVO',
-    fecha: '05/03/2025',
-    clubes: 10,
-  },
-  {
-    logo: require('../../../assets/barcelona.png'),
-    nombre: 'Torneo Veteranos',
-    estado: 'FINALIZADO',
-    fecha: '05/03/2025',
-    clubes: 10,
-  },
-];
-
 export default function TorneoScreen({ navigation }) {
+  const [busqueda, setBusqueda] = useState('');
+  const [torneos, setTorneos] = useState([]);
+
+  useEffect(() => {
+    const obtenerTorneos = async () => {
+      try {
+        const response = await API.get('/torneos');
+        setTorneos(response.data);
+      } catch (error) {
+        console.error('Error cargando torneos:', error);
+      }
+    };
+
+    obtenerTorneos();
+  }, []);
+
+  const torneosFiltrados = torneos.filter((t) =>
+    ((t.nombreTorneo || '') + ' ' + (t.estado || ''))
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       {/* Franjas decorativas */}
@@ -54,15 +54,30 @@ export default function TorneoScreen({ navigation }) {
 
       <View style={styles.searchWrapper}>
         <View style={styles.searchBox}>
-          <TextInput placeholder="Buscar" placeholderTextColor="#666" style={styles.input} />
+          <TextInput
+            placeholder="Buscar"
+            placeholderTextColor="#666"
+            style={styles.input}
+            value={busqueda}
+            onChangeText={setBusqueda}
+          />
         </View>
-        <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Buscar</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Buscar</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {torneos.map((torneo, i) => (
+        {torneosFiltrados.map((torneo, i) => (
           <View key={i} style={styles.cardTorneo}>
-            <CardListTorneos {...torneo} navigation={navigation} />
+            <CardListTorneos
+              logo={{ uri: torneo.logoSeleccionado }}
+              nombre={torneo.nombreTorneo}
+              estado={torneo.estado}
+              fecha={torneo.fechaInicio}
+              clubes={torneo.numeroEquipos}
+              navigation={navigation}
+            />
           </View>
         ))}
       </ScrollView>

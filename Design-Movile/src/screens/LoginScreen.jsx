@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, StyleSheet,
-  TouchableOpacity, Modal, Image, Dimensions
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Image,
+  Dimensions,
+  Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import RegistroModal from './RegistroModal';
+import API from '../api/api'; // Asegúrate de que la ruta es correcta
 
 const { width } = Dimensions.get('window');
 
@@ -14,13 +23,33 @@ export default function LoginScreen() {
   const [mostrarModal, setMostrarModal] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    if (correo === 'arbitro@gmail.com') {
-      navigation.replace('ArbitroHome');
-    } else if (correo === 'dueno@gmail.com') {
-      navigation.replace('CuentaDueno');
-    } else {
-      alert('Correo no válido');
+  const handleLogin = async () => {
+    try {
+      console.log('📤 Enviando datos:', { correo, password });
+
+      const res = await API.post('/auth/login', {
+        email: correo,
+        password: password,
+      });
+
+      const { token, rol } = res.data;
+
+      console.log('✅ Token recibido:', token);
+      console.log('🎭 Rol:', rol);
+
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('rol', rol);
+
+      if (rol === 'ARBITRO') {
+        navigation.replace('ArbitroHome');
+      } else if (rol === 'DUENO') {
+        navigation.replace('CuentaDueno');
+      } else {
+        Alert.alert('Error', 'Rol no reconocido');
+      }
+    } catch (error) {
+      console.log('❌ Error de login:', error.response?.data || error.message);
+      Alert.alert('Error', 'Credenciales inválidas');
     }
   };
 
@@ -58,7 +87,10 @@ export default function LoginScreen() {
           <Text style={styles.botonTexto}>Ingresar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.botonRegistrar} onPress={() => setMostrarModal(true)}>
+        <TouchableOpacity
+          style={styles.botonRegistrar}
+          onPress={() => setMostrarModal(true)}
+        >
           <Text style={styles.botonTextoSecundario}>Registrarse</Text>
         </TouchableOpacity>
       </View>
