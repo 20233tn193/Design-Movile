@@ -9,32 +9,29 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import ModalInformacionCredenciales from './ModalInfoCredenciales';
+
+import ModalPagoComprobacion from './ModalPagoComprobacion';
 
 const { width } = Dimensions.get('window');
 
 export default function PagoStripeScreen({ navigation }) {
-  const [modalInfoVisible, setModalInfoVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handlePago = () => {
-    // Simulación de pago exitoso
-    navigation.navigate('PagosDueno', { mostrarModalComprobacion: true });
+    setModalVisible(true); // Muestra modal
   };
-  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Logo */}
       <Image
         source={require('../../../assets/madrid.png')}
         style={styles.logo}
         resizeMode="contain"
       />
 
-      <Text style={styles.titulo}>Torneo Infantil - Arbitraje</Text>
-      <Text style={styles.monto}>$50</Text>
+      <Text style={styles.titulo}>Torneo Infantil - Inscripción</Text>
+      <Text style={styles.monto}>$900</Text>
 
-      {/* Botones de método de pago */}
       <TouchableOpacity style={styles.btnApple}>
         <Text style={styles.btnAppleText}> Pay</Text>
       </TouchableOpacity>
@@ -45,7 +42,6 @@ export default function PagoStripeScreen({ navigation }) {
 
       <Text style={styles.separator}>O paga con otra opción</Text>
 
-      {/* Campos del formulario */}
       <TextInput placeholder="Email" style={styles.input} />
       <TextInput placeholder="Card number" style={styles.input} keyboardType="numeric" />
 
@@ -57,20 +53,20 @@ export default function PagoStripeScreen({ navigation }) {
       <TextInput placeholder="País o región" style={styles.input} />
       <TextInput placeholder="Código postal" style={styles.input} />
 
-      {/* Botón de pago */}
       <TouchableOpacity style={styles.btnPagar} onPress={handlePago}>
-        <Text style={styles.btnPagarText}>Pagar $50</Text>
+        <Text style={styles.btnPagarText}>Pagar $900</Text>
       </TouchableOpacity>
 
-      {/* Modal de confirmación */}
-      <ModalInformacionCredenciales
-  visible={modalInfoVisible}
-  onClose={() => {
-    setModalInfoVisible(false);
-    navigation.navigate('PagosDueno', { mostrarModalComprobacion: true });
-  }}
-/>
- </ScrollView>
+      {/* Modal de comprobación */}
+      <ModalPagoComprobacion
+        visible={modalVisible}
+        onClose={() => {
+          setModalVisible(false);
+          navigation.navigate('InscripcionAprobado'); // ✅ Redirige a pantalla correcta
+        }}
+        navigation={navigation}
+      />
+    </ScrollView>
   );
 }
 

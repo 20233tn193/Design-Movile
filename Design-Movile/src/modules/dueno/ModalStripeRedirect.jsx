@@ -10,7 +10,7 @@ import {
 
 const { width } = Dimensions.get('window');
 
-export default function ModalStripeRedirect({ visible, onClose, onConfirm }) {
+export default function ModalStripeRedirect({ visible, onClose, navigation }) {
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
@@ -22,7 +22,13 @@ export default function ModalStripeRedirect({ visible, onClose, onConfirm }) {
           </Text>
 
           <View style={styles.botonesContainer}>
-            <TouchableOpacity style={styles.btnVerde} onPress={onConfirm}>
+            <TouchableOpacity
+              style={styles.btnVerde}
+              onPress={() => {
+                onClose(); // cerramos el modal
+                navigation.navigate('PagoStripe'); // redirigimos correctamente
+              }}
+            >
               <Text style={styles.textoBoton}>ACEPTAR</Text>
             </TouchableOpacity>
 
@@ -78,13 +84,13 @@ const styles = StyleSheet.create({
   btnVerde: {
     backgroundColor: 'green',
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     borderRadius: 6,
   },
   btnGris: {
     backgroundColor: '#333',
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     borderRadius: 6,
   },
   textoBoton: {

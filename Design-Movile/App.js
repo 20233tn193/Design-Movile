@@ -37,7 +37,10 @@ import PagoStripeScreen from './src/modules/dueno/PagoStripeScreen';
 import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
-import ModalStripeRedirect from './src/modules/dueno/ModalStripeRedirect';
+
+// 🆕 Nuevas pantallas agregadas
+import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
+import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
 
 // 🔐 Login único
 import LoginScreen from './src/screens/LoginScreen';
@@ -86,10 +89,12 @@ export default function App() {
         <Stack.Screen name="ConfirmarInscripcion" component={ConfirmarInscripcionScreen} />
         <Stack.Screen name="ConfirmarPago" component={ConfirmarPagoScreen} />
         <Stack.Screen name="PagoStripe" component={PagoStripeScreen} />
-        <Stack.Screen name="ModalInforCredenciales" component={ModalInfoCredenciales} />
+        <Stack.Screen name="ModalInfoCredenciales" component={ModalInfoCredenciales} />
         <Stack.Screen name="ModalConfirmarDescargaCredenciales" component={ModalConfirmarDescargaCredenciales} />
         <Stack.Screen name="ModalConfirmarEliminacion" component={ModalConfirmarEliminacion} />
-        <Stack.Screen name="ModalStripeRedirect" component={ModalStripeRedirect} />
+        {/* 🆕 Nuevas pantallas registradas */}
+        <Stack.Screen name="RegistroJugadorScreen" component={RegistroJugadorScreen} />
+        <Stack.Screen name="DetallesJugadorScreen" component={DetallesJugadorScreen} />
       </Stack.Navigator>
 
       <StatusBar style="light" />

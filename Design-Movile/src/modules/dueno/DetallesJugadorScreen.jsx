@@ -62,7 +62,7 @@ export default function DetallesJugadorScreen({ navigation }) {
 
       {/* Logo Manhattan */}
       <Image
-        source={require('../../../assets/logo_manhattan.png')}
+        source={require('../../../assets/manhattan_logo.jpg')}
         style={styles.logo}
         resizeMode="contain"
       />
@@ -83,11 +83,14 @@ const styles = StyleSheet.create({
     top: 0,
     backgroundColor: '#000',
     width: '100%',
-    padding: 12,
+    paddingTop: 30,         // <-- este es el ajuste clave
+    paddingBottom: 12,
+    paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 10,
   },
+  
   headerText: {
     color: '#FDBA12',
     fontWeight: 'bold',
