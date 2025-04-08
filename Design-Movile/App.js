@@ -13,12 +13,17 @@ import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
 import TarjetasScreen from './src/modules/home/TarjetasScreen';
 import Estadisticas from './src/modules/home/Estadisticas';
 
-// 🧑‍⚖️ Árbitro
+// 🔐 Login único
+import LoginScreen from './src/screens/LoginScreen';
+
+// ⚖️ Árbitro
+import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
+import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
 import DetallePartidoScreen from './src/modules/arbitro/DetallePartidoScreen';
 import RegistroCerradoScreen from './src/modules/arbitro/RegistroCerradoScreen';
 import ModalConfirmacion from './src/modules/arbitro/ModalConfirmacion';
 
-// 🧑‍💼 Dueño
+// 📋 Dueño
 import CuentaDuenoScreen from './src/modules/dueno/CuentaDuenoScreen';
 import CuentaDuenoEquipoScreen from './src/modules/dueno/CuentaDuenoEquipoScreen';
 import DetalleTorneoDuenoScreen from './src/modules/dueno/DetalleTorneoDuenoScreen';
@@ -37,15 +42,8 @@ import PagoStripeScreen from './src/modules/dueno/PagoStripeScreen';
 import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
-
-// 🆕 Nuevas pantallas agregadas
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
-
-// 🔐 Login único
-import LoginScreen from './src/screens/LoginScreen';
-import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
-import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,22 +63,23 @@ export default function App() {
 
         {/* 🔐 Login único */}
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="LoginScreen" component={LoginScreen} />
 
         {/* ⚖️ Árbitro */}
-        <Stack.Screen name="ArbitroHome" component={ArbitroHomeScreen} />
+        <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
         <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
         <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
         <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
         <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
 
         {/* 📋 Dueño */}
-        <Stack.Screen name="CuentaDueno" component={CuentaDuenoScreen} />
+        <Stack.Screen name="CuentaDuenoScreen" component={CuentaDuenoScreen} />
         <Stack.Screen name="CuentaDuenoEquipo" component={CuentaDuenoEquipoScreen} />
         <Stack.Screen name="DetalleTorneoDueno" component={DetalleTorneoDuenoScreen} />
         <Stack.Screen name="JugadoresRegistradosDueno" component={JugadoresRegistradosDuenoScreen} />
-        <Stack.Screen name="RegistroDueno" component={RegistroDuenoScreen} />
+        <Stack.Screen name="RegistroDuenoScreen" component={RegistroDuenoScreen} />
         <Stack.Screen name="RegistroEquipoDueno" component={RegistroEquipoDueno} />
-        <Stack.Screen name="RegistroEquipo" component={RegistroEquipoScreen} />
+        <Stack.Screen name="RegistroEquipoScreen" component={RegistroEquipoScreen} />
         <Stack.Screen name="ActualizarEquipoScreen" component={ActualizarEquipoScreen} />
         <Stack.Screen name="ActualizarCuentaDueno" component={ActualizarCuentaDuenoScreen} />
         <Stack.Screen name="InscripcionesDueno" component={InscripcionesDuenoScreen} />
@@ -92,7 +91,6 @@ export default function App() {
         <Stack.Screen name="ModalInfoCredenciales" component={ModalInfoCredenciales} />
         <Stack.Screen name="ModalConfirmarDescargaCredenciales" component={ModalConfirmarDescargaCredenciales} />
         <Stack.Screen name="ModalConfirmarEliminacion" component={ModalConfirmarEliminacion} />
-        {/* 🆕 Nuevas pantallas registradas */}
         <Stack.Screen name="RegistroJugadorScreen" component={RegistroJugadorScreen} />
         <Stack.Screen name="DetallesJugadorScreen" component={DetallesJugadorScreen} />
       </Stack.Navigator>

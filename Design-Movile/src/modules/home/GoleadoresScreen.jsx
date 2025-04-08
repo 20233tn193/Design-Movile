@@ -1,35 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
-
 import { Icon } from '@rneui/themed';
+import API from '../../api/api'; // Ajusta si es necesario
 
 const { width } = Dimensions.get('window');
 
-const datos = Array(5).fill({
-  nombre: 'Hanna Perez',
-  equipo: 'Madrid',
-  goles: 23,
-  logo: require('../../../assets/madrid.png'),
-});
+export default function GoleadoresScreen({ route }) {
+  const { torneoId } = route.params;
+  const [goleadores, setGoleadores] = useState([]);
 
-export default function GoleadoresScreen() {
+  useEffect(() => {
+    const cargarGoleadores = async () => {
+      try {
+        const response = await API.get(`/estadisticas/goleadores/${torneoId}`);
+        setGoleadores(response.data);
+      } catch (error) {
+        console.error('Error al obtener goleadores:', error);
+      }
+    };
+
+    cargarGoleadores();
+  }, [torneoId]);
+
   return (
     <View style={styles.container}>
-      {/* Franjas superiores */}
+      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Franjas inferiores */}
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
+      {/* Header */}
       <View style={styles.header}>
         <Image source={require('../../../assets/Goleadores.png')} style={styles.icono} />
         <Text style={styles.title}> Goleadores</Text>
       </View>
 
+      {/* Encabezados */}
       <View style={styles.tableHeader}>
         <Text style={styles.columnHeader}>Nombre</Text>
         <Text style={styles.columnHeader}>Equipo</Text>
@@ -37,22 +46,23 @@ export default function GoleadoresScreen() {
       </View>
 
       <FlatList
-        data={datos}
+        data={goleadores}
         keyExtractor={(_, i) => i.toString()}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <Text style={styles.column}>{item.nombre}</Text>
+            <Text style={styles.column}>{item.nombreJugador}</Text>
             <View style={styles.equipo}>
-              <Image source={item.logo} style={styles.logo} />
-              <Text style={styles.equipoText}>{item.equipo}</Text>
+              <Image
+                source={{ uri: item.logoEquipo || 'https://via.placeholder.com/40' }}
+                style={styles.logo}
+              />
+              <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
             <Text style={styles.column}>{item.goles}</Text>
           </View>
         )}
       />
-
-    
     </View>
   );
 }
@@ -172,5 +182,5 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginRight: 10,
-  }
+  },
 });
