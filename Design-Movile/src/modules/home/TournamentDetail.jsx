@@ -4,10 +4,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'rea
 const { width } = Dimensions.get('window');
 
 export default function TournamentDetail({ route, navigation }) {
-  const { nombre } = route.params;
+  const { nombre, torneoId } = route.params; // ahora también recibimos torneoId
 
   const buttons = [
-    { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones .png'), ruta: 'TablaPosiciones' },
+    { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones.png'), ruta: 'TablaPosiciones' },
     { label: 'Próximos Partidos', icon: require('../../../assets/ProximosPartidos.png'), ruta: 'Partidos' },
     { label: 'Maximos Goleadores', icon: require('../../../assets/Goleadores.png'), ruta: 'Goleadores' },
     { label: 'Tarjetas', icon: require('../../../assets/Tarjetas.png'), ruta: 'Tarjetas' },
@@ -35,15 +35,13 @@ export default function TournamentDetail({ route, navigation }) {
           <TouchableOpacity
             key={i}
             style={styles.card}
-            onPress={() => navigation.navigate(btn.ruta)}
+            onPress={() => navigation.navigate(btn.ruta, { torneoId })} // pasamos torneoId
           >
             <Image source={btn.icon} style={styles.iconoBoton} />
             <Text style={styles.text}>{btn.label}</Text>
           </TouchableOpacity>
         ))}
       </View>
-
-      
     </View>
   );
 }

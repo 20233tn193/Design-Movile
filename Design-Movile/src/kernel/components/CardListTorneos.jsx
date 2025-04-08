@@ -1,13 +1,9 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 
-export default function CardListTorneos({ logo, nombre, estado, fecha, clubes, navigation }) {
-  const irADetalles = () => {
-    navigation.navigate('TournamentDetail', { nombre });
-  };
-
+export default function CardListTorneos({ logo, nombre, estado, fecha, clubes }) {
   return (
-    <TouchableOpacity onPress={irADetalles} style={styles.card}>
+    <View style={styles.card}>
       <View style={styles.container}>
         <Image source={logo} style={styles.logo} />
         <View style={styles.details}>
@@ -18,7 +14,7 @@ export default function CardListTorneos({ logo, nombre, estado, fecha, clubes, n
           <Text style={styles.info}>Clubes: {clubes} • Fecha: {fecha}</Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -37,11 +33,10 @@ const styles = StyleSheet.create({
   logo: {
     width: 40,
     height: 40,
-    resizeMode: 'contain', // para mantener proporción
-    borderRadius: 60, // opcional si quieres dar forma circular suave
-    backgroundColor: 'transparent', // por si acaso
-  }
-  ,
+    resizeMode: 'contain',
+    borderRadius: 60,
+    backgroundColor: 'transparent',
+  },
   details: {
     marginLeft: 15,
     flex: 1,

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import CardListTorneos from '../../kernel/components/CardListTorneos';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // Asegúrate de que este path sea correcto
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
@@ -69,16 +69,24 @@ export default function TorneoScreen({ navigation }) {
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         {torneosFiltrados.map((torneo, i) => (
-          <View key={i} style={styles.cardTorneo}>
+          <TouchableOpacity
+            key={i}
+            style={styles.cardTorneo}
+            onPress={() =>
+              navigation.navigate('TournamentDetail', {
+                torneoId: torneo._id,
+                nombre: torneo.nombreTorneo,
+              })
+            }
+          >
             <CardListTorneos
               logo={{ uri: torneo.logoSeleccionado }}
               nombre={torneo.nombreTorneo}
               estado={torneo.estado}
               fecha={torneo.fechaInicio}
               clubes={torneo.numeroEquipos}
-              navigation={navigation}
             />
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
