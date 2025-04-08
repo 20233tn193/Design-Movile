@@ -1,31 +1,46 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, FlatList, Dimensions } from 'react-native';
-
-import { Icon } from '@rneui/themed';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  Dimensions,
+} from 'react-native';
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
-const datos = Array(6).fill({
-  equipo: 'Madrid',
-  logo: require('../../../assets/madrid.png'),
-  pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0
-});
+export default function TablaPosiciones({ route }) {
+  const { torneoId } = route.params;
+  const [tabla, setTabla] = useState([]);
 
-export default function TablaPosiciones() {
+  useEffect(() => {
+    const cargarTabla = async () => {
+      try {
+        const response = await API.get(`/estadisticas/tabla-posiciones/${torneoId}`);
+        setTabla(response.data);
+      } catch (error) {
+        console.error('Error al obtener tabla de posiciones:', error);
+      }
+    };
+
+    cargarTabla();
+  }, [torneoId]);
+
   return (
     <View style={styles.container}>
       {/* Franjas superiores */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
-
       {/* Franjas inferiores */}
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/Posiciones .png')} style={styles.icono} />
+        <Image source={require('../../../assets/Posiciones.png')} style={styles.icono} />
         <Text style={styles.headerText}> Tabla de Posiciones</Text>
       </View>
 
@@ -41,14 +56,17 @@ export default function TablaPosiciones() {
       </View>
 
       <FlatList
-        data={datos}
-        keyExtractor={(_, i) => i.toString()}
+        data={tabla}
+        keyExtractor={(item, index) => item.equipoId + index}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.equipo}>
-              <Image source={item.logo} style={styles.logo} />
-              <Text style={styles.equipoText}>{item.equipo}</Text>
+              <Image
+                source={{ uri: item.logoEquipo }}
+                style={styles.logo}
+              />
+              <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
             <Text style={styles.column}>{item.pj}</Text>
             <Text style={styles.column}>{item.pg}</Text>
@@ -56,17 +74,16 @@ export default function TablaPosiciones() {
             <Text style={styles.column}>{item.pp}</Text>
             <Text style={styles.column}>{item.gf}</Text>
             <Text style={styles.column}>{item.gc}</Text>
-            <Text style={styles.column}>{item.pts}</Text>
+            <Text style={styles.column}>{item.puntos}</Text>
           </View>
         )}
       />
-
-     
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // ... (misma definición de estilos que ya tienes)
   container: {
     flex: 1,
     backgroundColor: '#f2f2f2',
@@ -134,6 +151,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
   },
+  icono: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+    marginRight: 10,
+  },
   franja: {
     position: 'absolute',
     width: width * 2,
@@ -176,10 +199,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#d80027',
     transform: [{ rotate: '10deg' }],
   },
-  icono: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
-    marginRight: 10,
-  }
 });
