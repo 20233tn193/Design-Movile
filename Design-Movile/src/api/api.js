@@ -52,5 +52,14 @@ export const obtenerEquipoPorDueno = async (duenoId) => {
   }
 };
 
+export const actualizarUsuarioDesdeDueno = async (duenoId, datosUsuario) => {
+  try {
+    const response = await API.put(`/duenos/${duenoId}/usuario`, datosUsuario);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al actualizar el usuario desde el dueño:', error.response?.data || error.message);
+    throw error;
+  }
+};
 
 export default API;

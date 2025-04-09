@@ -8,10 +8,11 @@ import {
   Dimensions,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import API from '../../api/api'; // ← Ruta corregida según estructura real
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
@@ -21,10 +22,17 @@ export default function RegistroDuenoScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [confirmar, setConfirmar] = useState('');
+  const [loading, setLoading] = useState(false); // loader
 
   const handleCrearCuenta = async () => {
     if (!nombre || !apellido || !email || !contrasena || !confirmar) {
       Alert.alert('Campos incompletos', 'Por favor completa todos los campos');
+      return;
+    }
+
+    const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!correoRegex.test(email)) {
+      Alert.alert('Correo inválido', 'Por favor ingresa un correo válido');
       return;
     }
 
@@ -33,30 +41,30 @@ export default function RegistroDuenoScreen({ navigation }) {
       return;
     }
 
+    setLoading(true);
     try {
-      const usuarioResponse = await API.post('/auth/register', {
+      const response = await API.post('/auth/register/dueno', {
         email,
         password: contrasena,
         roles: ['DUENO'],
-      });
-
-      const idUsuario = usuarioResponse.data.id;
-      const token = usuarioResponse.data.token;
-
-      await AsyncStorage.setItem('token', token);
-
-      await API.post('/dueno', {
         nombre,
         apellido,
-        email,
-        idUsuario,
       });
 
-      Alert.alert('Éxito', 'Cuenta creada correctamente');
-      navigation.navigate('CuentaDuenoScreen');
+      const { token, usuarioId } = response.data;
+
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('usuarioId', usuarioId);
+      await AsyncStorage.setItem('duenoId', response.data.duenoId); // por si lo devuelves
+      await AsyncStorage.setItem('correo', email);
+
+      Alert.alert('Cuenta creada', 'Tu cuenta fue creada correctamente');
+      navigation.replace('BottomTabs');
     } catch (error) {
-      console.error('Error al registrar dueño:', error.response?.data || error.message);
+      console.error('❌ Error al registrar dueño:', error.response?.data || error.message);
       Alert.alert('Error', 'No se pudo registrar el usuario');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,9 +91,13 @@ export default function RegistroDuenoScreen({ navigation }) {
         <TextInput style={styles.input} placeholder="Contraseña" secureTextEntry value={contrasena} onChangeText={setContrasena} />
         <TextInput style={styles.input} placeholder="Confirmar contraseña" secureTextEntry value={confirmar} onChangeText={setConfirmar} />
 
-        <TouchableOpacity style={styles.btnCrear} onPress={handleCrearCuenta}>
-          <Text style={styles.btnTexto}>Crear Cuenta</Text>
-        </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 10 }} />
+        ) : (
+          <TouchableOpacity style={styles.btnCrear} onPress={handleCrearCuenta}>
+            <Text style={styles.btnTexto}>Crear Cuenta</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.link}>Ya tengo cuenta</Text>

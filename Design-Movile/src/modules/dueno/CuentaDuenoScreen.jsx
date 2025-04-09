@@ -12,6 +12,7 @@ import { Icon } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { obtenerDuenoPorId, obtenerEquipoPorDueno } from "../../api/api";
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get("window");
 
@@ -37,46 +38,51 @@ export default function CuentaDuenoScreen() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const duenoId = await AsyncStorage.getItem("duenoId");
-        const token = await AsyncStorage.getItem("token");
-        const email = await AsyncStorage.getItem("correo");
-        setCorreo(email); // guarda el correo ingresado manualmente
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const duenoId = await AsyncStorage.getItem("duenoId");
+          const token = await AsyncStorage.getItem("token");
 
-        console.log("✅ duenoId:", duenoId);
-        console.log("✅ token:", token);
-        console.log('🖼 Logo del equipo:', equipo?.logoUrl);
+          console.log("✅ duenoId:", duenoId);
+          console.log("✅ token:", token);
 
-        if (!duenoId) {
-          console.warn("⚠️ No se encontró duenoId");
-          return;
+          if (!duenoId) {
+            console.warn("⚠️ No se encontró duenoId");
+            return;
+          }
+
+          const duenoData = await obtenerDuenoPorId(duenoId);
+          console.log("📦 Datos del dueño:", duenoData);
+          setDueno(duenoData);
+
+          const equipos = await obtenerEquipoPorDueno(duenoId);
+          console.log("📦 Equipos del dueño:", equipos);
+
+          if (equipos.length > 0) {
+            setEquipo(equipos[0]);
+            console.log("✅ Primer equipo:", equipos[0]);
+          } else {
+            setEquipo(null);
+            console.log("ℹ️ El dueño no tiene equipos registrados.");
+          }
+          const correoGuardado = await AsyncStorage.getItem("correo");
+          setCorreo(correoGuardado);
+
+
+        } catch (error) {
+          console.error("❌ Error cargando datos:", error);
+        } finally {
+          setLoading(false);
         }
+      };
 
-        const duenoData = await obtenerDuenoPorId(duenoId);
-        console.log("📦 Datos del dueño:", duenoData);
-        setDueno(duenoData);
+      fetchData();
 
-        const equipos = await obtenerEquipoPorDueno(duenoId);
-        console.log("📦 Equipos del dueño:", equipos);
-
-        if (equipos.length > 0) {
-          setEquipo(equipos[0]);
-          console.log("✅ Primer equipo:", equipos[0]);
-        } else {
-          console.log("ℹ️ El dueño no tiene equipos registrados.");
-        }
-
-      } catch (error) {
-        console.error("❌ Error cargando datos:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+      // Cleanup no necesario en este caso
+    }, [])
+  );
 
 
   return (
@@ -155,7 +161,7 @@ export default function CuentaDuenoScreen() {
             </TouchableOpacity>
 
             <Image
-              source={require("../../../assets/manhattan_logo.jpg")}
+              source={require("../../../assets/ManhattanLogoRojo.png")}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -220,7 +226,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#000",
     padding: 12,
-    paddingTop: 30,
+    paddingTop: 50,
     width: "100%",
     zIndex: 2,
   },
@@ -304,9 +310,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   logo: {
-    width: 160,
-    height: 60,
-    marginTop: 25,
+    width: 200,
+    height: 200,
+    marginTop: 70,
   },
   bottomTabs: {
     flexDirection: "row",

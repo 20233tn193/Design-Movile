@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,
-    paddingTop: 50,
+    paddingTop: 50, //Aqui modificamos para que se baje mas el header
     zIndex: 10,
   },
   title: {

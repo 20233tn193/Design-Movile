@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,26 +7,105 @@ import {
   StyleSheet,
   Dimensions,
   SafeAreaView,
+  Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '@rneui/themed';
+import { obtenerDuenoPorId, actualizarUsuarioDesdeDueno } from '../../api/api';
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
 export default function ActualizarCuentaDuenoScreen({ navigation }) {
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [duenoId, setDuenoId] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmarPassword, setConfirmarPassword] = useState('');
+  const [usuarioId, setUsuarioId] = useState('');
+
+  const [idUsuario, setIdUsuario] = useState('');
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      const id = await AsyncStorage.getItem('duenoId');
+      const email = await AsyncStorage.getItem('correo');
+      const usuarioId = await AsyncStorage.getItem('usuarioId'); // 👈 importante
+      setDuenoId(id);
+      setIdUsuario(usuarioId); // 👈 guarda el usuarioId
+      setCorreo(email || '');
+
+      try {
+        const dueno = await obtenerDuenoPorId(id);
+        setNombre(dueno.nombre);
+        setApellido(dueno.apellido);
+      } catch (error) {
+        Alert.alert('Error', 'No se pudo cargar la información');
+      }
+    };
+
+    cargarDatos();
+  }, []);
+
+  const handleActualizar = async () => {
+    console.log('🟡 Intentando actualizar...');
+
+    // Validaciones
+    if (!nombre || !apellido) {
+      Alert.alert('Campos vacíos', 'Nombre y Apellido son obligatorios');
+      return;
+    }
+
+    if (!correo) {
+      Alert.alert('Correo requerido', 'El correo no puede estar vacío');
+      return;
+    }
+
+    const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!correoRegex.test(correo)) {
+      Alert.alert('Correo inválido', 'Por favor ingresa un correo válido');
+      return;
+    }
+
+    try {
+      console.log('🔵 Enviando PUT al dueño...');
+      await API.put(`/duenos/${duenoId}`, { nombre, apellido, idUsuario });
+
+      console.log('🔵 Enviando PUT al usuario...');
+      const userUpdateBody = { email: correo };
+
+      if (password && confirmarPassword) {
+        if (password !== confirmarPassword) {
+          Alert.alert('Error', 'Las contraseñas no coinciden');
+          return;
+        }
+        userUpdateBody.password = password;
+      }
+
+      await API.put(`/duenos/${duenoId}/usuario`, userUpdateBody);
+      await AsyncStorage.setItem('correo', correo); // ✅ aquí
+
+      Alert.alert('Éxito', 'Datos actualizados correctamente');
+      navigation.goBack();
+    } catch (error) {
+      console.error('❌ Error actualizando cuenta:', error.response?.data || error.message);
+      Alert.alert('Error', 'No se pudo actualizar la cuenta');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Encabezado con ícono y texto */}
+      {/* Header */}
       <View style={styles.header}>
         <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Actualizar Cuenta</Text>
       </View>
 
-      {/* Franjas superiores */}
+      {/* Franjas decorativas */}
       <View style={styles.triangleTopRed} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Franjas inferiores */}
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
@@ -34,13 +113,40 @@ export default function ActualizarCuentaDuenoScreen({ navigation }) {
       <View style={styles.content}>
         <Text style={styles.titulo}>Ingrese sus datos</Text>
 
-        <TextInput placeholder="Nombre" style={styles.input} />
-        <TextInput placeholder="Apellido" style={styles.input} />
-        <TextInput placeholder="20233tn152@utez.edu.mx" style={styles.input} />
-        <TextInput placeholder="Contraseña" secureTextEntry style={styles.input} />
-        <TextInput placeholder="Confirmar contraseña" secureTextEntry style={styles.input} />
+        <TextInput
+          placeholder="Nombre"
+          style={styles.input}
+          value={nombre}
+          onChangeText={setNombre}
+        />
+        <TextInput
+          placeholder="Apellido"
+          style={styles.input}
+          value={apellido}
+          onChangeText={setApellido}
+        />
+        <TextInput
+          placeholder="Correo"
+          style={styles.input}
+          value={correo}
+          onChangeText={setCorreo}
+        />
+        <TextInput
+          placeholder="Contraseña"
+          secureTextEntry
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TextInput
+          placeholder="Confirmar contraseña"
+          secureTextEntry
+          style={styles.input}
+          value={confirmarPassword}
+          onChangeText={setConfirmarPassword}
+        />
 
-        <TouchableOpacity style={styles.botonPrimario}>
+        <TouchableOpacity style={styles.botonPrimario} onPress={handleActualizar}>
           <Text style={styles.botonTexto}>Actualizar</Text>
         </TouchableOpacity>
 
@@ -64,7 +170,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   headerText: { color: '#FDBA12', fontSize: 18, fontWeight: 'bold' },
-
   content: {
     zIndex: 10,
     width: '85%',
@@ -108,7 +213,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
-
   triangleTopRed: {
     position: 'absolute',
     top: 0,

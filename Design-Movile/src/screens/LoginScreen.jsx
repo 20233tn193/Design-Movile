@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import RegistroModal from './RegistroModal';
 import API from '../api/api'; // Asegúrate de que la ruta es correcta
 import { obtenerDuenoPorUsuarioId } from '../api/api';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -22,6 +23,7 @@ export default function LoginScreen() {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,8 +31,17 @@ export default function LoginScreen() {
       return;
     }
   
+    // 🧠 Validar formato de correo
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexCorreo.test(email)) {
+      Alert.alert('Correo inválido', 'Por favor ingresa un correo con formato válido');
+      return;
+    }
+  
+    setLoading(true);
+  
     try {
-      const response = await API.post('/auth/login', { email, password });
+      const response = await API.post('/auth/login', { email, password }, { timeout: 3000 });
       const { token, rol, usuarioId } = response.data;
   
       console.log('✅ Token recibido:', token);
@@ -39,24 +50,41 @@ export default function LoginScreen() {
   
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('rol', rol);
+      await AsyncStorage.setItem('usuarioId', usuarioId);
+      await AsyncStorage.setItem('correo', email);
   
       if (rol === 'DUENO' && usuarioId) {
         try {
           const response = await API.get(`/duenos/usuario/${usuarioId}`);
           const duenoId = response.data.id;
-      
+  
           console.log('🔑 duenoId real:', duenoId);
           await AsyncStorage.setItem('duenoId', duenoId);
-          await AsyncStorage.setItem('correo', email); // guarda el correo ingresado manualmente
-        } catch (err) {
-          console.warn('⚠️ No se pudo obtener el duenoId');
+          await AsyncStorage.setItem('correo', email);
+        } catch (error) {
+          const mensajeError = error.response?.data?.message || error.response?.data || error.message;
+          console.error('❌ Error en login:', mensajeError);
+  
+          if (
+            mensajeError &&
+            (mensajeError.toLowerCase().includes('credenciales') ||
+             mensajeError.toLowerCase().includes('bad credentials') ||
+             mensajeError.toLowerCase().includes('usuario') ||
+             mensajeError.toLowerCase().includes('password'))
+          ) {
+            Alert.alert('Credenciales inválidas', 'Correo o contraseña incorrectos.');
+          } else {
+            Alert.alert('Error', 'No se pudo iniciar sesión. Intenta más tarde.');
+          }
         }
       }
   
       navigation.replace('BottomTabs');
     } catch (error) {
-      console.error('Error en login:', error.response?.data || error.message);
+      console.log('Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,8 +120,12 @@ export default function LoginScreen() {
           onChangeText={setPassword}
         />
 
-        <TouchableOpacity style={styles.btnLogin} onPress={handleLogin}>
-          <Text style={styles.btnTexto}>Ingresar</Text>
+        <TouchableOpacity style={styles.btnLogin} onPress={handleLogin} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.btnTexto}>Ingresar</Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('RegistroModal')}>
