@@ -1,120 +1,63 @@
 import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import jwtDecode from 'jwt-decode';
 
 const { width } = Dimensions.get('window');
 
-export default function SplashScreen() {
-  const navigation = useNavigation();
-
+export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log("⏩ Redirigiendo a BottomTabs...");
-      navigation.replace('BottomTabs');
-    }, 3000);
+    const verificarSesion = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          const roles = decoded.roles || [];
 
-    return () => clearTimeout(timer);
+          if (roles.includes('ARBITRO')) {
+            console.log('⏩ Redirigiendo a ArbitroHomeScreen...');
+            navigation.replace('ArbitroHomeScreen');
+          } else if (roles.includes('DUENO')) {
+            console.log('⏩ Redirigiendo a CuentaDuenoScreen...');
+            navigation.replace('CuentaDuenoScreen');
+          } else {
+            console.log('⏩ Rol no reconocido, redirigiendo a login...');
+            navigation.replace('LoginScreen');
+          }
+        } catch (error) {
+          console.error('⛔ Token inválido. Redirigiendo a login...');
+          navigation.replace('LoginScreen');
+        }
+      } else {
+        console.log('🔒 No hay token. Redirigiendo a login...');
+        navigation.replace('LoginScreen');
+      }
+    };
+
+    setTimeout(verificarSesion, 1000); // Simula carga breve
   }, []);
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
-
-      {/* Contenido */}
-      <View style={styles.content}>
-        <Image source={require('../../assets/logo.jpg')} style={styles.logo} />
-        <Text style={styles.titulo}>GTF</Text>
-        <Text style={styles.subtitulo}>Sistema de Gestión{'\n'}de Torneos de Fútbol</Text>
-      </View>
+      <Image source={require('../../assets/logo.jpg')} style={styles.logo} />
+      <Text style={styles.text}>GTF</Text>
+      <Text style={styles.subtext}>Sistema de Gestión de Torneos de Fútbol</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    alignItems: 'center',
-    zIndex: 10,
+    flex: 1, backgroundColor: '#fff',
+    justifyContent: 'center', alignItems: 'center',
   },
   logo: {
-    width: 140,
-    height: 140,
-    borderRadius: 70, // Circular
-    marginBottom: 20,
-    borderWidth: 4,
-    borderColor: '#0e1b39',
+    width: 100, height: 100, borderRadius: 50,
   },
-  titulo: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: '#d80027',
-    fontFamily: 'sans-serif-condensed',
-    marginBottom: 8,
+  text: {
+    fontSize: 40, fontWeight: 'bold', color: '#d80027', marginTop: 20,
   },
-  subtitulo: {
-    fontSize: 17,
-    textAlign: 'center',
-    color: '#0e1b39',
-    fontFamily: 'sans-serif',
-    fontWeight: 'bold',
-  },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 100,
-    borderRightWidth: width,
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: 3,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: 0,
-  },
-  franjaNegraTop: {
-    top: 50,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisTop: {
-    top: 80,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 40,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 5,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: -30,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
+  subtext: {
+    fontSize: 16, color: '#0e1b39', marginTop: 5,
   },
 });

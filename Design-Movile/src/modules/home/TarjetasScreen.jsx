@@ -1,26 +1,35 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Icon } from '@rneui/themed';
-
-
+import API from '../../api/api'; // ajusta si tu ruta es distinta
 const { width } = Dimensions.get('window');
 
-const datos = Array(6).fill({
-  jugador: 'Hanna Perez',
-  equipo: 'Madrid',
-  amarillas: 1,
-  rojas: 2,
-});
+export default function TarjetasScreen({ route }) {
+  const { torneoId } = route.params;
+  const [tarjetas, setTarjetas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default function TarjetasScreen() {
+  useEffect(() => {
+    const fetchTarjetas = async () => {
+      try {
+        const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
+        setTarjetas(response.data);
+      } catch (error) {
+        console.error('Error al cargar tarjetas:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTarjetas();
+  }, [torneoId]);
+
   return (
     <View style={styles.container}>
-      {/* Franjas superiores */}
+      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Franjas inferiores */}
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
@@ -39,21 +48,23 @@ export default function TarjetasScreen() {
         </View>
       </View>
 
-      <FlatList
-        data={datos}
-        keyExtractor={(_, i) => i.toString()}
-        contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
-        renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={[styles.text, { width: 120 }]}>{item.jugador}</Text>
-            <Text style={[styles.text, { width: 80 }]}>{item.equipo}</Text>
-            <Text style={styles.text}>{item.amarillas}</Text>
-            <Text style={styles.text}>{item.rojas}</Text>
-          </View>
-        )}
-      />
-
-     
+      {loading ? (
+        <ActivityIndicator color="#d80027" size="large" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={tarjetas}
+          keyExtractor={(_, i) => i.toString()}
+          contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
+          renderItem={({ item }) => (
+            <View style={styles.row}>
+              <Text style={[styles.text, { width: 120 }]}>{item.jugadorId || 'Sin nombre'}</Text>
+              <Text style={[styles.text, { width: 80 }]}>{item.torneoId}</Text>
+              <Text style={styles.text}>{item.amarillas}</Text>
+              <Text style={styles.text}>{item.rojas}</Text>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
