@@ -113,7 +113,7 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('RegistroModal')}>
+        <TouchableOpacity onPress={() => navigation.navigate('RegistroDuenoScreen')}>
           <Text style={styles.link}>¿No tienes cuenta? Regístrate</Text>
         </TouchableOpacity>
       </View>
