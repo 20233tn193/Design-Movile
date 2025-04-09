@@ -10,16 +10,8 @@ import { Icon } from '@rneui/themed';
 
 const { width } = Dimensions.get('window');
 
-const jugadores = [
-  'Hanna Perez',
-  'Hanna Perez',
-  'Hanna Perez',
-  'Hanna Perez',
-  'Hanna Perez',
-];
-
 export default function RegistroCerrado({ route }) {
-  const { asistencias, goles, rojas, amarillas } = route.params;
+  const { asistencias, goles, rojas, amarillas, jugadores } = route.params;
 
   const renderSeccion = (titulo, icono, color, valores) => (
     <View style={styles.seccionContainer}>
@@ -29,10 +21,10 @@ export default function RegistroCerrado({ route }) {
       </View>
       <FlatList
         data={jugadores}
-        keyExtractor={(_, i) => i.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <View style={styles.itemRow}>
-            <Text style={styles.itemNombre}>{item}</Text>
+            <Text style={styles.itemNombre}>{item.nombre} {item.apellido}</Text>
             <Text style={styles.itemValor}>{
               titulo === 'Asistencias' ? (asistencias[index] ? '✅' : '❌') : valores[index]
             }</Text>

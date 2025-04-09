@@ -1,45 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TextInput,
   FlatList,
-  Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
-
-const { width } = Dimensions.get('window');
-
-const partidos = Array(5).fill({
-  equipoLocal: 'Juventus',
-  equipoVisitante: 'Madrid',
-  cancha: 'Los Tamales - Verde',
-  fecha: '23/03/2025',
-  hora: '10:00 am',
-});
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { obtenerPartidosPorArbitro } from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativasSuave'; // <-- Importante
 
 export default function ArbitroHomeScreen({ navigation }) {
+  const [partidos, setPartidos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPartidos = async () => {
+      try {
+        const arbitroId = await AsyncStorage.getItem('arbitroId');
+        if (!arbitroId) {
+          console.warn('⚠️ arbitroId no encontrado');
+          return;
+        }
+
+        const data = await obtenerPartidosPorArbitro(arbitroId);
+        setPartidos(data);
+      } catch (error) {
+        console.error('❌ Error al cargar partidos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPartidos();
+  }, []);
+
   return (
     <View style={styles.container}>
-      {/* Triángulo superior y franjas decorativas */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <FranjasDecorativas /> {/* ✅ Aquí se usa el componente */}
 
-      {/* Franjas inferiores */}
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
-
-      {/* Encabezado */}
       <View style={styles.header}>
         <Icon name="calendar" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Partidos Asignados</Text>
       </View>
 
-      {/* Buscador */}
       <View style={styles.buscadorContainer}>
         <TextInput
           placeholder="Buscar"
@@ -51,34 +58,40 @@ export default function ArbitroHomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Lista de partidos */}
-      <FlatList
-        data={partidos}
-        keyExtractor={(_, i) => i.toString()}
-        contentContainerStyle={{ paddingBottom: 100 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => navigation.navigate('DetallePartido')}>
-            <View style={styles.card}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.vsText}>
-                  {item.equipoLocal} vs {item.equipoVisitante}
-                </Text>
-                <Text style={styles.cardSubText}>{item.cancha}</Text>
-                <Text style={styles.cardSubText}>{item.fecha}    {item.hora}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#001F4E" style={{ marginTop: 30 }} />
+      ) : (
+        <FlatList
+          data={partidos}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => navigation.navigate('DetallePartido', { partidoId: item.id })}>
+              <View style={styles.card}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.vsText}>
+                    {item.equipoLocal?.nombre || 'Local'} vs {item.equipoVisitante?.nombre || 'Visitante'}
+                  </Text>
+                  <Text style={styles.cardSubText}>
+                    {item.nombreCampo} - {item.nombreCancha}
+                  </Text>
+                  <Text style={styles.cardSubText}>
+                    {item.fecha}   {item.hora}
+                  </Text>
+                </View>
+                <Icon
+                  name="map-marker"
+                  type="font-awesome"
+                  color="#ff4d4d"
+                  size={28}
+                  containerStyle={{ marginLeft: 10 }}
+                />
               </View>
-              <Icon
-                name="map-marker"
-                type="font-awesome"
-                color="#ff4d4d"
-                size={28}
-                containerStyle={{ marginLeft: 10 }}
-              />
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+            </TouchableOpacity>
+          )}
+        />
+      )}
 
-      {/* Barra inferior */}
       <View style={styles.bottomTabs}>
         <TouchableOpacity onPress={() => navigation.replace('BottomTabs')}>
           <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
@@ -95,12 +108,7 @@ export default function ArbitroHomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    position: 'relative',
-    overflow: 'hidden',
-  },
+  container: { flex: 1, backgroundColor: '#fff', position: 'relative', overflow: 'hidden' },
   header: {
     backgroundColor: '#000',
     paddingHorizontal: 12,
@@ -110,11 +118,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10,
   },
-  headerText: {
-    color: '#FDBA12',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  headerText: { color: '#FDBA12', fontSize: 18, fontWeight: 'bold' },
   buscadorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -158,59 +162,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 4,
   },
-  cardSubText: {
-    color: '#fff',
-    fontSize: 12,
-    marginBottom: 2,
-  },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 10,
-    left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 70,
-    borderRightWidth: width * 2,
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: 2,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 40,
-    zIndex: -1,
-  },
-  franjaNegraTop: {
-    top: 80,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
-  },
+  cardSubText: { color: '#fff', fontSize: 12, marginBottom: 2 },
   bottomTabs: {
     position: 'absolute',
     bottom: 0,

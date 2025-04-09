@@ -46,6 +46,8 @@ import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarElimina
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
 
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {

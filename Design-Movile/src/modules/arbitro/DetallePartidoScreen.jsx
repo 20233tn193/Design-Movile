@@ -1,31 +1,57 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  FlatList,
-  Dimensions,
-  TouchableOpacity,
+  View, Text, StyleSheet, FlatList,
+  Dimensions, TouchableOpacity, Alert, ActivityIndicator
 } from 'react-native';
 import { Icon } from '@rneui/themed';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import ModalConfirmacion from './ModalConfirmacion';
+import { obtenerPartidoPorId, obtenerJugadoresPorEquipo, registrarResultadoPartido } from '../../api/api';
+import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave';
 
 const { width } = Dimensions.get('window');
 
-const jugadores = ['Hanna Perez', 'Hanna Perez', 'Hanna Perez', 'Hanna Perez', 'Hanna Perez'];
-
 export default function DetallePartidoScreen() {
+  const [partido, setPartido] = useState(null);
+  const [jugadores, setJugadores] = useState([]);
+  const [asistencias, setAsistencias] = useState([]);
+  const [goles, setGoles] = useState([]);
+  const [rojas, setRojas] = useState([]);
+  const [amarillas, setAmarillas] = useState([]);
   const [seccion, setSeccion] = useState('Asistencia');
-  const [asistencias, setAsistencias] = useState([true, true, false, false, false]);
-  const [goles, setGoles] = useState([0, 0, 0, 0, 0]);
-  const [rojas, setRojas] = useState([0, 0, 0, 0, 0]);
-  const [amarillas, setAmarillas] = useState([0, 0, 0, 0, 0]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [registroCerrado, setRegistroCerrado] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
+  const route = useRoute();
+  const { partidoId } = route.params;
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const p = await obtenerPartidoPorId(partidoId);
+        setPartido(p);
+
+        const jugadoresLocal = await obtenerJugadoresPorEquipo(p.equipoAId);
+        const jugadoresVisitante = await obtenerJugadoresPorEquipo(p.equipoBId);
+        const todos = [...jugadoresLocal, ...jugadoresVisitante];
+        setJugadores(todos);
+
+        setAsistencias(todos.map(() => false));
+        setGoles(todos.map(() => 0));
+        setRojas(todos.map(() => 0));
+        setAmarillas(todos.map(() => 0));
+      } catch (err) {
+        console.error('Error al cargar partido o jugadores:', err);
+        Alert.alert('Error', 'No se pudo cargar la información del partido.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarDatos();
+  }, [partidoId]);
 
   const aumentar = (arr, setArr, i) => {
     if (registroCerrado) return;
@@ -52,39 +78,53 @@ export default function DetallePartidoScreen() {
     setModalVisible(true);
   };
 
-  const confirmarCierre = () => {
+  const confirmarCierre = async () => {
     setModalVisible(false);
     setRegistroCerrado(true);
-    // Podrías enviar los datos si lo deseas aquí
+
+    try {
+      const registro = jugadores.map((jugador, index) => ({
+        jugadorId: jugador.id,
+        asistencia: asistencias[index],
+        goles: goles[index],
+        amarillas: amarillas[index],
+        rojas: rojas[index],
+      }));
+
+      await registrarResultadoPartido(partidoId, registro);
+      navigation.replace('RegistroCerrado', {
+        asistencias,
+        goles,
+        rojas,
+        amarillas,
+      });
+    } catch (err) {
+      console.error('Error al registrar resultado:', err);
+      Alert.alert('Error', 'No se pudo guardar el resultado.');
+    }
   };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 40 }} />;
+  }
 
   return (
     <View style={styles.container}>
-      {/* Triángulo superior y franjas decorativas */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <View style={StyleSheet.absoluteFill}>
+        <FranjasDecorativasSuave />
+      </View>
 
-      {/* Encabezado */}
+      {/* Encabezado de pantalla */}
       <View style={styles.header}>
-        <Icon name="fire" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
+        <Icon name="fire" type="font-awesome" color="#FDBA12" size={18} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Detalles del Partido</Text>
       </View>
 
-      {/* Buscador */}
-      <View style={styles.buscadorContainer}>
-        <TextInput placeholder="Buscar" placeholderTextColor="#555" style={styles.inputBuscar} />
-        <TouchableOpacity style={styles.btnBuscar}>
-          <Text style={styles.btnBuscarText}>Buscar</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Card de partido */}
+      {/* Card del partido */}
       <View style={styles.matchCard}>
-        <Text style={styles.matchTitle}>Juventus vs Madrid</Text>
+        <Text style={styles.matchTitle}>
+          {partido?.nombreEquipoA} vs {partido?.nombreEquipoB}
+        </Text>
         <TouchableOpacity
           style={[styles.btnTerminar, registroCerrado && { backgroundColor: '#aaa' }]}
           onPress={handleTerminarPartido}
@@ -96,7 +136,7 @@ export default function DetallePartidoScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Botones de secciones */}
+      {/* Filtros */}
       <View style={styles.iconosRow}>
         {['Asistencia', 'Goles', 'Roja', 'Amarilla'].map((sec, i) => (
           <TouchableOpacity
@@ -107,9 +147,7 @@ export default function DetallePartidoScreen() {
             <Icon
               name={sec === 'Asistencia' ? 'check-circle' : sec === 'Goles' ? 'futbol-o' : 'square'}
               type="font-awesome"
-              color={
-                sec === 'Roja' ? 'red' : sec === 'Amarilla' ? 'gold' : sec === 'Goles' ? '#000' : 'green'
-              }
+              color={sec === 'Roja' ? 'red' : sec === 'Amarilla' ? 'gold' : sec === 'Goles' ? '#000' : 'green'}
               size={36}
             />
             <Text style={styles.iconLabel}>{sec}</Text>
@@ -117,52 +155,48 @@ export default function DetallePartidoScreen() {
         ))}
       </View>
 
-      {/* Lista de jugadores */}
-      <View style={styles.recuadroJugadores}>
-        <FlatList
-          data={jugadores}
-          keyExtractor={(item, i) => i.toString()}
-          contentContainerStyle={{ paddingBottom: 60 }}
-          renderItem={({ item, index }) => (
-            <View style={styles.jugadorItem}>
-              <Text style={styles.jugadorNombre}>{item}</Text>
-              {seccion === 'Asistencia' && (
-                <TouchableOpacity onPress={() => toggleAsistencia(index)}>
-                  <Icon
-                    name={asistencias[index] ? 'check-circle' : 'circle-o'}
-                    type="font-awesome"
-                    color={asistencias[index] ? 'green' : '#999'}
-                    size={20}
-                  />
+      {/* Lista de jugadores tipo tabla */}
+      <FlatList
+        data={jugadores}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingBottom: 60 }}
+        renderItem={({ item, index }) => (
+          <View style={styles.jugadorRow}>
+            <Text style={styles.jugadorNombre}>{item.nombre} {item.apellido}</Text>
+            {seccion === 'Asistencia' ? (
+              <TouchableOpacity onPress={() => toggleAsistencia(index)}>
+                <Icon
+                  name={asistencias[index] ? 'check-circle' : 'circle-o'}
+                  type="font-awesome"
+                  color={asistencias[index] ? 'green' : '#999'}
+                  size={22}
+                />
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.contadorContainer}>
+                <TouchableOpacity onPress={() => disminuir(
+                  seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
+                  seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
+                  index
+                )}>
+                  <Text style={styles.operador}>−</Text>
                 </TouchableOpacity>
-              )}
-              {['Goles', 'Roja', 'Amarilla'].includes(seccion) && (
-                <View style={styles.contadorContainer}>
-                  <TouchableOpacity onPress={() => disminuir(
-                    seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
-                    seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
-                    index
-                  )}>
-                    <Text style={styles.operador}>-</Text>
-                  </TouchableOpacity>
-                  <Text style={styles.valorContador}>
-                    {seccion === 'Goles' ? goles[index] : seccion === 'Roja' ? rojas[index] : amarillas[index]}
-                  </Text>
-                  <TouchableOpacity onPress={() => aumentar(
-                    seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
-                    seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
-                    index
-                  )}>
-                    <Text style={styles.operador}>+</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          )}
-        />
-      </View>
+                <Text style={styles.valorContador}>
+                  {seccion === 'Goles' ? goles[index] : seccion === 'Roja' ? rojas[index] : amarillas[index]}
+                </Text>
+                <TouchableOpacity onPress={() => aumentar(
+                  seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
+                  seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
+                  index
+                )}>
+                  <Text style={styles.operador}>＋</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+      />
 
-      {/* Modal de confirmación */}
       <ModalConfirmacion
         visible={modalVisible}
         onCancelar={() => setModalVisible(false)}
@@ -175,46 +209,17 @@ export default function DetallePartidoScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
-    backgroundColor: '#000',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    paddingTop: 40,
     flexDirection: 'row',
     alignItems: 'center',
-    zIndex: 10,
+    padding: 14,
+    paddingTop: 30,
+    backgroundColor: '#000',
+    zIndex: 1,
   },
   headerText: {
     color: '#FDBA12',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-  },
-  buscadorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 15,
-    marginTop: 10,
-    zIndex: 20,
-  },
-  inputBuscar: {
-    flex: 1,
-    backgroundColor: '#f1f1f1',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  btnBuscar: {
-    backgroundColor: '#d80027',
-    marginLeft: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  btnBuscarText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 12,
   },
   matchCard: {
     backgroundColor: '#0e1b39',
@@ -222,7 +227,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     alignItems: 'center',
-    zIndex: 10,
+    zIndex: 1,
   },
   matchTitle: {
     color: '#FDBA12',
@@ -245,13 +250,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    paddingHorizontal: 10,
   },
   iconoContainer: {
-    backgroundColor: '#e8e8e8',
+    backgroundColor: '#f2f2f2',
     alignItems: 'center',
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 12,
     width: 70,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
   iconoActivo: {
     borderWidth: 2,
@@ -263,89 +274,42 @@ const styles = StyleSheet.create({
     marginTop: 5,
     textAlign: 'center',
   },
-  recuadroJugadores: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    margin: 10,
-    padding: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  jugadorItem: {
+  jugadorRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#fff',
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    paddingHorizontal: 20,
+    marginHorizontal: 15,
+    marginBottom: 8,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#eee',
   },
   jugadorNombre: {
     fontSize: 14,
-    color: '#333',
+    fontWeight: 'bold',
+    color: '#222',
   },
   contadorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
   operador: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
     color: '#000',
+    paddingHorizontal: 8,
   },
   valorContador: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#000',
-  },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 10,
-    left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 70,
-    borderRightWidth: width * 2,
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: -1,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 40,
-    zIndex: -1,
-  },
-  franjaNegraTop: {
-    top: 80,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
   },
 });

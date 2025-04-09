@@ -1,27 +1,75 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Dimensions,
+  View, Text, StyleSheet, Image, TouchableOpacity,
+  Dimensions, Alert, ActivityIndicator
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave'; // ✅ Importar componente
 
 const { width } = Dimensions.get('window');
 
 export default function CuentaArbitroScreen() {
   const navigation = useNavigation();
+  const [arbitro, setArbitro] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const usuarioId = await AsyncStorage.getItem('usuarioId');
+        const token = await AsyncStorage.getItem('token');
+
+        if (!usuarioId || !token) {
+          Alert.alert('Error', 'No hay sesión activa');
+          return;
+        }
+
+        const response = await axios.get(
+          `http://192.168.1.69:8080/api/arbitros`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const arbitroEncontrado = response.data.find(a => a.idUsuario === usuarioId);
+
+        if (!arbitroEncontrado) {
+          Alert.alert('Error', 'No se encontró información del árbitro.');
+          return;
+        }
+
+        setArbitro(arbitroEncontrado);
+      } catch (error) {
+        console.error('Error al cargar árbitro:', error);
+        Alert.alert('Error', 'No se pudo obtener la información del árbitro');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    cargarDatos();
+  }, []);
+
+  const cerrarSesion = async () => {
+    await AsyncStorage.clear();
+    navigation.replace('LoginScreen');
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 50 }} />;
+  }
 
   return (
     <View style={styles.container}>
-      {/* Triángulos y franjas */}
-      <View style={styles.triangleTopRed} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      {/* ✅ Componente de franjas decorativas detrás */}
+      <View style={StyleSheet.absoluteFill}>
+        <FranjasDecorativasSuave />
+      </View>
 
       {/* Encabezado */}
       <View style={styles.header}>
@@ -29,12 +77,15 @@ export default function CuentaArbitroScreen() {
         <Text style={styles.headerText}>Cuenta</Text>
       </View>
 
-      {/* Contenido centrado */}
       <View style={styles.content}>
-        {/* Perfil */}
+        {/* Imagen y rol */}
         <View style={styles.profileContainer}>
           <Image
-            source={require('../../../assets/arbitro.jpg')}
+            source={
+              arbitro?.fotoUrl
+                ? { uri: arbitro.fotoUrl }
+                : require('../../../assets/arbitro.jpg')
+            }
             style={styles.profileImage}
           />
           <TouchableOpacity style={styles.rolBadge}>
@@ -42,15 +93,15 @@ export default function CuentaArbitroScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Info tarjeta */}
+        {/* Info del árbitro */}
         <View style={styles.cardInfo}>
-          <Text style={styles.name}>Juan Chavez</Text>
-          <Text style={styles.text}>20233tn152@utez.edu.mx</Text>
-          <Text style={styles.text}>7772074581</Text>
+          <Text style={styles.name}>{arbitro?.nombre} {arbitro?.apellido}</Text>
+          <Text style={styles.text}>{arbitro?.correo}</Text>
+          <Text style={styles.text}>{arbitro?.celular}</Text>
         </View>
 
-        {/* Botón cerrar sesión */}
-        <TouchableOpacity style={styles.logoutButton}>
+        {/* Botón logout */}
+        <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>
           <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
 
@@ -76,51 +127,13 @@ const styles = StyleSheet.create({
     padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    zIndex: 10,
     paddingTop: 30,
+    zIndex: 1,
   },
   headerText: {
     color: '#FDBA12',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 70,
-    borderRightWidth: width * 2,
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: 1,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 40,
-  },
-  franjaNegraTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-    zIndex: 0,
-  },
-  franjaGrisTop: {
-    top: 100,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-    zIndex: 0,
-  },
-  franjaGrisBottom: {
-    bottom: -30,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-    zIndex: 0,
   },
   profileContainer: {
     flexDirection: 'row',

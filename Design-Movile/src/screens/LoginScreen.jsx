@@ -12,18 +12,14 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import RegistroModal from './RegistroModal';
-import API from '../api/api'; // Asegúrate de que la ruta es correcta
-import { obtenerDuenoPorUsuarioId } from '../api/api';
-import { ActivityIndicator } from 'react-native';
+import API from '../api/api';
 
 const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
-  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -41,47 +37,36 @@ export default function LoginScreen() {
     setLoading(true);
   
     try {
-      const response = await API.post('/auth/login', { email, password }, { timeout: 3000 });
-      const { token, rol, usuarioId } = response.data;
-  
+      const res = await API.post('/auth/login', {
+        email,
+        password,
+      });
+
+      const { token, rol, usuarioId } = res.data;
+
       console.log('✅ Token recibido:', token);
       console.log('🎭 Rol:', rol);
-      console.log('🧾 usuarioId:', usuarioId);
-  
+      console.log('🆔 Usuario ID:', usuarioId);
+
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('rol', rol);
       await AsyncStorage.setItem('usuarioId', usuarioId);
-      await AsyncStorage.setItem('correo', email);
-  
-      if (rol === 'DUENO' && usuarioId) {
-        try {
-          const response = await API.get(`/duenos/usuario/${usuarioId}`);
-          const duenoId = response.data.id;
-  
-          console.log('🔑 duenoId real:', duenoId);
-          await AsyncStorage.setItem('duenoId', duenoId);
-          await AsyncStorage.setItem('correo', email);
-        } catch (error) {
-          const mensajeError = error.response?.data?.message || error.response?.data || error.message;
-          console.error('❌ Error en login:', mensajeError);
-  
-          if (
-            mensajeError &&
-            (mensajeError.toLowerCase().includes('credenciales') ||
-             mensajeError.toLowerCase().includes('bad credentials') ||
-             mensajeError.toLowerCase().includes('usuario') ||
-             mensajeError.toLowerCase().includes('password'))
-          ) {
-            Alert.alert('Credenciales inválidas', 'Correo o contraseña incorrectos.');
-          } else {
-            Alert.alert('Error', 'No se pudo iniciar sesión. Intenta más tarde.');
-          }
-        }
+
+      if (rol === 'ARBITRO') {
+        const arbitroRes = await API.get(`/arbitros/usuario/${usuarioId}`);
+        await AsyncStorage.setItem('arbitroId', arbitroRes.data.id);
+        navigation.replace('ArbitroHomeScreen');
+      } else if (rol === 'DUENO') {
+        const duenoRes = await API.get(`/duenos/usuario/${usuarioId}`);
+        await AsyncStorage.setItem('duenoId', duenoRes.data.id);
+        navigation.replace('CuentaDuenoScreen');
+      } else {
+        Alert.alert('Error', 'Rol no reconocido');
       }
   
       navigation.replace('BottomTabs');
     } catch (error) {
-      console.log('Error en login:', error.response?.data || error.message);
+      console.error('❌ Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
     } finally {
       setLoading(false);
@@ -135,7 +120,6 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff', position: 'relative' },

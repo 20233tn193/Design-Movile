@@ -24,28 +24,41 @@ export default function SplashScreen({ navigation }) {
 
     const verificarSesion = async () => {
       const token = await AsyncStorage.getItem('token');
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-          const roles = decoded.roles || [];
+      console.log('🪪 Token recuperado:', token);
 
-          if (roles.includes('ARBITRO')) {
-            navigation.replace('ArbitroHomeScreen');
-          } else if (roles.includes('DUENO')) {
-            navigation.replace('CuentaDuenoScreen');
-          } else {
-            navigation.replace('BottomTabs');
-          }
-        } catch (error) {
-          navigation.replace('BottomTabs');
+      if (!token || token.split('.').length !== 3) {
+        console.warn('⚠️ Token inválido o mal formado:', token);
+        await AsyncStorage.removeItem('token');
+        navigation.replace('LoginScreen');
+        return;
+      }
+
+      try {
+        const decoded = jwtDecode(token);
+        console.log('✅ Token decodificado:', decoded);
+
+        const roles = decoded.roles || [];
+
+        if (roles.includes('ARBITRO')) {
+          console.log('⏩ Redirigiendo a ArbitroHomeScreen...');
+          navigation.replace('ArbitroHomeScreen');
+        } else if (roles.includes('DUENO')) {
+          console.log('⏩ Redirigiendo a CuentaDuenoScreen...');
+          navigation.replace('CuentaDuenoScreen');
+        } else {
+          console.log('❓ Rol no reconocido. Redirigiendo a login...');
+          await AsyncStorage.removeItem('token');
+          navigation.replace('LoginScreen');
         }
-      } else {
-        navigation.replace('BottomTabs');
+      } catch (error) {
+        console.error('⛔ Error al decodificar el token:', error.message);
+        await AsyncStorage.removeItem('token');
+        navigation.replace('LoginScreen');
       }
     };
   
 
-    setTimeout(verificarSesion, 2500); // Simula carga
+    setTimeout(verificarSesion, 1000); // Simula carga breve de splash
   }, []);
 
 
