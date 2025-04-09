@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,
-    paddingTop: 30,
+    paddingTop: 50,
     zIndex: 10,
   },
   title: {
@@ -157,19 +157,19 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   franjaGrisTop: {
-    top: 120,
+    top: 170,
     left: -width,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
   },
   franjaNegraTop: {
-    top: 90,
+    top: 120,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaRojaTop: {
-    top: 60,
+    top: 80,
     left: -width,
     backgroundColor: '#d80027',
     transform: [{ rotate: '-10deg' }],

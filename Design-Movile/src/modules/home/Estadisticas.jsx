@@ -47,19 +47,6 @@ export default function Estadisticas({ navigation }) {
           <Text style={styles.value}>54</Text>
         </View>
       </ScrollView>
-
-      {/* Barra personalizada */}
-      <View style={styles.bottomTabs}>
-        <TouchableOpacity onPress={() => navigation.replace('BottomTabs')}>
-          <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.replace('CuentaArbitro')}>
-          <Icon name="user" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.replace('Estadisticas')}>
-          <Icon name="bar-chart" type="font-awesome" color="#FDBA12" size={24} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }

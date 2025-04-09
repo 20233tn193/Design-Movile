@@ -43,14 +43,8 @@ import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
 
-//  
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
-
-//  Login 
-import LoginScreen from './src/screens/LoginScreen';
-import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
-import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -67,11 +61,11 @@ export default function App() {
         <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
         <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
         <Stack.Screen name="Estadisticas" component={Estadisticas} />
-
-        {/* 🔐 Login único */}
+        
+        {/* 🔐 Login único 
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
-
+        */}
         {/* ⚖️ Árbitro */}
         <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
         <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />

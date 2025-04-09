@@ -3,12 +3,27 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 
 export default function CardListTorneos({ logo, nombre, estado, fecha, clubes }) {
   return (
+
+
     <View style={styles.card}>
       <View style={styles.container}>
         <Image source={logo} style={styles.logo} />
         <View style={styles.details}>
           <Text style={styles.nombre}>{nombre}</Text>
-          <Text style={[styles.estado, estado === 'ACTIVO' ? styles.activo : styles.finalizado]}>
+          <Text
+            style={[
+              styles.estado,
+              estado.toUpperCase().trim() === 'ABIERTO'
+                ? styles.abierto
+                : estado.toUpperCase().trim() === 'FINALIZADO'
+                  ? styles.finalizado
+                  : estado.toUpperCase().trim() === 'CERRADO'
+                    ? styles.cerrado
+                    : estado.toUpperCase().trim() === 'EN CURSO'
+                      ? styles.enCurso
+                      : styles.otros,
+            ]}
+          >
             {estado}
           </Text>
           <Text style={styles.info}>Clubes: {clubes} • Fecha: {fecha}</Text>
@@ -49,11 +64,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginVertical: 4,
   },
-  activo: {
+  abierto: {
     color: 'green',
   },
   finalizado: {
     color: 'red',
+  },
+  cerrado: {
+    color: '#FFA500',
+  },
+  enCurso: {
+    color: '#007BFF',
+  },
+  otros: {
+    color: '#FDBA12',
   },
   info: {
     fontSize: 12,

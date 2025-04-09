@@ -20,13 +20,21 @@ export default function CuentaDuenoScreen() {
   const [dueno, setDueno] = useState(null);
   const [equipo, setEquipo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [correo, setCorreo] = useState(null);
 
-  const handleLogout = () => {
-    AsyncStorage.clear();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Login" }],
-    });
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('rol');
+      await AsyncStorage.removeItem('duenoId'); // si guardas esto también
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'BottomTabs' }],
+      });
+    } catch (error) {
+      console.error('❌ Error al cerrar sesión:', error);
+    }
   };
 
   useEffect(() => {
@@ -34,39 +42,42 @@ export default function CuentaDuenoScreen() {
       try {
         const duenoId = await AsyncStorage.getItem("duenoId");
         const token = await AsyncStorage.getItem("token");
-  
+        const email = await AsyncStorage.getItem("correo");
+        setCorreo(email); // guarda el correo ingresado manualmente
+
         console.log("✅ duenoId:", duenoId);
         console.log("✅ token:", token);
-  
+        console.log('🖼 Logo del equipo:', equipo?.logoUrl);
+
         if (!duenoId) {
           console.warn("⚠️ No se encontró duenoId");
           return;
         }
-  
+
         const duenoData = await obtenerDuenoPorId(duenoId);
         console.log("📦 Datos del dueño:", duenoData);
         setDueno(duenoData);
-  
+
         const equipos = await obtenerEquipoPorDueno(duenoId);
         console.log("📦 Equipos del dueño:", equipos);
-  
+
         if (equipos.length > 0) {
           setEquipo(equipos[0]);
           console.log("✅ Primer equipo:", equipos[0]);
         } else {
           console.log("ℹ️ El dueño no tiene equipos registrados.");
         }
-  
+
       } catch (error) {
         console.error("❌ Error cargando datos:", error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
+
 
   return (
     <View style={styles.container}>
@@ -93,7 +104,10 @@ export default function CuentaDuenoScreen() {
             <View style={styles.card}>
               <View style={styles.rowTop}>
                 {equipo?.logoUrl ? (
-                  <Image source={{ uri: equipo.logoUrl }} style={styles.fotoPlaceholder} />
+                  <Image
+                    source={{ uri: equipo.logoUrl }}
+                    style={[styles.fotoPlaceholder, { resizeMode: 'contain' }]}
+                  />
                 ) : (
                   <View style={styles.fotoPlaceholder} />
                 )}
@@ -109,10 +123,7 @@ export default function CuentaDuenoScreen() {
                 {dueno?.nombre || ""} {dueno?.apellido || ""}
               </Text>
               <Text style={styles.dato}>
-                {dueno?.correo || "Correo no disponible"}
-              </Text>
-              <Text style={styles.dato}>
-                {dueno?.celular || "Teléfono no disponible"}
+                {dueno?.correo || correo || "Correo no disponible"}
               </Text>
 
               <TouchableOpacity
@@ -123,12 +134,21 @@ export default function CuentaDuenoScreen() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              style={styles.botonAzul}
-              onPress={() => navigation.navigate("RegistroEquipoDueno")}
-            >
-              <Text style={styles.botonTexto}>Crear Equipo</Text>
-            </TouchableOpacity>
+            {equipo ? (
+              <TouchableOpacity
+                style={styles.botonAzul}
+                onPress={() => navigation.navigate("InscripcionesDuenoScreen")} // asegúrate de que esta ruta esté registrada
+              >
+                <Text style={styles.botonTexto}>Torneos Inscritos</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.botonAzul}
+                onPress={() => navigation.navigate("RegistroEquipoDueno")}
+              >
+                <Text style={styles.botonTexto}>Crear Equipo</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity style={styles.botonRojo} onPress={handleLogout}>
               <Text style={styles.botonTexto}>Cerrar Sesión</Text>
@@ -141,19 +161,6 @@ export default function CuentaDuenoScreen() {
             />
           </>
         )}
-      </View>
-
-      {/* Bottom Tabs */}
-      <View style={styles.bottomTabs}>
-        <TouchableOpacity onPress={() => navigation.navigate("TorneoScreen")}>
-          <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("CuentaDuenoScreen")}>
-          <Icon name="user" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Estadisticas")}>
-          <Icon name="bar-chart" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
       </View>
     </View>
   );

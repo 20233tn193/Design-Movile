@@ -14,10 +14,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import RegistroModal from './RegistroModal';
 import API from '../api/api'; // Asegúrate de que la ruta es correcta
+import { obtenerDuenoPorUsuarioId } from '../api/api';
 
 const { width } = Dimensions.get('window');
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -26,27 +28,32 @@ export default function LoginScreen({ navigation }) {
       Alert.alert('Campos vacíos', 'Por favor ingresa correo y contraseña');
       return;
     }
-
+  
     try {
-      const response = await API.post('/auth/login', {
-        email,
-        password,
-      });
-
-      const { token, rol } = res.data;
-
+      const response = await API.post('/auth/login', { email, password });
+      const { token, rol, usuarioId } = response.data;
+  
       console.log('✅ Token recibido:', token);
       console.log('🎭 Rol:', rol);
-
+      console.log('🧾 usuarioId:', usuarioId);
+  
       await AsyncStorage.setItem('token', token);
-
-      if (rol === 'ARBITRO') {
-        navigation.replace('ArbitroHome');
-      } else if (rol === 'DUENO') {
-        navigation.replace('CuentaDueno');
-      } else {
-        Alert.alert('Rol no válido', 'Tu cuenta no tiene un rol asignado');
+      await AsyncStorage.setItem('rol', rol);
+  
+      if (rol === 'DUENO' && usuarioId) {
+        try {
+          const response = await API.get(`/duenos/usuario/${usuarioId}`);
+          const duenoId = response.data.id;
+      
+          console.log('🔑 duenoId real:', duenoId);
+          await AsyncStorage.setItem('duenoId', duenoId);
+          await AsyncStorage.setItem('correo', email); // guarda el correo ingresado manualmente
+        } catch (err) {
+          console.warn('⚠️ No se pudo obtener el duenoId');
+        }
       }
+  
+      navigation.replace('BottomTabs');
     } catch (error) {
       console.error('Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
