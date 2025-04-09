@@ -5,6 +5,7 @@ import TorneoScreen from '../modules/home/TorneoScreen';
 import Estadisticas from '../modules/home/Estadisticas';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '@rneui/themed';
+import CuentaDuenoScreen from '../modules/dueno/CuentaDuenoScreen';
 
 
 function PerfilScreenWrapper() {

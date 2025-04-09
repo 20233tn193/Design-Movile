@@ -118,12 +118,23 @@ export default function CuentaDuenoScreen() {
                   <View style={styles.fotoPlaceholder} />
                 )}
 
-                <View style={styles.estadoEquipo}>
+                <View style={styles.estadoEquipoRow}>
                   <Text style={styles.estadoTexto}>
                     {equipo ? equipo.nombre : "Sin equipo"}
                   </Text>
+
+                  {equipo && (
+                    <TouchableOpacity
+                      style={styles.editEquipoIcon}
+                      onPress={() => navigation.navigate("ActualizarEquipoScreen", { equipo })}
+                    >
+                      <Icon name="edit" type="feather" size={20} color="#FDBA12" />
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
+
+
 
               <Text style={styles.nombre}>
                 {dueno?.nombre || ""} {dueno?.apellido || ""}
@@ -136,7 +147,7 @@ export default function CuentaDuenoScreen() {
                 style={styles.editIcon}
                 onPress={() => navigation.navigate("ActualizarCuentaDueno")}
               >
-                <Icon name="edit" type="feather" size={20} color="#000" />
+                <Icon name="edit" type="feather" size={30} color="#000" />
               </TouchableOpacity>
             </View>
 
@@ -178,6 +189,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     position: "relative",
     overflow: "hidden",
+  },
+  estadoEquipoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#001F4E',
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 10,
+    justifyContent: 'center',
+    left: -25,
+  },
+  
+  editEquipoIcon: {
+    paddingLeft: 10,
   },
   franja: {
     position: "absolute",
@@ -258,29 +284,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   fotoPlaceholder: {
-    width: 70,
-    height: 70,
+    width: 140,
+    height: 140,
     backgroundColor: "#ccc",
     borderRadius: 10,
+    left: -25,
   },
   estadoEquipo: {
     backgroundColor: "#001F4E",
-    paddingHorizontal: 10,
+    paddingHorizontal: 30,
     paddingVertical: 6,
     borderRadius: 12,
+
   },
   estadoTexto: {
     color: "#FDBA12",
     fontWeight: "bold",
+    fontSize: 24,
   },
   nombre: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: "bold",
     marginTop: 10,
     textAlign: "center",
   },
   dato: {
-    fontSize: 14,
+    fontSize: 18,
     color: "#333",
     textAlign: "center",
   },
@@ -288,6 +317,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 12,
     right: 12,
+
   },
   botonAzul: {
     backgroundColor: "#001F4E",
@@ -312,7 +342,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 200,
-    marginTop: 70,
+    marginTop: 50,
   },
   bottomTabs: {
     flexDirection: "row",

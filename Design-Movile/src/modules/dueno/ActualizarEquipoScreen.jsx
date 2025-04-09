@@ -4,63 +4,118 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Image,
+  Alert,
+  StyleSheet,
   Dimensions,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
-import ModalConfirmarEliminacion from './ModalConfirmarEliminacion'; // Ajusta esta ruta si es necesario
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import API from '../../api/api';
+import ModalConfirmarEliminacion from './ModalConfirmarEliminacion';
 
 const { width } = Dimensions.get('window');
 
-export default function ActualizarEquipoScreen({ navigation }) {
+export default function ActualizarEquipoScreen({ navigation, route }) {
+  const { equipo } = route.params || {};
+  const [nombreEquipo, setNombreEquipo] = useState(equipo?.nombre || '');
+  const [logoUri, setLogoUri] = useState(equipo?.logoUrl || '');
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleEliminar = () => {
-    setModalVisible(true);
+  const handleSeleccionarImagen = async () => {
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!resultado.canceled) {
+      setLogoUri(`data:image/jpeg;base64,${resultado.assets[0].base64}`);
+    }
   };
 
-  const confirmarEliminacion = () => {
-    setModalVisible(false);
-    navigation.goBack(); // Puedes reemplazar esto con tu lógica de eliminación real
+  const handleActualizar = async () => {
+    if (!nombreEquipo || !logoUri) {
+      Alert.alert('Campos requeridos', 'Nombre e imagen son obligatorios');
+      return;
+    }
+
+    try {
+      const actualizado = {
+        nombre: nombreEquipo,
+        logoUrl: logoUri,
+        duenoId: equipo.duenoId,
+        eliminado: equipo.eliminado,
+        partidosGanados: equipo.partidosGanados,
+        partidosPerdidos: equipo.partidosPerdidos,
+      };
+
+      await API.put(`/equipos/${equipo.id}`, actualizado);
+
+      Alert.alert('Actualizado', 'El equipo se actualizó correctamente', [
+        { text: 'OK', onPress: () => navigation.navigate('BottomTabs', { screen: 'Perfil' }) },
+      ]);
+    } catch (error) {
+      console.error('❌ Error actualizando equipo:', error.response?.data || error.message);
+      Alert.alert('Error', 'No se pudo actualizar el equipo');
+    }
+  };
+
+  const confirmarEliminacion = async () => {
+    try {
+      await API.delete(`/equipos/${equipo.id}`);
+      setModalVisible(false);
+      Alert.alert('Eliminado', 'El equipo ha sido eliminado', [
+        { text: 'OK', onPress: () => navigation.navigate('BottomTabs', { screen: 'Perfil' }) },
+      ]);
+    } catch (error) {
+      console.error('❌ Error eliminando equipo:', error.response?.data || error.message);
+      Alert.alert('Error', 'No se pudo eliminar el equipo');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Encabezado */}
+      {/* Franjas decorativas */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
+
+      {/* Header */}
       <View style={styles.header}>
         <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Actualizar Equipo</Text>
       </View>
 
-      {/* Franjas decorativas */}
-      <View style={styles.franjaRoja} />
-      <View style={styles.franjaNegra} />
-      <View style={styles.franjaGris} />
-
       <Text style={styles.titulo}>Datos del Equipo</Text>
 
       <Image
-        source={{ uri: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg' }}
+        source={{ uri: logoUri }}
         style={styles.imagenEscudo}
         resizeMode="contain"
       />
 
-      <TouchableOpacity style={styles.botonImagen}>
+      <TouchableOpacity style={styles.botonImagen} onPress={handleSeleccionarImagen}>
         <Text style={styles.botonImagenTexto}>Cargar imagen</Text>
       </TouchableOpacity>
 
       <TextInput
         style={styles.input}
-        placeholder="Barcelona"
+        value={nombreEquipo}
+        onChangeText={setNombreEquipo}
+        placeholder="Nombre del equipo"
         placeholderTextColor="#555"
       />
 
-      <TouchableOpacity style={styles.botonNegro}>
+      <TouchableOpacity style={styles.botonNegro} onPress={handleActualizar}>
         <Text style={styles.botonTexto}>Actualizar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.botonRojo} onPress={handleEliminar}>
+      <TouchableOpacity style={styles.botonRojo} onPress={() => setModalVisible(true)}>
         <Text style={styles.botonTexto}>Eliminar</Text>
       </TouchableOpacity>
 
@@ -68,7 +123,6 @@ export default function ActualizarEquipoScreen({ navigation }) {
         <Text style={styles.botonTexto}>Cancelar</Text>
       </TouchableOpacity>
 
-      {/* Modal */}
       <ModalConfirmarEliminacion
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -82,16 +136,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingTop: 140,
+    position: 'relative',
+    overflow: 'hidden',
     alignItems: 'center',
+    paddingTop: 125, // espacio suficiente para header + franjas
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#000',
     paddingVertical: 12,
-    paddingTop: 40,
+    paddingTop: 50,
     paddingHorizontal: 20,
     width: '100%',
     position: 'absolute',
@@ -99,36 +154,64 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   headerText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#FDBA12',
     fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
-  franjaRoja: {
+  franja: {
     position: 'absolute',
-    top: 50,
-    left: -width,
     width: width * 2,
-    height: 40,
+    height: 50,
+    zIndex: 0,
+  },
+  franjaRojaTop: {
+    top: 80,
+    left: -width,
     backgroundColor: '#d80027',
     transform: [{ rotate: '-10deg' }],
   },
-  franjaNegra: {
-    position: 'absolute',
-    top: 75,
+  franjaNegraTop: {
+    top: 120,
     left: -width,
-    width: width * 2,
-    height: 40,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
-  franjaGris: {
-    position: 'absolute',
-    top: 100,
+  franjaGrisTop: {
+    top: 150,
     left: -width,
-    width: width * 2,
-    height: 40,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: 0,
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: 0,
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: 0,
   },
   titulo: {
     fontSize: 18,
@@ -138,21 +221,21 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
-    marginBottom: 16,
+    marginBottom: 15,
   },
   imagenEscudo: {
-    width: 120,
-    height: 120,
+    width: 300,
+    height: 300,
     borderRadius: 10,
     backgroundColor: '#ccc',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   botonImagen: {
     backgroundColor: '#000',
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 6,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   botonImagenTexto: {
     color: '#FDBA12',
@@ -165,8 +248,9 @@ const styles = StyleSheet.create({
     padding: 12,
     fontStyle: 'italic',
     color: '#000',
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
+    fontSize: 24,
   },
   botonNegro: {
     backgroundColor: '#000',
@@ -174,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   botonRojo: {
     backgroundColor: '#d80027',
@@ -182,7 +266,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   botonGris: {
     backgroundColor: '#555',

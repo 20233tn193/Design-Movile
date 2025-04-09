@@ -1,22 +1,70 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  Dimensions,
+  View, Text, TextInput, TouchableOpacity,
+  StyleSheet, Image, Dimensions, Alert
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { Icon } from '@rneui/themed';
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
 export default function RegistroEquipoDueno({ navigation }) {
   const [nombreEquipo, setNombreEquipo] = useState('');
+  const [logoUri, setLogoUri] = useState(null);
 
-  const handleCrear = () => {
-    navigation.navigate('CuentaDuenoEquipo');
+  const handleSeleccionarImagen = async () => {
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+      base64: true,
+    });
+
+    if (!resultado.canceled) {
+      setLogoUri(`data:image/jpeg;base64,${resultado.assets[0].base64}`);
+    }
+  };
+
+  const handleCrear = async () => {
+    if (!nombreEquipo || !logoUri) {
+      Alert.alert('Datos incompletos', 'Debes ingresar el nombre del equipo y cargar un logo');
+      return;
+    }
+  
+    const nombreLimpio = nombreEquipo.trim();
+  
+    if (nombreLimpio.length < 3) {
+      Alert.alert('Nombre muy corto', 'El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+  
+    if (nombreLimpio.length > 20) {
+      Alert.alert('Nombre muy largo', 'El nombre no debe exceder los 30 caracteres');
+      return;
+    }
+  
+    try {
+      const duenoId = await AsyncStorage.getItem('duenoId');
+  
+      const nuevoEquipo = {
+        nombre: nombreLimpio,
+        logoUrl: logoUri,
+        duenoId,
+        eliminado: false,
+        partidosGanados: 0,
+        partidosPerdidos: 0,
+      };
+  
+      await API.post('/equipos', nuevoEquipo);
+  
+      Alert.alert('Equipo registrado', 'Tu equipo fue creado exitosamente', [
+        { text: 'OK', onPress: () => navigation.replace('BottomTabs', { screen: 'Perfil' }) },
+      ]);
+    } catch (error) {
+      console.error('❌ Error al crear equipo:', error.response?.data || error.message);
+      Alert.alert('Error', 'No se pudo registrar el equipo');
+    }
   };
 
   const handleCancelar = () => {
@@ -25,7 +73,7 @@ export default function RegistroEquipoDueno({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Triángulo y Franjas decorativas */}
+      {/* Decoración */}
       <View style={styles.triangleTopRed} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -33,24 +81,22 @@ export default function RegistroEquipoDueno({ navigation }) {
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-      {/* Encabezado */}
+      {/* Header */}
       <View style={styles.header}>
-  <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
-  <Text style={styles.headerText}>Registro de Equipo</Text>
-</View>
+        <Icon name="user" type="font-awesome" color="#fff" size={20} style={{ marginRight: 8 }} />
+        <Text style={styles.headerText}>Registro de Equipo</Text>
+      </View>
 
-      {/* Contenido */}
       <View style={styles.content}>
         <Text style={styles.title}>Datos del Equipo</Text>
 
         <Image
-          source={{ uri: 'https://placehold.co/120x120?text=Logo' }}
+          source={logoUri ? { uri: logoUri } : require('../../../assets/placeholder.png')}
           style={styles.image}
         />
+        <Text style={styles.textoResolucion}>Tamaño recomendado: 300x300 px</Text>
 
-        <TouchableOpacity style={styles.botonUniforme}>
-          <Text style={styles.botonTextoNegro}>Cargar imagen</Text>
-        </TouchableOpacity>
+
 
         <TextInput
           placeholder="Nombre del Equipo"
@@ -59,6 +105,10 @@ export default function RegistroEquipoDueno({ navigation }) {
           value={nombreEquipo}
           onChangeText={setNombreEquipo}
         />
+
+        <TouchableOpacity style={styles.botonUniforme} onPress={handleSeleccionarImagen}>
+          <Text style={styles.botonTextoNegro}>Cargar imagen</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.botonRojo} onPress={handleCrear}>
           <Text style={styles.botonTexto}>Crear</Text>
@@ -127,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#000',
     padding: 12,
-    paddingTop: 30,
+    paddingTop: 50,
     width: '100%',
     zIndex: 10,
   },
@@ -140,25 +190,30 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 15,
   },
   title: {
-    fontSize: 16,
+    fontSize: 24,
     fontWeight: 'bold',
     backgroundColor: '#0e1b39',
     color: '#fff',
     paddingVertical: 6,
     paddingHorizontal: 20,
     borderRadius: 6,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   image: {
-    width: 140,
-    height: 140,
+    width: 300,
+    height: 300,
     resizeMode: 'cover',
     backgroundColor: '#ddd',
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 10,
+  },
+  textoResolucion: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 25,
   },
   input: {
     backgroundColor: '#f0f0f0',
@@ -166,9 +221,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 6,
     width: '80%',
-    marginBottom: 20,
+    marginBottom: 50,
     color: '#000',
     textAlign: 'center',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   botonUniforme: {
     backgroundColor: '#000',
@@ -176,7 +233,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   botonRojo: {
     backgroundColor: '#d80027',
@@ -184,7 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   botonGris: {
     backgroundColor: '#333',
