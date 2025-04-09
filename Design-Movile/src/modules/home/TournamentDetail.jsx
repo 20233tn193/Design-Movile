@@ -5,6 +5,8 @@ const { width } = Dimensions.get('window');
 
 export default function TournamentDetail({ route, navigation }) {
   const { nombre, torneoId } = route.params; // ahora también recibimos torneoId
+  console.log('📦 TournamentDetail → torneoId:', torneoId);
+
 
   const buttons = [
     { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones.png'), ruta: 'TablaPosiciones' },
@@ -31,16 +33,19 @@ export default function TournamentDetail({ route, navigation }) {
       </View>
 
       <View style={styles.options}>
-        {buttons.map((btn, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.card}
-            onPress={() => navigation.navigate(btn.ruta, { torneoId })} // pasamos torneoId
-          >
-            <Image source={btn.icon} style={styles.iconoBoton} />
-            <Text style={styles.text}>{btn.label}</Text>
-          </TouchableOpacity>
-        ))}
+      {buttons.map((btn, i) => (
+  <TouchableOpacity
+    key={i}
+    style={styles.card}
+    onPress={() => {
+      console.log('👉 Enviando torneoId:', torneoId); 
+      navigation.navigate(btn.ruta, { torneoId }); 
+    }}
+  >
+    <Image source={btn.icon} style={styles.iconoBoton} />
+    <Text style={styles.text}>{btn.label}</Text>
+  </TouchableOpacity>
+))}
       </View>
     </View>
   );

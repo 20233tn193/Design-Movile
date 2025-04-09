@@ -68,26 +68,32 @@ export default function TorneoScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {torneosFiltrados.map((torneo, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.cardTorneo}
-            onPress={() =>
-              navigation.navigate('TournamentDetail', {
-                torneoId: torneo._id,
-                nombre: torneo.nombreTorneo,
-              })
-            }
-          >
-            <CardListTorneos
-              logo={{ uri: torneo.logoSeleccionado }}
-              nombre={torneo.nombreTorneo}
-              estado={torneo.estado}
-              fecha={torneo.fechaInicio}
-              clubes={torneo.numeroEquipos}
-            />
-          </TouchableOpacity>
-        ))}
+      {torneosFiltrados.map((torneo, i) => {
+  console.log('📌 Torneo recibido:', torneo); // ✅ Aquí sí es correcto
+
+  return (
+    <TouchableOpacity
+      key={i}
+      style={styles.cardTorneo}
+      onPress={() => {
+        console.log('📦 Enviando a TournamentDetail →', torneo.id);
+        navigation.navigate('TournamentDetail', {
+          torneoId: torneo.id, // ✅ ID correcto
+          nombre: torneo.nombreTorneo,
+        });
+      }}
+    >
+      <CardListTorneos
+        logo={{ uri: torneo.logoSeleccionado }}
+        nombre={torneo.nombreTorneo}
+        estado={torneo.estado}
+        fecha={torneo.fechaInicio}
+        clubes={torneo.numeroEquipos}
+      />
+    </TouchableOpacity>
+  );
+})}
+
       </ScrollView>
     </View>
   );

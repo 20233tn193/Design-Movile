@@ -16,12 +16,15 @@ export default function TablaPosiciones({ route }) {
   const [tabla, setTabla] = useState([]);
 
   useEffect(() => {
+    console.log('🏆 torneoId recibido:', torneoId);
+
     const cargarTabla = async () => {
       try {
         const response = await API.get(`/estadisticas/tabla-posiciones/${torneoId}`);
+        console.log('📊 Datos completos recibidos:', response.data);
         setTabla(response.data);
       } catch (error) {
-        console.error('Error al obtener tabla de posiciones:', error);
+        console.error('❌ Error al obtener tabla de posiciones:', error);
       }
     };
 
@@ -46,9 +49,9 @@ export default function TablaPosiciones({ route }) {
 
       <View style={styles.tableHeader}>
         <Text style={[styles.columnHeader, { width: 100 }]}>Equipo</Text>
+        <Text style={[styles.columnHeader, { width: 60 }]}>Fase</Text>
         <Text style={styles.columnHeader}>PJ</Text>
         <Text style={styles.columnHeader}>PG</Text>
-        <Text style={styles.columnHeader}>PE</Text>
         <Text style={styles.columnHeader}>PP</Text>
         <Text style={styles.columnHeader}>GF</Text>
         <Text style={styles.columnHeader}>GC</Text>
@@ -61,19 +64,16 @@ export default function TablaPosiciones({ route }) {
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <View style={styles.equipo}>
-              <Image
-                source={{ uri: item.logoEquipo }}
-                style={styles.logo}
-              />
+            <View style={[styles.equipo, { width: 100 }]}>
+              <Image source={{ uri: item.logoEquipo }} style={styles.logo} />
               <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
-            <Text style={styles.column}>{item.pj}</Text>
-            <Text style={styles.column}>{item.pg}</Text>
-            <Text style={styles.column}>{item.pe}</Text>
-            <Text style={styles.column}>{item.pp}</Text>
-            <Text style={styles.column}>{item.gf}</Text>
-            <Text style={styles.column}>{item.gc}</Text>
+            <Text style={[styles.column, { width: 60 }]}>{item.fase}</Text>
+            <Text style={styles.column}>{item.partidosJugados}</Text>
+            <Text style={styles.column}>{item.ganados}</Text>
+            <Text style={styles.column}>{item.perdidos}</Text>
+            <Text style={styles.column}>{item.golesFavor}</Text>
+            <Text style={styles.column}>{item.golesContra}</Text>
             <Text style={styles.column}>{item.puntos}</Text>
           </View>
         )}
@@ -83,7 +83,6 @@ export default function TablaPosiciones({ route }) {
 }
 
 const styles = StyleSheet.create({
-  // ... (misma definición de estilos que ya tienes)
   container: {
     flex: 1,
     backgroundColor: '#f2f2f2',

@@ -1,29 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Dimensions } from 'react-native';
 import { Icon } from '@rneui/themed';
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
-const partidos = [
-  {
-    local: { nombre: 'Madrid', logo: require('../../../assets/madrid.png') },
-    visitante: { nombre: 'Juventus', logo: require('../../../assets/Juventus.jpg') },
-    resultado: '1 : 0',
-    cancha: 'Los Tamales - Verde',
-    hora: '10:00 am',
-    arbitro: 'Juan Chavez'
-  },
-  {
-    local: { nombre: 'Paris', logo: require('../../../assets/paris.png') },
-    visitante: { nombre: 'Barcelona', logo: require('../../../assets/barcelona.png') },
-    resultado: '2 : 1',
-    cancha: 'Los Tamales - Rojo',
-    hora: '12:00 pm',
-    arbitro: 'Juan Chavez'
-  },
-];
+export default function PartidosScreen({ route }) {
+  const { torneoId } = route.params;
+  const [jornadas, setJornadas] = useState([]);
 
-export default function PartidosScreen() {
+  useEffect(() => {
+    console.log('📅 torneoId recibido en PartidosScreen:', torneoId);
+
+    const cargarPartidos = async () => {
+      try {
+        const response = await API.get(`/partidos/calendario/${torneoId}`);
+        const data = response.data || {};
+        console.log('📋 Datos de jornadas:', data);
+        setJornadas(Object.entries(data));
+      } catch (error) {
+        console.error('❌ Error al cargar partidos:', error);
+      }
+    };
+
+    cargarPartidos();
+  }, [torneoId]);
+
+  const renderPartido = (partido, index) => {
+    const local = partido.local || {};
+    const visitante = partido.visitante || {};
+
+    const logoLocal = local.logo ? { uri: local.logo } : require('../../../assets/barcelona.png');
+    const logoVisitante = visitante.logo ? { uri: visitante.logo } : require('../../../assets/barcelona.png');
+
+    return (
+      <View key={index} style={styles.card}>
+        <View style={styles.row}>
+          <Image source={logoLocal} style={styles.logo} />
+          <Text style={styles.resultado}>VS</Text>
+          <Image source={logoVisitante} style={styles.logo} />
+        </View>
+
+        <View style={styles.nombres}>
+          <Text style={styles.nombreEquipo}>{local.nombre || 'Equipo A'}</Text>
+          <Text style={styles.nombreEquipo}>{visitante.nombre || 'Equipo B'}</Text>
+        </View>
+
+        <View style={styles.infoContainer}>
+          <View>
+            <Text style={styles.infoText}>{partido.nombreCancha || 'Cancha no definida'}</Text>
+            <Text style={styles.infoText}>{partido.hora || 'Hora no definida'}</Text>
+            <Text style={styles.arbitro}>{partido.nombreArbitro || 'Árbitro por confirmar'}</Text>
+          </View>
+          <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={20} />
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       {/* Franjas superiores */}
@@ -42,45 +76,24 @@ export default function PartidosScreen() {
         <Text style={styles.headerText}> Partidos</Text>
       </View>
 
-      {/* Jornada */}
-      <View style={styles.jornadaContainer}>
-        <Text style={styles.jornadaText}>
-          <Text style={styles.jornadaBold}>Jornada 1</Text>
-          <Text style={styles.jornadaSeparador}>   -   </Text>
-          <Text style={styles.jornadaBold}>Domingo 23/03/2025</Text>
-        </Text>
-      </View>
-
       <FlatList
-        data={partidos}
-        keyExtractor={(_, i) => i.toString()}
+        data={jornadas}
+        keyExtractor={([jornada], i) => jornada + i}
         contentContainerStyle={{ paddingBottom: 120 }}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.row}>
-              <Image source={item.local.logo} style={styles.logo} />
-              <Text style={styles.resultado}>{item.resultado}</Text>
-              <Image source={item.visitante.logo} style={styles.logo} />
-            </View>
-
-            <View style={styles.nombres}>
-              <Text style={styles.nombreEquipo}>{item.local.nombre}</Text>
-              <Text style={styles.nombreEquipo}>{item.visitante.nombre}</Text>
-            </View>
-
-            <View style={styles.infoContainer}>
-              <View>
-                <Text style={styles.infoText}>{item.cancha}</Text>
-                <Text style={styles.infoText}>{item.hora}</Text>
-                <Text style={styles.arbitro}>{item.arbitro}</Text>
+        renderItem={({ item }) => {
+          const [jornada, partidos] = item;
+          return (
+            <View>
+              <View style={styles.jornadaContainer}>
+                <Text style={styles.jornadaText}>
+                  <Text style={styles.jornadaBold}>{jornada}</Text>
+                </Text>
               </View>
-              <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={20} />
+              {partidos.map(renderPartido)}
             </View>
-          </View>
-        )}
+          );
+        }}
       />
-
-  
     </View>
   );
 }
@@ -123,9 +136,6 @@ const styles = StyleSheet.create({
   },
   jornadaBold: {
     fontWeight: 'bold',
-    color: '#FDBA12',
-  },
-  jornadaSeparador: {
     color: '#FDBA12',
   },
   card: {
@@ -230,5 +240,5 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginRight: 10,
-  }
+  },
 });
