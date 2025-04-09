@@ -13,7 +13,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import RegistroModal from './RegistroModal';
-import API from '../api/api'; // Asegúrate de que la ruta es correcta
+import API from '../api/api';
 
 const { width } = Dimensions.get('window');
 
@@ -32,10 +32,13 @@ export default function LoginScreen() {
         password: password,
       });
 
-      const { token, rol } = res.data;
+      const token = res.data.token;
+      const rol = res.data.rol;
+      const usuarioId = res.data.usuarioId;
 
       console.log('✅ Token recibido:', token);
       console.log('🎭 Rol:', rol);
+      console.log('🆔 Usuario ID:', usuarioId);
 
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('rol', rol);
@@ -43,6 +46,13 @@ export default function LoginScreen() {
       if (rol === 'ARBITRO') {
         navigation.replace('ArbitroHome');
       } else if (rol === 'DUENO') {
+        // 🔁 Obtener duenoId usando el usuarioId
+        const duenoRes = await API.get(`/duenos/usuario/${usuarioId}`);
+        const dueno = duenoRes.data;
+
+        console.log('🧑‍💼 Dueño:', dueno);
+
+        await AsyncStorage.setItem('duenoId', dueno.id);
         navigation.replace('CuentaDueno');
       } else {
         Alert.alert('Error', 'Rol no reconocido');
@@ -101,6 +111,7 @@ export default function LoginScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
