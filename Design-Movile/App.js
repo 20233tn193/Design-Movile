@@ -85,7 +85,7 @@ export default function App() {
         <Stack.Screen name="RegistroEquipoScreen" component={RegistroEquipoScreen} />
         <Stack.Screen name="ActualizarEquipoScreen" component={ActualizarEquipoScreen} />
         <Stack.Screen name="ActualizarCuentaDueno" component={ActualizarCuentaDuenoScreen} />
-        <Stack.Screen name="InscripcionesDueno" component={InscripcionesDuenoScreen} />
+        <Stack.Screen name="InscripcionesDuenoScreen" component={InscripcionesDuenoScreen} />
         <Stack.Screen name="InscripcionProceso" component={InscripcionProcesoScreen} />
         <Stack.Screen name="InscripcionAprobado" component={InscripcionAprobadoScreen} />
         <Stack.Screen name="ConfirmarInscripcion" component={ConfirmarInscripcionScreen} />

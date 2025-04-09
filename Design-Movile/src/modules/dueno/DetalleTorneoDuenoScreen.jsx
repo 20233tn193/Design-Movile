@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,10 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  Alert,
 } from 'react-native';
-
+import API from '../../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalConfirmarInscripcion from './ModalConfirmarInscripcion';
 import ModalStripeRedirect from './ModalStripeRedirect';
 
@@ -19,45 +21,63 @@ const { width } = Dimensions.get('window');
 export default function DetalleTorneoDuenoScreen({ navigation, route }) {
   const [modalInscripcionVisible, setModalInscripcionVisible] = useState(false);
   const [modalStripeVisible, setModalStripeVisible] = useState(false);
+  const [equipoId, setEquipoId] = useState(null);
 
-  const { nombre, imagen } = route.params || {
-    nombre: 'Torneo Infantil',
-    imagen: require('../../../assets/madrid.png'),
+  const { torneo } = route.params;
+
+  useEffect(() => {
+    const obtenerEquipo = async () => {
+      try {
+        const duenoId = await AsyncStorage.getItem('duenoId');
+        const res = await API.get(`/equipos/dueño/${duenoId}`);
+        const equipos = res.data;
+        if (equipos.length > 0) {
+          setEquipoId(equipos[0].id); // suponiendo que tiene un solo equipo
+        }
+      } catch (error) {
+        console.error('❌ Error al obtener equipo:', error);
+      }
+    };
+
+    obtenerEquipo();
+  }, []);
+
+  const handleInscripcion = async () => {
+    try {
+      await API.post('/api/equipos/inscribirse', {
+        equipoId: equipoId,
+        torneoId: torneo.id,
+      });
+      Alert.alert('✅ Inscrito', 'Tu equipo fue inscrito correctamente');
+      setModalStripeVisible(true);
+    } catch (error) {
+      console.error('❌ Error al inscribirse:', error.response?.data || error.message);
+      Alert.alert('Error', 'No se pudo completar la inscripción');
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Encabezado limpio */}
       <View style={styles.header}>
         <Text style={styles.headerText}>🏆 Detalles del Torneo</Text>
       </View>
 
-      {/* Tarjeta del torneo */}
       <View style={styles.card}>
-        <Image source={imagen} style={styles.logo} />
+        <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
         <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle}>{nombre}</Text>
-          <Text style={styles.estado}>ACTIVO</Text>
-          <Text style={styles.cardText}>Inicio: 05/03/2025</Text>
-          <Text style={styles.cardText}>10 equipos</Text>
-          <Text style={styles.cardText}>Espacios disponibles: 3</Text>
-          <Text style={styles.cardText}>Inscripción: $900</Text>
+          <Text style={styles.cardTitle}>{torneo.nombreTorneo}</Text>
+          <Text style={styles.estado}>{torneo.estado}</Text>
+          <Text style={styles.cardText}>Inicio: {torneo.fechaInicio}</Text>
+          <Text style={styles.cardText}>{torneo.numeroEquipos} equipos</Text>
+          <Text style={styles.cardText}>Inscripción: ${torneo.costo}</Text>
         </View>
       </View>
 
-      {/* Información adicional */}
       <View style={styles.infoBox}>
         <Text style={styles.infoTitle}>Información del Torneo</Text>
-        <Text style={styles.infoText}>Clasificación por doble eliminación</Text>
-
-        <Text style={styles.infoTitle}>Requisitos</Text>
-        <Text style={styles.infoText}>
-          Lorem ipsum dolor sit amet consectetur adipiscing elit duis, porta mattis odio ligula
-          pulvinar habitasse variu
-        </Text>
+        <Text style={styles.infoText}>{torneo.informacion}</Text>
       </View>
 
-      {/* Botones */}
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.btnGreen}
@@ -65,7 +85,6 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
         >
           <Text style={styles.btnText}>Inscribirse</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.btnGray}
           onPress={() => navigation.goBack()}
@@ -74,7 +93,6 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
         </TouchableOpacity>
       </View>
 
-      {/* MODALES */}
       <ModalConfirmarInscripcion
         visible={modalInscripcionVisible}
         onClose={() => setModalInscripcionVisible(false)}
@@ -83,17 +101,19 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
           setModalStripeVisible(true);
         }}
         torneo={nombre}
+        torneoId={torneoId} // ← agrega esto
         navigation={navigation}
       />
 
       <ModalStripeRedirect
         visible={modalStripeVisible}
         onClose={() => setModalStripeVisible(false)}
-        navigation={navigation} // ✅ navegación pasada correctamente
+        navigation={navigation}
       />
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

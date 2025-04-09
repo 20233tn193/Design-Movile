@@ -10,6 +10,8 @@ import {
 import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 
+
+
 const { width } = Dimensions.get('window');
 
 export default function CuentaDuenoEquipoScreen() {
@@ -57,7 +59,7 @@ export default function CuentaDuenoEquipoScreen() {
 
         <TouchableOpacity
           style={styles.btnBlue}
-          onPress={() => navigation.navigate('InscripcionesDueno')}
+          onPress={() => navigation.navigate('InscripcionesDuenoScreen')}
         >
           <Text style={styles.btnText}>Torneos inscritos</Text>
         </TouchableOpacity>
