@@ -24,7 +24,7 @@ export default function ModalConfirmarInscripcion({ visible, onClose, onConfirm,
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
     } catch (error) {
-      console.error('❌ Error al inscribirse:', error);
+      console.log('❌ Error al inscribirse:', error);
       Alert.alert('Error', 'No se pudo realizar la inscripción.');
     }
   };

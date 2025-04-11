@@ -29,7 +29,7 @@ export default function ArbitroHomeScreen({ navigation }) {
         const data = await obtenerPartidosPorArbitro(arbitroId);
         setPartidos(data);
       } catch (error) {
-        console.error('❌ Error al cargar partidos:', error);
+        console.log('❌ Error al cargar partidos:', error);
       } finally {
         setLoading(false);
       }

@@ -24,7 +24,7 @@ export default function PartidosScreen({ route }) {
         setJornadaLabel(`Jornada ${ultima}`);
       }
     } catch (error) {
-      console.error('Error cargando partidos:', error);
+      console.log('Error cargando partidos:', error);
     } finally {
       setLoading(false);
     }

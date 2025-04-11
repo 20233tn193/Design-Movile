@@ -60,7 +60,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
         setTorneosInscritos(torneosInscritos);
         console.log('✅ Lógica completada sin errores');
       } catch (err) {
-        console.error('❌ Error al cargar torneos:', err);
+        console.log('❌ Error al cargar torneos:', err);
       }
     };
   

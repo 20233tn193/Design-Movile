@@ -89,7 +89,7 @@ export default function ActualizarCuentaDuenoScreen({ navigation }) {
       Alert.alert('Éxito', 'Datos actualizados correctamente');
       navigation.goBack();
     } catch (error) {
-      console.error('❌ Error actualizando cuenta:', error.response?.data || error.message);
+      console.log('❌ Error actualizando cuenta:', error.response?.data || error.message);
       Alert.alert('Error', 'No se pudo actualizar la cuenta');
     }
   };

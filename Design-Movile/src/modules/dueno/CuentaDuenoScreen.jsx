@@ -27,6 +27,7 @@ export default function CuentaDuenoScreen() {
     try {
       await AsyncStorage.removeItem('token');
       await AsyncStorage.removeItem('rol');
+      await AsyncStorage.removeItem('correo'); // si guardas esto también
       await AsyncStorage.removeItem('duenoId'); // si guardas esto también
 
       navigation.reset({
@@ -34,7 +35,7 @@ export default function CuentaDuenoScreen() {
         routes: [{ name: 'BottomTabs' }],
       });
     } catch (error) {
-      console.error('❌ Error al cerrar sesión:', error);
+      console.log('❌ Error al cerrar sesión:', error);
     }
   };
 
@@ -58,11 +59,11 @@ export default function CuentaDuenoScreen() {
           setDueno(duenoData);
 
           const equipos = await obtenerEquipoPorDueno(duenoId);
-          console.log("📦 Equipos del dueño:", equipos);
+          //console.log("📦 Equipos del dueño:", equipos);
 
           if (equipos.length > 0) {
             setEquipo(equipos[0]);
-            console.log("✅ Primer equipo:", equipos[0]);
+            //console.log("✅ Primer equipo:", equipos[0]);
           } else {
             setEquipo(null);
             console.log("ℹ️ El dueño no tiene equipos registrados.");
@@ -140,7 +141,7 @@ export default function CuentaDuenoScreen() {
                 {dueno?.nombre || ""} {dueno?.apellido || ""}
               </Text>
               <Text style={styles.dato}>
-                {dueno?.correo || correo || "Correo no disponible"}
+                {correo || "Correo no disponible"}
               </Text>
 
               <TouchableOpacity
@@ -171,11 +172,13 @@ export default function CuentaDuenoScreen() {
               <Text style={styles.botonTexto}>Cerrar Sesión</Text>
             </TouchableOpacity>
 
-            <Image
-              source={require("../../../assets/ManhattanLogoRojo.png")}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+            <TouchableOpacity onPress={() => navigation.navigate("EsterEgg")}>
+              <Image
+                source={require("../../../assets/ManhattanLogoRojo.png")}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
           </>
         )}
       </View>
@@ -201,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     left: -25,
   },
-  
+
   editEquipoIcon: {
     paddingLeft: 10,
   },
@@ -342,7 +345,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 200,
     height: 200,
-    marginTop: 50,
+    marginTop: 0,
   },
   bottomTabs: {
     flexDirection: "row",

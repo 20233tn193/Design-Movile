@@ -15,7 +15,7 @@ export default function TarjetasScreen({ route }) {
         const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
         setTarjetas(response.data);
       } catch (error) {
-        console.error('Error al cargar tarjetas:', error);
+        console.log('Error al cargar tarjetas:', error);
       } finally {
         setLoading(false);
       }

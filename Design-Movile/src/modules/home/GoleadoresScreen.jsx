@@ -15,7 +15,7 @@ export default function GoleadoresScreen({ route }) {
         const response = await API.get(`/estadisticas/goleadores/${torneoId}`);
         setGoleadores(response.data);
       } catch (error) {
-        console.error('Error al obtener goleadores:', error);
+        console.log('Error al obtener goleadores:', error);
       }
     };
 

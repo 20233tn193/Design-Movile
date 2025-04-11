@@ -13,6 +13,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import API from '../api/api';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -20,22 +21,23 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Campos vacíos', 'Por favor ingresa correo y contraseña');
       return;
     }
-  
+
     // 🧠 Validar formato de correo
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexCorreo.test(email)) {
       Alert.alert('Correo inválido', 'Por favor ingresa un correo con formato válido');
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const res = await API.post('/auth/login', {
         email,
@@ -51,6 +53,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('rol', rol);
       await AsyncStorage.setItem('usuarioId', usuarioId);
+      await AsyncStorage.setItem('correo', email);
 
       if (rol === 'ARBITRO') {
         const arbitroRes = await API.get(`/arbitros/usuario/${usuarioId}`);
@@ -63,10 +66,10 @@ export default function LoginScreen() {
       } else {
         Alert.alert('Error', 'Rol no reconocido');
       }
-  
+
       navigation.replace('BottomTabs');
     } catch (error) {
-      console.error('❌ Error en login:', error.response?.data || error.message);
+      console.log('❌ Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
     } finally {
       setLoading(false);
