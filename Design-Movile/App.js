@@ -46,8 +46,6 @@ import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarElimina
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
 
-
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -64,10 +62,9 @@ export default function App() {
         <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
         <Stack.Screen name="Estadisticas" component={Estadisticas} />
         
-        {/* 🔐 Login único 
-        <Stack.Screen name="Login" component={LoginScreen} />
+        {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        */}
+
         {/* ⚖️ Árbitro */}
         <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
         <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
@@ -102,4 +99,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-

@@ -23,7 +23,7 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
   const [modalStripeVisible, setModalStripeVisible] = useState(false);
   const [equipoId, setEquipoId] = useState(null);
 
-  const { torneo } = route.params;
+  const torneo = route?.params?.torneo;
 
   useEffect(() => {
     const obtenerEquipo = async () => {
@@ -32,7 +32,7 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
         const res = await API.get(`/equipos/dueño/${duenoId}`);
         const equipos = res.data;
         if (equipos.length > 0) {
-          setEquipoId(equipos[0].id); // suponiendo que tiene un solo equipo
+          setEquipoId(equipos[0].id);
         }
       } catch (error) {
         console.error('❌ Error al obtener equipo:', error);
@@ -45,8 +45,8 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
   const handleInscripcion = async () => {
     try {
       await API.post('/api/equipos/inscribirse', {
-        equipoId: equipoId,
-        torneoId: torneo.id,
+        equipoId,
+        torneoId: torneo?.id,
       });
       Alert.alert('✅ Inscrito', 'Tu equipo fue inscrito correctamente');
       setModalStripeVisible(true);
@@ -63,19 +63,24 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
       </View>
 
       <View style={styles.card}>
-        <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
+        <Image
+          source={{
+            uri: torneo?.logoSeleccionado?.uri || torneo?.logoSeleccionado || 'https://via.placeholder.com/60',
+          }}
+          style={styles.logo}
+        />
         <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle}>{torneo.nombreTorneo}</Text>
-          <Text style={styles.estado}>{torneo.estado}</Text>
-          <Text style={styles.cardText}>Inicio: {torneo.fechaInicio}</Text>
-          <Text style={styles.cardText}>{torneo.numeroEquipos} equipos</Text>
-          <Text style={styles.cardText}>Inscripción: ${torneo.costo}</Text>
+          <Text style={styles.cardTitle}>{torneo?.nombreTorneo}</Text>
+          <Text style={styles.estado}>{torneo?.estado}</Text>
+          <Text style={styles.cardText}>Inicio: {torneo?.fechaInicio}</Text>
+          <Text style={styles.cardText}>{torneo?.numeroEquipos} equipos</Text>
+          <Text style={styles.cardText}>Inscripción: ${torneo?.costo}</Text>
         </View>
       </View>
 
       <View style={styles.infoBox}>
         <Text style={styles.infoTitle}>Información del Torneo</Text>
-        <Text style={styles.infoText}>{torneo.informacion}</Text>
+        <Text style={styles.infoText}>{torneo?.informacion}</Text>
       </View>
 
       <View style={styles.buttonRow}>
@@ -98,10 +103,10 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
         onClose={() => setModalInscripcionVisible(false)}
         onConfirm={() => {
           setModalInscripcionVisible(false);
-          setModalStripeVisible(true);
+          handleInscripcion(); // ← se llama aquí
         }}
-        torneo={nombre}
-        torneoId={torneoId} // ← agrega esto
+        torneo={torneo?.nombreTorneo}
+        torneoId={torneo?.id}
         navigation={navigation}
       />
 
@@ -113,7 +118,6 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
     </ScrollView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

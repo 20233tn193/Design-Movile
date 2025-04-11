@@ -11,7 +11,7 @@ import {
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { obtenerPartidosPorArbitro } from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativasSuave'; // <-- Importante
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativasSuave';
 
 export default function ArbitroHomeScreen({ navigation }) {
   const [partidos, setPartidos] = useState([]);
@@ -40,7 +40,7 @@ export default function ArbitroHomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <FranjasDecorativas /> {/* ✅ Aquí se usa el componente */}
+      <FranjasDecorativas />
 
       <View style={styles.header}>
         <Icon name="calendar" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
@@ -63,7 +63,7 @@ export default function ArbitroHomeScreen({ navigation }) {
       ) : (
         <FlatList
           data={partidos}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()} // ✅ convertimos a string
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => navigation.navigate('DetallePartido', { partidoId: item.id })}>

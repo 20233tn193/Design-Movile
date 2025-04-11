@@ -7,7 +7,7 @@ import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave'; // ✅ Importar componente
+import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave';
 
 const { width } = Dimensions.get('window');
 
@@ -28,7 +28,7 @@ export default function CuentaArbitroScreen() {
         }
 
         const response = await axios.get(
-          `http://192.168.1.69:8080/api/arbitros`,
+          `http://192.168.105.31:8080/api/arbitros/usuario/${usuarioId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -36,14 +36,7 @@ export default function CuentaArbitroScreen() {
           }
         );
 
-        const arbitroEncontrado = response.data.find(a => a.idUsuario === usuarioId);
-
-        if (!arbitroEncontrado) {
-          Alert.alert('Error', 'No se encontró información del árbitro.');
-          return;
-        }
-
-        setArbitro(arbitroEncontrado);
+        setArbitro(response.data);
       } catch (error) {
         console.error('Error al cargar árbitro:', error);
         Alert.alert('Error', 'No se pudo obtener la información del árbitro');
@@ -66,19 +59,16 @@ export default function CuentaArbitroScreen() {
 
   return (
     <View style={styles.container}>
-      {/* ✅ Componente de franjas decorativas detrás */}
       <View style={StyleSheet.absoluteFill}>
         <FranjasDecorativasSuave />
       </View>
 
-      {/* Encabezado */}
       <View style={styles.header}>
         <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Cuenta</Text>
       </View>
 
       <View style={styles.content}>
-        {/* Imagen y rol */}
         <View style={styles.profileContainer}>
           <Image
             source={
@@ -93,19 +83,16 @@ export default function CuentaArbitroScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Info del árbitro */}
         <View style={styles.cardInfo}>
           <Text style={styles.name}>{arbitro?.nombre} {arbitro?.apellido}</Text>
           <Text style={styles.text}>{arbitro?.correo}</Text>
           <Text style={styles.text}>{arbitro?.celular}</Text>
         </View>
 
-        {/* Botón logout */}
         <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>
           <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
 
-        {/* Logo */}
         <Image
           source={require('../../../assets/manhattan_logo.jpg')}
           style={styles.logo}

@@ -9,6 +9,7 @@ import {
   Image,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +20,7 @@ const { width } = Dimensions.get('window');
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // ✅ Estado loading agregado
   const navigation = useNavigation();
 
   const handleLogin = async () => {
@@ -26,16 +28,15 @@ export default function LoginScreen() {
       Alert.alert('Campos vacíos', 'Por favor ingresa correo y contraseña');
       return;
     }
-  
-    // 🧠 Validar formato de correo
+
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexCorreo.test(email)) {
       Alert.alert('Correo inválido', 'Por favor ingresa un correo con formato válido');
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const res = await API.post('/auth/login', {
         email,
@@ -63,8 +64,7 @@ export default function LoginScreen() {
       } else {
         Alert.alert('Error', 'Rol no reconocido');
       }
-  
-      navigation.replace('BottomTabs');
+
     } catch (error) {
       console.error('❌ Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
