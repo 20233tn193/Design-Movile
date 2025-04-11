@@ -24,7 +24,7 @@ export default function TorneoScreen({ navigation }) {
         const response = await API.get('/torneos');
         setTorneos(response.data);
       } catch (error) {
-        console.error('Error cargando torneos:', error);
+        console.log('Error cargando torneos:', error);
       }
     };
 

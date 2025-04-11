@@ -38,7 +38,7 @@ export default function CuentaArbitroScreen() {
 
         setArbitro(response.data);
       } catch (error) {
-        console.error('Error al cargar árbitro:', error);
+        console.log('Error al cargar árbitro:', error);
         Alert.alert('Error', 'No se pudo obtener la información del árbitro');
       } finally {
         setLoading(false);

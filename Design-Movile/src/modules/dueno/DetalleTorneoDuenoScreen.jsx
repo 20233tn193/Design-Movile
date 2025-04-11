@@ -35,7 +35,7 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
           setEquipoId(equipos[0].id);
         }
       } catch (error) {
-        console.error('❌ Error al obtener equipo:', error);
+        console.log('❌ Error al obtener equipo:', error);
       }
     };
 
@@ -51,7 +51,7 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
       Alert.alert('✅ Inscrito', 'Tu equipo fue inscrito correctamente');
       setModalStripeVisible(true);
     } catch (error) {
-      console.error('❌ Error al inscribirse:', error.response?.data || error.message);
+      console.log('❌ Error al inscribirse:', error.response?.data || error.message);
       Alert.alert('Error', 'No se pudo completar la inscripción');
     }
   };

@@ -42,6 +42,7 @@ import PagoStripeScreen from './src/modules/dueno/PagoStripeScreen';
 import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
+import EsterEggScreen from './src/modules/dueno/EsterEggScreen';
 
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
@@ -93,6 +94,7 @@ export default function App() {
         <Stack.Screen name="ModalConfirmarEliminacion" component={ModalConfirmarEliminacion} />
         <Stack.Screen name="RegistroJugadorScreen" component={RegistroJugadorScreen} />
         <Stack.Screen name="DetallesJugadorScreen" component={DetallesJugadorScreen} />
+        <Stack.Screen name="EsterEgg" component={EsterEggScreen} />
       </Stack.Navigator>
 
       <StatusBar style="light" />

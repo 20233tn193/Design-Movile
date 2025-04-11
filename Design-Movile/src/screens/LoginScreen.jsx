@@ -14,6 +14,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import API from '../api/api';
+import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -29,6 +30,7 @@ export default function LoginScreen() {
       return;
     }
 
+    // 🧠 Validar formato de correo
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexCorreo.test(email)) {
       Alert.alert('Correo inválido', 'Por favor ingresa un correo con formato válido');
@@ -52,6 +54,7 @@ export default function LoginScreen() {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('rol', rol);
       await AsyncStorage.setItem('usuarioId', usuarioId);
+      await AsyncStorage.setItem('correo', email);
 
       if (rol === 'ARBITRO') {
         const arbitroRes = await API.get(`/arbitros/usuario/${usuarioId}`);
@@ -65,8 +68,9 @@ export default function LoginScreen() {
         Alert.alert('Error', 'Rol no reconocido');
       }
 
+      navigation.replace('BottomTabs');
     } catch (error) {
-      console.error('❌ Error en login:', error.response?.data || error.message);
+      console.log('❌ Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
     } finally {
       setLoading(false);

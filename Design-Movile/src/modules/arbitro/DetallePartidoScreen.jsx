@@ -43,7 +43,7 @@ export default function DetallePartidoScreen() {
         setRojas(todos.map(() => 0));
         setAmarillas(todos.map(() => 0));
       } catch (err) {
-        console.error('Error al cargar partido o jugadores:', err);
+        console.log('Error al cargar partido o jugadores:', err);
         Alert.alert('Error', 'No se pudo cargar la información del partido.');
       } finally {
         setLoading(false);
@@ -99,7 +99,7 @@ export default function DetallePartidoScreen() {
         amarillas,
       });
     } catch (err) {
-      console.error('Error al registrar resultado:', err);
+      console.log('Error al registrar resultado:', err);
       Alert.alert('Error', 'No se pudo guardar el resultado.');
     }
   };

@@ -75,7 +75,7 @@ export default function RegistroDuenoScreen({ navigation }) {
     } catch (error) {
       const mensaje = error.response?.data || error.message;
     
-      console.error('❌ Error al registrar o loguear:', mensaje);
+      console.log('❌ Error al registrar o loguear:', mensaje);
     
       if (mensaje && typeof mensaje === 'string' && mensaje.toLowerCase().includes('email')) {
         Alert.alert(

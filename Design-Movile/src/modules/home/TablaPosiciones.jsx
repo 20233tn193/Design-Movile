@@ -21,7 +21,7 @@ export default function TablaPosiciones({ route }) {
         const response = await API.get(`/estadisticas/tabla-posiciones/${torneoId}`);
         setTabla(response.data);
       } catch (error) {
-        console.error('Error al obtener tabla de posiciones:', error);
+        console.log('Error al obtener tabla de posiciones:', error);
       }
     };
 
