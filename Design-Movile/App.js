@@ -6,12 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // 🌐 Público
 import SplashScreen from './src/screens/SplashScreen';
 import BottomTabs from './src/navigation/BottomTabs';
-import TournamentDetail from './src/modules/home/TournamentDetail';
-import TablaPosiciones from './src/modules/home/TablaPosiciones';
-import PartidosScreen from './src/modules/home/PartidosScreen';
-import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
-import TarjetasScreen from './src/modules/home/TarjetasScreen';
-import Estadisticas from './src/modules/home/Estadisticas';
+import HomeTabs from './src/navigation/HomeTabs';
 
 // 🔐 Login único
 import LoginScreen from './src/screens/LoginScreen';
@@ -56,12 +51,8 @@ export default function App() {
         {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
-        <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
-        <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
-        <Stack.Screen name="Partidos" component={PartidosScreen} />
-        <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
-        <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
-        <Stack.Screen name="Estadisticas" component={Estadisticas} />
+        <Stack.Screen name="HomeTabs" component={HomeTabs} />
+        
         
         {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />

@@ -7,7 +7,7 @@ import { Icon } from '@rneui/themed';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ModalConfirmacion from './ModalConfirmacion';
 import { obtenerPartidoPorId, obtenerJugadoresPorEquipo, registrarResultadoPartido } from '../../api/api';
-import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave';
+import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 

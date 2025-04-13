@@ -14,7 +14,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import API from '../api/api';
-import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -68,7 +67,7 @@ export default function LoginScreen() {
         Alert.alert('Error', 'Rol no reconocido');
       }
 
-      navigation.replace('BottomTabs');
+      //navigation.replace('BottomTabs');
     } catch (error) {
       console.log('❌ Error en login:', error.response?.data || error.message);
       Alert.alert('Error', 'Credenciales inválidas o problema de conexión');

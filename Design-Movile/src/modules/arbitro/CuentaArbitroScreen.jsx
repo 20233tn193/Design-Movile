@@ -7,7 +7,7 @@ import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave';
+import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 

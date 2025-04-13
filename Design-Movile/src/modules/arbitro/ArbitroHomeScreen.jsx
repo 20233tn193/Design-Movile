@@ -11,7 +11,7 @@ import {
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { obtenerPartidosPorArbitro } from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativasSuave';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 export default function ArbitroHomeScreen({ navigation }) {
   const [partidos, setPartidos] = useState([]);
