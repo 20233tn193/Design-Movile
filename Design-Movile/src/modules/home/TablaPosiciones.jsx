@@ -17,6 +17,7 @@ export default function TablaPosiciones({ route }) {
   const [tabla, setTabla] = useState([]);
 
   useEffect(() => {
+    console.log('📦 ID del torneo recibido:', torneoId);
     const cargarTabla = async () => {
       try {
         const response = await API.get(`/estadisticas/tabla-posiciones/${torneoId}`);
@@ -51,20 +52,22 @@ export default function TablaPosiciones({ route }) {
 
       <FlatList
         data={tabla}
-        keyExtractor={(item, index) => item.equipoId + index}
+        keyExtractor={(_, index) => index.toString()}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.equipo}>
-              <Image source={{ uri: item.logoEquipo }} style={styles.logo} />
+              <Image source={{ uri: item.logoUrl }} style={styles.logo} />
               <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
-            <Text style={styles.column}>{item.pj}</Text>
-            <Text style={styles.column}>{item.pg}</Text>
-            <Text style={styles.column}>{item.pe}</Text>
-            <Text style={styles.column}>{item.pp}</Text>
-            <Text style={styles.column}>{item.gf}</Text>
-            <Text style={styles.column}>{item.gc}</Text>
+            <Text style={styles.column}>{item.partidosJugados}</Text>
+            <Text style={styles.column}>{item.ganados}</Text>
+            <Text style={styles.column}>
+              {item.partidosJugados - item.ganados - item.perdidos}
+            </Text>
+            <Text style={styles.column}>{item.perdidos}</Text>
+            <Text style={styles.column}>{item.golesFavor}</Text>
+            <Text style={styles.column}>{item.golesContra}</Text>
             <Text style={styles.column}>{item.puntos}</Text>
           </View>
         )}

@@ -2,21 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativas'; // Asegúrate de que la ruta sea correcta
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
 export default function PartidosScreen({ route }) {
+  const { torneoId } = route.params;
   const [partidos, setPartidos] = useState([]);
   const [jornadaLabel, setJornadaLabel] = useState('');
   const [loading, setLoading] = useState(true);
-
-  const torneoId = route?.params?.torneoId || 'DEFAULT_ID';
 
   const obtenerPartidos = async () => {
     try {
       const response = await API.get(`/partidos/calendario/${torneoId}`);
       const calendario = response.data;
+
       const jornadas = Object.keys(calendario).sort((a, b) => b - a);
       if (jornadas.length > 0) {
         const ultima = jornadas[0];
@@ -32,7 +32,7 @@ export default function PartidosScreen({ route }) {
 
   useEffect(() => {
     obtenerPartidos();
-  }, []);
+  }, [torneoId]);
 
   const renderPartido = ({ item }) => (
     <View style={styles.card}>

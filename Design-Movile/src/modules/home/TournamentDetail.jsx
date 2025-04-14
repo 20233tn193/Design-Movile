@@ -5,7 +5,7 @@ import FranjasDecorativas from '../../kernel/components/FranjasDecorativas'; // 
 const { width } = Dimensions.get('window');
 
 export default function TournamentDetail({ route, navigation }) {
-  const { nombre, torneoId } = route.params;
+  const { nombre, torneoId ,logo} = route.params;
 
   const buttons = [
     {
@@ -35,8 +35,8 @@ export default function TournamentDetail({ route, navigation }) {
       <FranjasDecorativas />
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/TorneoABC.jpg')} style={styles.icono} />
-        <Text style={styles.title}>{nombre}</Text>
+      <Image source={{ uri: logo }} style={styles.icono} />
+      <Text style={styles.title}>{nombre}</Text>
       </View>
 
       <View style={styles.options}>

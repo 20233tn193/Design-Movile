@@ -73,6 +73,7 @@ export default function TorneoScreen({ navigation }) {
                 params: {
                   torneoId: torneo._id,
                   nombre: torneo.nombreTorneo,
+                  logo: torneo.logoSeleccionado,
                 },
               })
             }

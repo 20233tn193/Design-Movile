@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativas'; // Ajusta la ruta si es necesario
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -15,7 +15,14 @@ export default function TarjetasScreen({ route }) {
     const fetchTarjetas = async () => {
       try {
         const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
-        setTarjetas(response.data);
+        const datos = response.data.map((item) => ({
+          nombre: `${item.nombre || ''} ${item.apellido || ''}`,
+          equipoNombre: item.equipoNombre || 'Sin equipo',
+          equipoEscudo: item.equipoEscudo || 'https://via.placeholder.com/40',
+          amarillas: item.amarillas,
+          rojas: item.rojas,
+        }));
+        setTarjetas(datos);
       } catch (error) {
         console.log('Error al cargar tarjetas:', error);
       } finally {
@@ -53,8 +60,11 @@ export default function TarjetasScreen({ route }) {
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
           renderItem={({ item }) => (
             <View style={styles.row}>
-              <Text style={[styles.text, { width: 120 }]}>{item.jugadorId || 'Sin nombre'}</Text>
-              <Text style={[styles.text, { width: 80 }]}>{item.torneoId}</Text>
+              <Text style={[styles.text, { width: 120 }]}>{item.nombre}</Text>
+              <View style={[styles.equipo, { width: 80 }]}>
+                <Image source={{ uri: item.equipoEscudo }} style={styles.logo} />
+                <Text style={styles.equipoText}>{item.equipoNombre}</Text>
+              </View>
               <Text style={styles.text}>{item.amarillas}</Text>
               <Text style={styles.text}>{item.rojas}</Text>
             </View>
@@ -122,5 +132,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginRight: 20,
     color: '#333',
+  },
+  equipo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  equipoText: {
+    fontSize: 12,
+    marginLeft: 5,
+    color: '#333',
+  },
+  logo: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
   },
 });
