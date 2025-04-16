@@ -1,3 +1,4 @@
+// ✅ ArbitroHomeScreen corregido sin bottomTabs (usa ArbitroTabs.js)
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -63,7 +64,7 @@ export default function ArbitroHomeScreen({ navigation }) {
       ) : (
         <FlatList
           data={partidos}
-          keyExtractor={(item) => item.id.toString()} // ✅ convertimos a string
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => navigation.navigate('DetallePartido', { partidoId: item.id })}>
@@ -91,18 +92,6 @@ export default function ArbitroHomeScreen({ navigation }) {
           )}
         />
       )}
-
-      <View style={styles.bottomTabs}>
-        <TouchableOpacity onPress={() => navigation.replace('BottomTabs')}>
-          <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.replace('CuentaArbitro')}>
-          <Icon name="user" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.replace('Estadisticas')}>
-          <Icon name="bar-chart" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -163,15 +152,4 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardSubText: { color: '#fff', fontSize: 12, marginBottom: 2 },
-  bottomTabs: {
-    position: 'absolute',
-    bottom: 0,
-    height: 60,
-    backgroundColor: '#1a1a1a',
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 5,
-  },
 });

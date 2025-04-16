@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, StyleSheet, Image, TouchableOpacity,
-  Dimensions, Alert, ActivityIndicator
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativas';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -28,14 +34,14 @@ export default function CuentaArbitroScreen() {
         }
 
         const response = await axios.get(
-          `http://192.168.105.31:8080/api/arbitros/usuario/${usuarioId}`,
+          `http://192.168.1.65:8080/api/arbitros/usuario/${usuarioId}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-
+        console.log("🎯 Datos del árbitro recibidos:", response.data);
         setArbitro(response.data);
       } catch (error) {
         console.log('Error al cargar árbitro:', error);
@@ -49,19 +55,35 @@ export default function CuentaArbitroScreen() {
   }, []);
 
   const cerrarSesion = async () => {
-    await AsyncStorage.clear();
-    navigation.replace('LoginScreen');
+    Alert.alert(
+      'Cerrar sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sí, salir',
+          style: 'destructive',
+          onPress: async () => {
+            await AsyncStorage.clear();
+            navigation.replace('LoginScreen');
+          },
+        },
+      ]
+    );
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 50 }} />;
+    return (
+      <View style={styles.container}>
+        <FranjasDecorativas />
+        <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 50 }} />
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
-      <View style={StyleSheet.absoluteFill}>
-        <FranjasDecorativasSuave />
-      </View>
+      <FranjasDecorativas />
 
       <View style={styles.header}>
         <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
@@ -69,10 +91,12 @@ export default function CuentaArbitroScreen() {
       </View>
 
       <View style={styles.content}>
+        <Text style={styles.welcome}>¡Bienvenido, {arbitro?.nombre}!</Text>
+
         <View style={styles.profileContainer}>
           <Image
             source={
-              arbitro?.fotoUrl
+              arbitro?.fotoUrl && arbitro.fotoUrl.startsWith('data:image')
                 ? { uri: arbitro.fotoUrl }
                 : require('../../../assets/arbitro.jpg')
             }
@@ -86,7 +110,7 @@ export default function CuentaArbitroScreen() {
         <View style={styles.cardInfo}>
           <Text style={styles.name}>{arbitro?.nombre} {arbitro?.apellido}</Text>
           <Text style={styles.text}>{arbitro?.correo}</Text>
-          <Text style={styles.text}>{arbitro?.celular}</Text>
+          <Text style={styles.text}>{arbitro?.celular || 'Sin número registrado'}</Text>
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>
@@ -103,11 +127,9 @@ export default function CuentaArbitroScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  content: {
+  container: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
   header: {
     backgroundColor: '#000',
@@ -121,6 +143,18 @@ const styles = StyleSheet.create({
     color: '#FDBA12',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  welcome: {
+    fontSize: 18,
+    color: '#001F4E',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
   },
   profileContainer: {
     flexDirection: 'row',
