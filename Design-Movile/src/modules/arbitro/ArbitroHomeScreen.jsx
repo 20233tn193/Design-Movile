@@ -1,3 +1,4 @@
+// ✅ ArbitroHomeScreen corregido sin bottomTabs (usa ArbitroTabs.js)
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -11,7 +12,7 @@ import {
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { obtenerPartidosPorArbitro } from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativasSuave'; // <-- Importante
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 export default function ArbitroHomeScreen({ navigation }) {
   const [partidos, setPartidos] = useState([]);
@@ -40,7 +41,7 @@ export default function ArbitroHomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <FranjasDecorativas /> {/* ✅ Aquí se usa el componente */}
+      <FranjasDecorativas />
 
       <View style={styles.header}>
         <Icon name="calendar" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
@@ -63,7 +64,7 @@ export default function ArbitroHomeScreen({ navigation }) {
       ) : (
         <FlatList
           data={partidos}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => navigation.navigate('DetallePartido', { partidoId: item.id })}>
@@ -91,18 +92,6 @@ export default function ArbitroHomeScreen({ navigation }) {
           )}
         />
       )}
-
-      <View style={styles.bottomTabs}>
-        <TouchableOpacity onPress={() => navigation.replace('Main')}>
-          <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.replace('CuentaArbitro')}>
-          <Icon name="user" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.replace('Estadisticas')}>
-          <Icon name="bar-chart" type="font-awesome" color="#fff" size={24} />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 }
@@ -163,15 +152,4 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardSubText: { color: '#fff', fontSize: 12, marginBottom: 2 },
-  bottomTabs: {
-    position: 'absolute',
-    bottom: 0,
-    height: 60,
-    backgroundColor: '#1a1a1a',
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingBottom: 5,
-  },
 });

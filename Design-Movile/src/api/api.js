@@ -3,7 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: 'http://192.168.100.192:8080/api',
+  baseURL: 'http://192.168.1.65:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,6 +21,8 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// 🔽 Obtener dueño por ID
+// Removed duplicate function declaration
 // // 🔽 Obtener dueño por ID
 // export const obtenerDuenoPorId = async (id) => {
 //   try {

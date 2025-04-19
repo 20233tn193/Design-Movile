@@ -6,12 +6,12 @@ export default function ModalConfirmacion({ visible, onConfirmar, onCancelar }) 
     <Modal animationType="fade" transparent={true} visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          {/* Encabezado superior negro */}
+          {/* Encabezado */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalHeaderText}>Confirmar Cierre</Text>
           </View>
 
-          {/* Contenido del modal */}
+          {/* Contenido */}
           <View style={styles.modalContent}>
             <Text style={styles.titulo}>¿Terminar Partido?</Text>
             <Text style={styles.texto}>Esta acción no se puede deshacer</Text>
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   modal: {
     width: '80%',
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
   modalHeader: {
     backgroundColor: '#0e1b39',
-    paddingVertical: 8,
+    paddingVertical: 10,
     alignItems: 'center',
     borderBottomWidth: 3,
     borderBottomColor: '#FDBA12',
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
   modalHeaderText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   modalContent: {
     padding: 20,
@@ -70,10 +71,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#555',
     marginBottom: 20,
+    textAlign: 'center',
   },
   botones: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     gap: 10,
     width: '100%',
   },
@@ -94,9 +95,11 @@ const styles = StyleSheet.create({
   textoCancelar: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 13,
   },
   textoConfirmar: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 13,
   },
 });

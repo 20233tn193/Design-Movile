@@ -32,7 +32,7 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
         const res = await API.get(`/equipos/dueño/${duenoId}`);
         const equipos = res.data;
         if (equipos.length > 0) {
-          setEquipoId(equipos[0].id); // suponiendo que tiene un solo equipo
+          setEquipoId(equipos[0].id);
         }
       } catch (error) {
         console.log('❌ Error al obtener equipo:', error);
@@ -45,8 +45,8 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
   const handleInscripcion = async () => {
     try {
       await API.post('/api/equipos/inscribirse', {
-        equipoId: equipoId,
-        torneoId: torneo.id,
+        equipoId,
+        torneoId: torneo?.id,
       });
       Alert.alert('✅ Inscrito', 'Tu equipo fue inscrito correctamente');
       setModalStripeVisible(true);

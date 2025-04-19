@@ -6,22 +6,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // 🌐 Público
 import SplashScreen from './src/screens/SplashScreen';
 import BottomTabs from './src/navigation/BottomTabs';
-import TournamentDetail from './src/modules/home/TournamentDetail';
-import TablaPosiciones from './src/modules/home/TablaPosiciones';
-import PartidosScreen from './src/modules/home/PartidosScreen';
-import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
-import TarjetasScreen from './src/modules/home/TarjetasScreen';
-import Estadisticas from './src/modules/home/Estadisticas';
+import HomeTabs from './src/navigation/HomeTabs';
+import ArbitroTabs from './src/navigation/ArbitroTabs'; // ✅ Tabs árbitro
 
-// 🔐 Login único
+// 🔐 Login
 import LoginScreen from './src/screens/LoginScreen';
-
-// ⚖️ Árbitro
-import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
-import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
-import DetallePartidoScreen from './src/modules/arbitro/DetallePartidoScreen';
-import RegistroCerradoScreen from './src/modules/arbitro/RegistroCerradoScreen';
-import ModalConfirmacion from './src/modules/arbitro/ModalConfirmacion';
 
 // 📋 Dueño
 import CuentaDuenoScreen from './src/modules/dueno/CuentaDuenoScreen';
@@ -44,11 +33,8 @@ import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
 import EsterEggScreen from './src/modules/dueno/EsterEggScreen';
-
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
-
-
 
 const Stack = createNativeStackNavigator();
 
@@ -68,14 +54,12 @@ export default function App() {
         
         {/* 🔐 Login único 
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen name="HomeTabs" component={HomeTabs} />
+        <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
+
+        {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        */}
-        {/* ⚖️ Árbitro */}
-        <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
-        <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
-        <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
-        <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
-        <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
 
         {/* 📋 Dueño */}
         <Stack.Screen name="CuentaDuenoScreen" component={CuentaDuenoScreen} />
@@ -106,4 +90,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-

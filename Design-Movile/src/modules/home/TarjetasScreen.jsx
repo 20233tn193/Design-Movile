@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // ajusta si tu ruta es distinta
+import API from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
+
 const { width } = Dimensions.get('window');
 
 export default function TarjetasScreen({ route }) {
@@ -13,7 +15,14 @@ export default function TarjetasScreen({ route }) {
     const fetchTarjetas = async () => {
       try {
         const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
-        setTarjetas(response.data);
+        const datos = response.data.map((item) => ({
+          nombre: `${item.nombre || ''} ${item.apellido || ''}`,
+          equipoNombre: item.equipoNombre || 'Sin equipo',
+          equipoEscudo: item.equipoEscudo || 'https://via.placeholder.com/40',
+          amarillas: item.amarillas,
+          rojas: item.rojas,
+        }));
+        setTarjetas(datos);
       } catch (error) {
         console.log('Error al cargar tarjetas:', error);
       } finally {
@@ -26,13 +35,7 @@ export default function TarjetasScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
       <View style={styles.header}>
         <Icon name="credit-card" type="font-awesome-5" color="#FDBA12" size={20} />
@@ -57,8 +60,11 @@ export default function TarjetasScreen({ route }) {
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
           renderItem={({ item }) => (
             <View style={styles.row}>
-              <Text style={[styles.text, { width: 120 }]}>{item.jugadorId || 'Sin nombre'}</Text>
-              <Text style={[styles.text, { width: 80 }]}>{item.torneoId}</Text>
+              <Text style={[styles.text, { width: 120 }]}>{item.nombre}</Text>
+              <View style={[styles.equipo, { width: 80 }]}>
+                <Image source={{ uri: item.equipoEscudo }} style={styles.logo} />
+                <Text style={styles.equipoText}>{item.equipoNombre}</Text>
+              </View>
               <Text style={styles.text}>{item.amarillas}</Text>
               <Text style={styles.text}>{item.rojas}</Text>
             </View>
@@ -127,46 +133,18 @@ const styles = StyleSheet.create({
     marginRight: 20,
     color: '#333',
   },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
+  equipo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
+  equipoText: {
+    fontSize: 12,
+    marginLeft: 5,
+    color: '#333',
   },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
+  logo: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
   },
 });

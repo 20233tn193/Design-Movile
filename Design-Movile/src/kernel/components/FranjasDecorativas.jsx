@@ -1,15 +1,13 @@
 import React from 'react';
-import { View, Dimensions, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-export default function FranjasDecorativasSuave() {
+const FranjasDecorativas = () => {
   return (
-    <>
-      {/* Triángulo superior */}
-      <View style={styles.triangleTopRed} />
-      
-      {/* Franjas superiores */}
+    <View style={styles.backgroundContainer}>
+      {/* Franjas superiores (ajustadas más abajo) */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
 
@@ -17,53 +15,61 @@ export default function FranjasDecorativasSuave() {
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
-    </>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  triangleTopRed: {
+  backgroundContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: 0,
-    height: 0,
-    borderTopWidth: 90,
-    borderRightWidth: width * 3, // más ancho para cubrir laterales
-    borderTopColor: '#d80027',
-    borderRightColor: 'transparent',
-    zIndex: 1,
+    right: 0,
+    bottom: 0,
+    zIndex: -1,
   },
   franja: {
     position: 'absolute',
-    width: width * 3, // extendido a 3x el ancho
-    height: 60,
-    left: -width, // centrar mejor con exceso
-    zIndex: -1,
+    width: width * 2,
+    height: 50,
+  },
+  franjaRojaTop: {
+    top: 30, // antes 0
+    left: -width / 2,
+    backgroundColor: '#d80027',
+    height: 80,
+    transform: [{ rotate: '-10deg' }],
   },
   franjaNegraTop: {
-    top: 90,
+    top: 90, // antes 60
+    left: -width / 2,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaGrisTop: {
-    top: 140,
+    top: 120, // antes 90
+    left: -width / 2,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
   },
   franjaGrisBottom: {
-    bottom: 110,
+    bottom: 70,
+    left: -width / 2,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '10deg' }],
   },
   franjaNegraBottom: {
-    bottom: 60,
+    bottom: 35,
+    left: -width / 2,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '10deg' }],
   },
   franjaRojaBottom: {
-    bottom: 10,
+    bottom: 0,
+    left: -width / 2,
     backgroundColor: '#d80027',
     transform: [{ rotate: '10deg' }],
   },
 });
+
+export default FranjasDecorativas;

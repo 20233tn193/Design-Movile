@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import API from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas'; // Ajusta la ruta según tu estructura
 
 const { width } = Dimensions.get('window');
 
@@ -16,6 +17,7 @@ export default function TablaPosiciones({ route }) {
   const [tabla, setTabla] = useState([]);
 
   useEffect(() => {
+    console.log('📦 ID del torneo recibido:', torneoId);
     const cargarTabla = async () => {
       try {
         const response = await API.get(`/estadisticas/tabla-posiciones/${torneoId}`);
@@ -30,17 +32,10 @@ export default function TablaPosiciones({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas superiores */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      {/* Franjas inferiores */}
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/Posiciones.png')} style={styles.icono} />
+        <Image source={require('../../../assets/TablaPosiciones .png')} style={styles.icono} />
         <Text style={styles.headerText}> Tabla de Posiciones</Text>
       </View>
 
@@ -57,23 +52,22 @@ export default function TablaPosiciones({ route }) {
 
       <FlatList
         data={tabla}
-        keyExtractor={(item, index) => item.equipoId + index}
+        keyExtractor={(_, index) => index.toString()}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.equipo}>
-              <Image
-                source={{ uri: item.logoEquipo }}
-                style={styles.logo}
-              />
+              <Image source={{ uri: item.logoUrl }} style={styles.logo} />
               <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
-            <Text style={styles.column}>{item.pj}</Text>
-            <Text style={styles.column}>{item.pg}</Text>
-            <Text style={styles.column}>{item.pe}</Text>
-            <Text style={styles.column}>{item.pp}</Text>
-            <Text style={styles.column}>{item.gf}</Text>
-            <Text style={styles.column}>{item.gc}</Text>
+            <Text style={styles.column}>{item.partidosJugados}</Text>
+            <Text style={styles.column}>{item.ganados}</Text>
+            <Text style={styles.column}>
+              {item.partidosJugados - item.ganados - item.perdidos}
+            </Text>
+            <Text style={styles.column}>{item.perdidos}</Text>
+            <Text style={styles.column}>{item.golesFavor}</Text>
+            <Text style={styles.column}>{item.golesContra}</Text>
             <Text style={styles.column}>{item.puntos}</Text>
           </View>
         )}
@@ -83,7 +77,6 @@ export default function TablaPosiciones({ route }) {
 }
 
 const styles = StyleSheet.create({
-  // ... (misma definición de estilos que ya tienes)
   container: {
     flex: 1,
     backgroundColor: '#f2f2f2',
@@ -156,47 +149,5 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginRight: 10,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
-  },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
   },
 });

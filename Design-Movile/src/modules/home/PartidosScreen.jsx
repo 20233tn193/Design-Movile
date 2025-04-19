@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // Asegúrate que la ruta sea correcta
+import API from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
 export default function PartidosScreen({ route }) {
+  const { torneoId } = route.params;
   const [partidos, setPartidos] = useState([]);
   const [jornadaLabel, setJornadaLabel] = useState('');
   const [loading, setLoading] = useState(true);
-
-  const torneoId = route?.params?.torneoId || 'DEFAULT_ID'; // Cambia esto por un ID real
 
   const obtenerPartidos = async () => {
     try {
       const response = await API.get(`/partidos/calendario/${torneoId}`);
       const calendario = response.data;
 
-      const jornadas = Object.keys(calendario).sort((a, b) => b - a); // Última jornada
+      const jornadas = Object.keys(calendario).sort((a, b) => b - a);
       if (jornadas.length > 0) {
         const ultima = jornadas[0];
         setPartidos(calendario[ultima]);
@@ -32,7 +32,7 @@ export default function PartidosScreen({ route }) {
 
   useEffect(() => {
     obtenerPartidos();
-  }, []);
+  }, [torneoId]);
 
   const renderPartido = ({ item }) => (
     <View style={styles.card}>
@@ -41,12 +41,10 @@ export default function PartidosScreen({ route }) {
         <Text style={styles.resultado}>{item.golesLocal ?? 0} : {item.golesVisitante ?? 0}</Text>
         <Image source={{ uri: item.logoVisitante }} style={styles.logo} />
       </View>
-
       <View style={styles.nombres}>
         <Text style={styles.nombreEquipo}>{item.nombreLocal}</Text>
         <Text style={styles.nombreEquipo}>{item.nombreVisitante}</Text>
       </View>
-
       <View style={styles.infoContainer}>
         <View>
           <Text style={styles.infoText}>{item.nombreCampo} - {item.nombreCancha}</Text>
@@ -60,21 +58,13 @@ export default function PartidosScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
-      {/* Header */}
       <View style={styles.header}>
         <Image source={require('../../../assets/ProximosPartidos.png')} style={styles.icono} />
         <Text style={styles.headerText}> Partidos</Text>
       </View>
 
-      {/* Jornada */}
       <View style={styles.jornadaContainer}>
         <Text style={styles.jornadaText}>
           <Text style={styles.jornadaBold}>{jornadaLabel}</Text>
@@ -189,48 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: 'italic',
     color: '#555',
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
-  },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
   },
   icono: {
     width: 24,

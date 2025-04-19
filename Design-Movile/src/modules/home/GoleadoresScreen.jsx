@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // Ajusta si es necesario
+import API from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -13,7 +14,13 @@ export default function GoleadoresScreen({ route }) {
     const cargarGoleadores = async () => {
       try {
         const response = await API.get(`/estadisticas/goleadores/${torneoId}`);
-        setGoleadores(response.data);
+        const data = response.data.map((item) => ({
+          nombreJugador: `${item.nombre} ${item.apellido}`,
+          nombreEquipo: item.equipoNombre || 'Sin equipo',
+          logoEquipo: item.equipoEscudo || 'https://via.placeholder.com/40',
+          goles: item.goles,
+        }));
+        setGoleadores(data);
       } catch (error) {
         console.log('Error al obtener goleadores:', error);
       }
@@ -24,21 +31,13 @@ export default function GoleadoresScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
-      {/* Header */}
       <View style={styles.header}>
         <Image source={require('../../../assets/Goleadores.png')} style={styles.icono} />
         <Text style={styles.title}> Goleadores</Text>
       </View>
 
-      {/* Encabezados */}
       <View style={styles.tableHeader}>
         <Text style={styles.columnHeader}>Nombre</Text>
         <Text style={styles.columnHeader}>Equipo</Text>
@@ -54,7 +53,7 @@ export default function GoleadoresScreen({ route }) {
             <Text style={styles.column}>{item.nombreJugador}</Text>
             <View style={styles.equipo}>
               <Image
-                source={{ uri: item.logoEquipo || 'https://via.placeholder.com/40' }}
+                source={{ uri: item.logoEquipo }}
                 style={styles.logo}
               />
               <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
@@ -134,48 +133,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
-  },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
   },
   icono: {
     width: 24,

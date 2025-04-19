@@ -1,33 +1,42 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas'; // Ajusta la ruta si es diferente
 
 const { width } = Dimensions.get('window');
 
 export default function TournamentDetail({ route, navigation }) {
-  const { nombre, torneoId } = route.params; // ahora también recibimos torneoId
+  const { nombre, torneoId ,logo} = route.params;
 
   const buttons = [
-    { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones.png'), ruta: 'TablaPosiciones' },
-    { label: 'Próximos Partidos', icon: require('../../../assets/ProximosPartidos.png'), ruta: 'Partidos' },
-    { label: 'Maximos Goleadores', icon: require('../../../assets/Goleadores.png'), ruta: 'Goleadores' },
-    { label: 'Tarjetas', icon: require('../../../assets/Tarjetas.png'), ruta: 'Tarjetas' },
+    {
+      label: 'Tabla de Posiciones',
+      icon: require('../../../assets/TablaPosiciones .png'), // Ícono nuevo
+      ruta: 'TablaPosiciones',
+    },
+    {
+      label: 'Próximos Partidos',
+      icon: require('../../../assets/ProximosPartidos.png'),
+      ruta: 'Partidos',
+    },
+    {
+      label: 'Maximos Goleadores',
+      icon: require('../../../assets/Goleadores.png'),
+      ruta: 'Goleadores',
+    },
+    {
+      label: 'Tarjetas',
+      icon: require('../../../assets/Tarjetas.png'),
+      ruta: 'Tarjetas',
+    },
   ];
 
   return (
     <View style={styles.container}>
-      {/* Franjas superiores */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-
-      {/* Franjas inferiores */}
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/TorneoABC.jpg')} style={styles.icono} />
-        <Text style={styles.title}> {nombre}</Text>
+      <Image source={{ uri: logo }} style={styles.icono} />
+      <Text style={styles.title}>{nombre}</Text>
       </View>
 
       <View style={styles.options}>
@@ -35,7 +44,7 @@ export default function TournamentDetail({ route, navigation }) {
           <TouchableOpacity
             key={i}
             style={styles.card}
-            onPress={() => navigation.navigate(btn.ruta, { torneoId })} // pasamos torneoId
+            onPress={() => navigation.navigate(btn.ruta, { torneoId })}
           >
             <Image source={btn.icon} style={styles.iconoBoton} />
             <Text style={styles.text}>{btn.label}</Text>
@@ -100,49 +109,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   iconoBoton: {
-    width: 30,
-    height: 30,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
-  },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
+    width: 45,  // Tamaño aumentado
+    height: 45,
+    resizeMode: 'contain',
   },
 });

@@ -7,7 +7,7 @@ import { Icon } from '@rneui/themed';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import ModalConfirmacion from './ModalConfirmacion';
 import { obtenerPartidoPorId, obtenerJugadoresPorEquipo, registrarResultadoPartido } from '../../api/api';
-import FranjasDecorativasSuave from '../../kernel/components/FranjasDecorativasSuave';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -35,6 +35,9 @@ export default function DetallePartidoScreen() {
 
         const jugadoresLocal = await obtenerJugadoresPorEquipo(p.equipoAId);
         const jugadoresVisitante = await obtenerJugadoresPorEquipo(p.equipoBId);
+        jugadoresLocal.forEach(j => j.equipo = 'local');
+        jugadoresVisitante.forEach(j => j.equipo = 'visitante');
+
         const todos = [...jugadoresLocal, ...jugadoresVisitante];
         setJugadores(todos);
 
@@ -55,16 +58,41 @@ export default function DetallePartidoScreen() {
 
   const aumentar = (arr, setArr, i) => {
     if (registroCerrado) return;
+
     const nuevo = [...arr];
-    nuevo[i]++;
+
+    if (seccion === 'Amarilla') {
+      if (nuevo[i] >= 2) {
+        Alert.alert('Expulsión automática', 'El jugador ya tiene dos amarillas. Se asignó tarjeta roja y fue expulsado.');
+        return;
+      }
+      nuevo[i]++;
+      if (nuevo[i] === 2) {
+        const nuevasRojas = [...rojas];
+        nuevasRojas[i] = 1;
+        setRojas(nuevasRojas);
+      }
+    } else if (seccion === 'Roja') {
+      nuevo[i] = 1; // Solo una roja
+    } else {
+      nuevo[i]++;
+    }
+
     setArr(nuevo);
   };
 
   const disminuir = (arr, setArr, i) => {
     if (registroCerrado) return;
     const nuevo = [...arr];
-    if (nuevo[i] > 0) nuevo[i]--;
-    setArr(nuevo);
+    if (nuevo[i] > 0) {
+      nuevo[i]--;
+      if (seccion === 'Amarilla' && nuevo[i] < 2) {
+        const nuevasRojas = [...rojas];
+        nuevasRojas[i] = 0;
+        setRojas(nuevasRojas);
+      }
+      setArr(nuevo);
+    }
   };
 
   const toggleAsistencia = (index) => {
@@ -111,16 +139,14 @@ export default function DetallePartidoScreen() {
   return (
     <View style={styles.container}>
       <View style={StyleSheet.absoluteFill}>
-        <FranjasDecorativasSuave />
+        <FranjasDecorativas />
       </View>
 
-      {/* Encabezado de pantalla */}
       <View style={styles.header}>
         <Icon name="fire" type="font-awesome" color="#FDBA12" size={18} style={{ marginRight: 8 }} />
         <Text style={styles.headerText}>Detalles del Partido</Text>
       </View>
 
-      {/* Card del partido */}
       <View style={styles.matchCard}>
         <Text style={styles.matchTitle}>
           {partido?.nombreEquipoA} vs {partido?.nombreEquipoB}
@@ -136,7 +162,6 @@ export default function DetallePartidoScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Filtros */}
       <View style={styles.iconosRow}>
         {['Asistencia', 'Goles', 'Roja', 'Amarilla'].map((sec, i) => (
           <TouchableOpacity
@@ -155,14 +180,16 @@ export default function DetallePartidoScreen() {
         ))}
       </View>
 
-      {/* Lista de jugadores tipo tabla */}
       <FlatList
         data={jugadores}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 60 }}
         renderItem={({ item, index }) => (
-          <View style={styles.jugadorRow}>
-            <Text style={styles.jugadorNombre}>{item.nombre} {item.apellido}</Text>
+          <View style={[
+            styles.jugadorRow,
+            item.equipo === 'local' ? { backgroundColor: '#e0f7ff' } : { backgroundColor: '#fff0f0' }
+          ]}>
+            <Text style={styles.jugadorNombre}>{item.nombre} {item.apellido} {rojas[index] > 0 ? '⚠️ Expulsado' : ''}</Text>
             {seccion === 'Asistencia' ? (
               <TouchableOpacity onPress={() => toggleAsistencia(index)}>
                 <Icon
@@ -278,7 +305,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginHorizontal: 15,

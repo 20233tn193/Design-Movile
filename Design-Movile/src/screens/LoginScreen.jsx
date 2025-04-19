@@ -9,19 +9,19 @@ import {
   Image,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import API from '../api/api';
-import { ActivityIndicator } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -29,7 +29,6 @@ export default function LoginScreen() {
       return;
     }
 
-    // 🧠 Validar formato de correo
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!regexCorreo.test(email)) {
       Alert.alert('Correo inválido', 'Por favor ingresa un correo con formato válido');
@@ -66,7 +65,7 @@ export default function LoginScreen() {
       if (rol === 'ARBITRO') {
         const arbitroRes = await API.get(`/arbitros/usuario/${usuarioId}`);
         await AsyncStorage.setItem('arbitroId', arbitroRes.data.id);
-        navigation.replace('CuentaArbitro');
+        navigation.replace('ArbitroTabs'); // ✅ Redirigir al flujo de tabs del árbitro
       } else if (rol === 'DUENO') {
         const duenoRes = await API.get(`/duenos/usuario/${usuarioId}`);
         await AsyncStorage.setItem('duenoId', duenoRes.data.id);
