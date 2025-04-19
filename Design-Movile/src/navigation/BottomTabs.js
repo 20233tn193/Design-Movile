@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from '@rneui/themed';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, ActivityIndicator } from 'react-native';
+
 import TorneoScreen from '../modules/home/TorneoScreen';
 import Estadisticas from '../modules/home/Estadisticas';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Icon } from '@rneui/themed';
-import CuentaDuenoScreen from '../modules/dueno/CuentaDuenoScreen';
-
+import PerfilStack from './PerfilStack';
 
 function PerfilScreenWrapper() {
   const [pantalla, setPantalla] = React.useState(null);
@@ -17,16 +17,15 @@ function PerfilScreenWrapper() {
       const rol = await AsyncStorage.getItem('rol');
       const duenoId = await AsyncStorage.getItem('duenoId');
       const arbitroId = await AsyncStorage.getItem('arbitroId');
-    
+
       if (!token || !rol) {
         const LoginScreen = require('../screens/LoginScreen').default;
         setPantalla(<LoginScreen />);
         return;
       }
-    
+
       if (rol === 'DUENO' && duenoId) {
-        const CuentaDuenoScreen = require('../modules/dueno/CuentaDuenoScreen').default;
-        setPantalla(<CuentaDuenoScreen />);
+        setPantalla(<PerfilStack />);
       } else if (rol === 'ARBITRO' && arbitroId) {
         const CuentaArbitroScreen = require('../modules/arbitro/CuentaArbitroScreen').default;
         setPantalla(<CuentaArbitroScreen />);
@@ -87,7 +86,7 @@ export default function BottomTabs() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Estadísticas"
         component={Estadisticas}
         options={{
@@ -95,8 +94,7 @@ export default function BottomTabs() {
             <Icon name="bar-chart" type="font-awesome" color={color} size={20} />
           ),
         }}
-      />
-      
+      /> */}
     </Tab.Navigator>
   );
 }

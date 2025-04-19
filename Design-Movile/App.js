@@ -38,6 +38,7 @@ import InscripcionProcesoScreen from './src/modules/dueno/InscripcionProcesoScre
 import InscripcionAprobadoScreen from './src/modules/dueno/InscripcionAprobadoScreen';
 import ConfirmarInscripcionScreen from './src/modules/dueno/ConfirmarInscripcionScreen';
 import ConfirmarPagoScreen from './src/modules/dueno/ConfirmarPagoScreen';
+import PagosDuenoScreen from './src/modules/dueno/PagosDuenoScreen';
 import PagoStripeScreen from './src/modules/dueno/PagoStripeScreen';
 import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
@@ -57,7 +58,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
         {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen name="Main" component={BottomTabs} />
         <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
         <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
         <Stack.Screen name="Partidos" component={PartidosScreen} />
@@ -91,6 +92,7 @@ export default function App() {
         <Stack.Screen name="InscripcionAprobado" component={InscripcionAprobadoScreen} />
         <Stack.Screen name="ConfirmarInscripcion" component={ConfirmarInscripcionScreen} />
         <Stack.Screen name="ConfirmarPago" component={ConfirmarPagoScreen} />
+        <Stack.Screen name="PagosDuenoScreen" component={PagosDuenoScreen} />
         <Stack.Screen name="PagoStripe" component={PagoStripeScreen} />
         <Stack.Screen name="ModalInfoCredenciales" component={ModalInfoCredenciales} />
         <Stack.Screen name="ModalConfirmarDescargaCredenciales" component={ModalConfirmarDescargaCredenciales} />

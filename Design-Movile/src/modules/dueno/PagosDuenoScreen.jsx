@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,215 +9,251 @@ import {
   Dimensions,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
-import ModalStripeRedirect from './ModalStripeRedirect'; // asegúrate que esté bien importado
+import ModalStripeRedirect from './ModalStripeRedirect';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
 export default function PagosDuenoScreen({ navigation }) {
   const [modalStripeVisible, setModalStripeVisible] = useState(false);
+  const route = useRoute();
+  const { equipo, torneo } = route.params || {};
+  const [pagos, setPagos] = useState([]);
+
+  useEffect(() => {
+    const fetchPagos = async () => {
+      try {
+        const duenoId = await AsyncStorage.getItem('duenoId');
+        const res = await API.get(`/pagos/dueno/${duenoId}`);
+        setPagos(res.data);
+      } catch (error) {
+        console.log('❌ Error al obtener pagos:', error);
+      }
+    };
+
+    fetchPagos();
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Encabezado */}
       <View style={styles.header}>
-        <Icon name="dollar" type="font-awesome" color="#FDBA12" size={18} />
-        <Text style={styles.headerText}>  Pagos</Text>
+        <Text style={styles.headerText}>💰 Pagos</Text>
       </View>
 
-      {/* Franjas decorativas */}
-      <View style={styles.franjaRoja} />
-      <View style={styles.franjaNegra} />
-      <View style={styles.franjaGris} />
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-      {/* Tarjeta de torneo */}
-      <View style={styles.torneoCard}>
-        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
-        <View style={styles.torneoInfo}>
-          <Text style={styles.nombreTorneo}>Torneo Infantil</Text>
-          <Text style={styles.estado}>CERRADO</Text>
-          <Text style={styles.subtexto}>05/03/2025   10 clubs</Text>
-        </View>
-        <TouchableOpacity style={styles.btnPago}>
-          <Icon name="dollar" type="font-awesome" color="#fff" size={20} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Tabla de pagos */}
-      <View style={styles.encabezadoTabla}>
-        <Text style={styles.th}>Nombre</Text>
-        <Text style={styles.th}># Partido</Text>
-        <Text style={styles.th}>Monto</Text>
-        <Text style={styles.th}>Estatus</Text>
-      </View>
-
-      <ScrollView style={styles.tabla}>
-        {[
-          ['Arbitraje', '1', '$100', 'Pagado'],
-          ['Cancha', '1', '$50', 'Pagado'],
-          ['Arbitraje', '2', '$100', 'Pagado'],
-          ['Cancha', '2', '$50', 'Pagado'],
-          ['Arbitraje', '3', '$100', 'Pendiente'],
-          ['Cancha', '3', '$50', 'Pendiente'],
-        ].map(([nombre, partido, monto, estatus], i) => (
-          <View key={i} style={styles.fila}>
-            <Text style={styles.td}>{nombre}</Text>
-            <Text style={styles.td}>{partido}</Text>
-            <Text style={styles.td}>{monto}</Text>
-            <Text style={[styles.td, { color: estatus === 'Pendiente' ? 'red' : 'green' }]}>
-              {estatus}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }}>
+        <View style={styles.torneoCard}>
+          <Image
+            source={{ uri: torneo.logoSeleccionado || 'https://placehold.co/50x50' }}
+            style={styles.logo}
+          />
+          <View style={styles.torneoInfo}>
+            <Text style={styles.nombreTorneo}>{torneo?.nombreTorneo || 'Nombre torneo'}</Text>
+            <Text
+              style={[styles.estado,
+                torneo.estado?.toUpperCase().trim() === 'ABIERTO' ? styles.abierto
+                  : torneo.estado?.toUpperCase().trim() === 'FINALIZADO' ? styles.finalizado
+                    : torneo.estado?.toUpperCase().trim() === 'CERRADO' ? styles.cerrado
+                      : torneo.estado?.toUpperCase().trim() === 'EN CURSO' ? styles.enCurso
+                        : styles.otros]}
+            >
+              {torneo.estado}
             </Text>
+            <Text style={styles.subtexto}>{torneo?.fechaInicio || 'Fecha'} · {torneo?.numeroEquipos || 0} clubs</Text>
           </View>
-        ))}
+        </View>
+
+        <View style={styles.encabezadoTabla}>
+          <Text style={styles.th}>Nombre</Text>
+          <Text style={styles.th}># Partido</Text>
+          <Text style={styles.th}>Monto</Text>
+          <Text style={styles.th}>Estatus</Text>
+        </View>
+
+        {pagos.length === 0 ? (
+          <Text style={{ textAlign: 'center', marginVertical: 20 }}>No hay pagos disponibles.</Text>
+        ) : (
+          pagos.map((pago, i) => (
+            <View key={i} style={styles.fila}>
+              <Text style={styles.td}>
+                {pago.tipo === 'inscripcion' ? 'Inscripción' : pago.tipo === 'arbitraje' ? 'Arbitraje' : pago.tipo === 'uso_de_cancha' ? 'Cancha' : pago.tipo}
+              </Text>
+              <Text style={styles.td}>{pago.partidoId ? `P${pago.partidoId}` : '-'}</Text>
+              <Text style={styles.td}>${pago.monto}</Text>
+              <Text style={[styles.td, { color: pago.estatus === 'pendiente' ? 'red' : 'green' }]}>
+                {pago.estatus.charAt(0).toUpperCase() + pago.estatus.slice(1)}
+              </Text>
+            </View>
+          ))
+        )}
+
+        <View style={styles.botones}>
+          <TouchableOpacity style={styles.btnAccion} onPress={() => setModalStripeVisible(true)}>
+            <Text style={styles.btnTexto}>Datos de Pago</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
-      {/* Botones */}
-      <View style={styles.botones}>
-        <TouchableOpacity style={styles.btnAccion} onPress={() => setModalStripeVisible(true)}>
-          <Text style={styles.btnTexto}>Pagar arbitraje</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnAccion} onPress={() => setModalStripeVisible(true)}>
-          <Text style={styles.btnTexto}>Pagar cancha</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal Stripe */}
       <ModalStripeRedirect
         visible={modalStripeVisible}
         onClose={() => setModalStripeVisible(false)}
-        onConfirm={() => {
-          setModalStripeVisible(false);
-          navigation.navigate('PagoStripe'); // redirige a la pantalla de Stripe
-        }}
+        navigation={navigation}
+        nombreEquipo={equipo?.nombre || 'NombreEquipo'}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 130,
-    paddingHorizontal: 16,
-    backgroundColor: '#fff',
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
   header: {
-    flexDirection: 'row',
     backgroundColor: '#000',
-    width: '100%',
-    padding: 12,
-    position: 'absolute',
-    top: 0,
-    zIndex: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingTop: 50,
+    zIndex: 2,
   },
   headerText: {
     color: '#FDBA12',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
+    marginLeft: 10,
   },
-  franjaRoja: {
+  franja: {
     position: 'absolute',
-    top: 50,
+    width: width * 2.1,
+    height: 50,
+    zIndex: 0,
+  },
+  franjaRojaTop: {
+    top: 80,
     left: -width,
-    width: width * 2,
-    height: 40,
     backgroundColor: '#d80027',
     transform: [{ rotate: '-10deg' }],
   },
-  franjaNegra: {
-    position: 'absolute',
-    top: 75,
+  franjaNegraTop: {
+    top: 120,
     left: -width,
-    width: width * 2,
-    height: 40,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
-  franjaGris: {
-    position: 'absolute',
-    top: 100,
+  franjaGrisTop: {
+    top: 160,
     left: -width,
-    width: width * 2,
-    height: 40,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
   },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: -10,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
+  },
   torneoCard: {
     flexDirection: 'row',
-    backgroundColor: '#0e1b39',
-    padding: 10,
-    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 10,
+    backgroundColor: '#0e1b39',
+    borderRadius: 12,
+    padding: 12,
+    margin: 15,
   },
   logo: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     marginRight: 10,
-    borderRadius: 8,
   },
   torneoInfo: {
     flex: 1,
   },
   nombreTorneo: {
-    color: '#fff',
+    color: 'white',
     fontWeight: 'bold',
+    fontSize: 14,
   },
   estado: {
-    color: 'orange',
     fontWeight: 'bold',
-  },
-  subtexto: {
-    color: '#fff',
     fontSize: 12,
   },
-  btnPago: {
-    backgroundColor: '#d80027',
-    padding: 10,
-    borderRadius: 10,
+  abierto: {
+    color: 'green',
+  },
+  finalizado: {
+    color: 'red',
+  },
+  cerrado: {
+    color: '#FFA500',
+  },
+  enCurso: {
+    color: '#007BFF',
+  },
+  otros: {
+    color: '#FDBA12',
+  },
+  subtexto: {
+    color: 'white',
+    fontSize: 12,
   },
   encabezadoTabla: {
     flexDirection: 'row',
     backgroundColor: '#0e1b39',
     padding: 10,
-    borderRadius: 10,
-    justifyContent: 'space-between',
+    marginHorizontal: 15,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
   th: {
-    color: '#fff',
-    fontWeight: 'bold',
     flex: 1,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  tabla: {
-    marginVertical: 10,
+    paddingLeft: 20,
+    fontWeight: 'bold',
+    color: '#FDBA12',
+    textAlign: 'center'
   },
   fila: {
     flexDirection: 'row',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
+    backgroundColor: '#fff',
+    padding: 10,
     borderBottomColor: '#ccc',
-    justifyContent: 'space-between',
+    borderBottomWidth: 1,
   },
   td: {
     flex: 1,
-    textAlign: 'center',
-    color: '#000',
-    fontSize: 12,
+    fontSize: 14,
+    textAlign: 'center'
   },
   botones: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-    marginTop: 10,
+    justifyContent: 'center',
+    marginHorizontal: 15,
+    marginTop: 20,
   },
   btnAccion: {
-    flex: 1,
     backgroundColor: '#0e1b39',
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: 'center',
+    width: '100%',
   },
   btnTexto: {
     color: '#FDBA12',

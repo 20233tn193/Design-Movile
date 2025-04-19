@@ -10,30 +10,54 @@ import {
 
 const { width } = Dimensions.get('window');
 
-export default function ModalStripeRedirect({ visible, onClose, navigation }) {
+export default function ModalStripeRedirect({ visible, onClose, navigation, nombreEquipo }) {
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.titulo}>Confirmar</Text>
+          <Text style={styles.titulo}>Referencia de pago</Text>
 
           <Text style={styles.texto}>
-            Será redirigido a <Text style={styles.bold}>Stripe</Text> para realizar su pago
+            Para realizar el pago, utiliza la siguiente información:
           </Text>
+
+          <View style={styles.datoContainer}>
+            <Text style={styles.label}>Banco:</Text>
+            <Text style={styles.valor}>BBVA</Text>
+          </View>
+
+          <View style={styles.datoContainer}>
+            <Text style={styles.label}>Número de cuenta:</Text>
+            <Text style={styles.valor}>0123 4567 8910 1121</Text>
+          </View>
+
+          <View style={styles.datoContainer}>
+            <Text style={styles.label}>Titular:</Text>
+            <Text style={styles.valor}>Yasmin</Text>
+          </View>
+
+          <View style={styles.concepto}>
+            <Text style={styles.label}>Concepto:</Text>
+            <Text style={styles.valor}>
+              {nombreEquipo} 
+            </Text>
+            <Text style={styles.ejemplo}>Ejemplo: {nombreEquipo || 'Barcelona'} Partido 1</Text>
+            
+          </View>
+
+          <View style={styles.montos}>
+            <Text style={styles.monto}>Arbitraje: $100</Text>
+            <Text style={styles.monto}>Cancha: $50</Text>
+          </View>
 
           <View style={styles.botonesContainer}>
             <TouchableOpacity
-              style={styles.btnVerde}
+              style={styles.btnAceptar}
               onPress={() => {
-                onClose(); // cerramos el modal
-                navigation.navigate('PagoStripe'); // redirigimos correctamente
+                onClose();
               }}
             >
               <Text style={styles.textoBoton}>ACEPTAR</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.btnGris} onPress={onClose}>
-              <Text style={styles.textoBoton}>CANCELAR</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -51,47 +75,77 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: '#fff',
-    width: width * 0.8,
-    borderRadius: 8,
+    width: width * 0.85,
+    borderRadius: 12,
     padding: 20,
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   titulo: {
-    backgroundColor: '#1a1a1a',
-    color: '#FDBA12',
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#FDBA12',
+    backgroundColor: '#1a1a1a',
     paddingVertical: 10,
-    width: '100%',
+    paddingHorizontal: 16,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    alignSelf: 'stretch',
     textAlign: 'center',
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    marginBottom: 15,
+    marginBottom: 16,
   },
   texto: {
-    fontSize: 16,
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 16,
+  },
+  datoContainer: {
+    marginBottom: 8,
+  },
+  label: {
+    fontWeight: 'bold',
     color: '#000',
-    textAlign: 'center',
+    fontSize: 16,
+  },
+  valor: {
+    color: '#444',
+    fontSize: 16,
+  },
+  concepto: {
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  ejemplo: {
+    color: '#888',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  montos: {
     marginBottom: 20,
   },
-  bold: {
+  monto: {
+    fontSize: 14,
+    color: '#0e1b39',
     fontWeight: 'bold',
   },
   botonesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignSelf: 'stretch',
     gap: 10,
   },
-  btnVerde: {
+  btnAceptar: {
+    flex: 1,
     backgroundColor: 'green',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
   },
-  btnGris: {
-    backgroundColor: '#333',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
+  btnCancelar: {
+    flex: 1,
+    backgroundColor: '#555',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   textoBoton: {
     color: '#fff',

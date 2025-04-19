@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,14 +9,61 @@ import {
   ScrollView,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import API from '../../api/api';
 import ModalConfirmarDescargaCredenciales from './ModalConfirmarDescargaCredenciales';
+import { ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
-export default function JugadoresRegistradosDuenoScreen({ navigation }) {
+export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
   const [modalConfirmarVisible, setModalConfirmarVisible] = useState(false);
+  const [equipo, setEquipo] = useState(null);
+  const [jugadores, setJugadores] = useState([]);
+  const [pagoEstatus, setPagoEstatus] = useState(null);
 
-  const torneoCerrado = true;
+  const torneo = route.params?.torneo;
+
+  const estadoValido = torneo?.estado?.toUpperCase().trim();
+  const esEditable = estadoValido === 'ABIERTO' || estadoValido === 'CERRADO';
+
+  const mostrarAlertaNoEditable = () => {
+    alert('Esta acción solo está disponible si el torneo está ABIERTO o CERRADO.');
+  };
+
+  const [loading, setLoading] = useState(false);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          setJugadores([]); // limpia antes de volver a cargar
+          setLoading(true);
+          const duenoId = await AsyncStorage.getItem('duenoId');
+
+          const equipoPagoRes = await API.get(`/equipos/torneo-con-dueno/${torneo.id}`);
+          const equipoEncontrado = equipoPagoRes.data.find(e => e.duenoNombre && e.pagoEstatus);
+          setPagoEstatus(equipoEncontrado?.pagoEstatus);
+
+          const equipoDuenoRes = await API.get(`/equipos/dueño/${duenoId}`);
+          const equipoFiltrado = equipoDuenoRes.data.find(e => e.torneoId === torneo.id);
+          setEquipo(equipoFiltrado);
+          await AsyncStorage.setItem('equipoId', equipoFiltrado.id);
+
+          if (equipoFiltrado?.id) {
+            const jugadoresRes = await API.get(`/jugadores/equipo/${equipoFiltrado.id}`);
+            setJugadores(jugadoresRes.data);
+          }
+        } catch (err) {
+          console.log('Error al cargar datos:', err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchData();
+    }, [torneo])
+  );
 
   return (
     <View style={styles.container}>
@@ -26,21 +73,44 @@ export default function JugadoresRegistradosDuenoScreen({ navigation }) {
       </View>
 
       {/* Franjas decorativas */}
-      <View style={styles.triangleTopRed} />
+      <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       {/* Tarjeta del torneo */}
       <View style={styles.torneoCard}>
-        <Image source={require('../../../assets/madrid.png')} style={styles.logo} />
+        <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
         <View style={styles.torneoInfo}>
-          <Text style={styles.nombreTorneo}>Torneo Infantil</Text>
-          <Text style={styles.estadoCerrado}>CERRADO</Text>
-          <Text style={styles.subtexto}>05/03/2025   10 clubs</Text>
+          <Text style={styles.nombreTorneo}>{torneo.nombreTorneo}</Text>
+          <Text
+            style={[
+              styles.estado,
+              torneo.estado?.toUpperCase().trim() === 'ABIERTO'
+                ? styles.abierto
+                : torneo.estado?.toUpperCase().trim() === 'FINALIZADO'
+                  ? styles.finalizado
+                  : torneo.estado?.toUpperCase().trim() === 'CERRADO'
+                    ? styles.cerrado
+                    : torneo.estado?.toUpperCase().trim() === 'EN CURSO'
+                      ? styles.enCurso
+                      : styles.otros,
+            ]}
+          >
+            {torneo.estado}
+          </Text>
+          <Text style={styles.subtexto}>
+            {torneo.fechaInicio} · {torneo.numeroEquipos} clubs
+          </Text>
         </View>
         <TouchableOpacity
-          style={styles.btnPago}
-          onPress={() => navigation.navigate('PagosDuenoScreen')}
+          style={[
+            styles.btnPago,
+            { backgroundColor: '#C12143' },
+          ]}
+          onPress={() => navigation.navigate('PagosDuenoScreen', { equipo, torneo })}
         >
           <Icon name="dollar" type="font-awesome" color="#fff" size={20} />
         </TouchableOpacity>
@@ -54,15 +124,20 @@ export default function JugadoresRegistradosDuenoScreen({ navigation }) {
       </View>
 
       <ScrollView style={styles.listaJugadores}>
-        {[1, 2, 3, 4, 5].map((_, i) => (
+        {loading ? (
+          <ActivityIndicator size="large" color="#0e1b39" style={{ marginVertical: 20 }} />
+        ) : jugadores.length === 0 ? (
+          <Text style={{ textAlign: 'center', marginVertical: 20 }}>No hay jugadores registrados.</Text>
+        ) : jugadores.map((j, i) => (
           <View key={i} style={styles.fila}>
-            <Text style={styles.td}>Hanna</Text>
-            <Text style={styles.td}>Perez</Text>
+            <Image source={{ uri: j.fotoUrl }} style={styles.avatar} />
+            <Text style={styles.td}>{j.nombre}</Text>
+            <Text style={styles.td}>{j.apellido}</Text>
             <View style={styles.acciones}>
-              <TouchableOpacity onPress={() => navigation.navigate('RegistroJugadorScreen')}>
+              <TouchableOpacity onPress={() => navigation.navigate('RegistroJugadorScreen', { jugador: j }, { equipoId: equipo.id })}>
                 <Icon name="pencil" type="font-awesome" size={18} color="#d80027" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('DetallesJugadorScreen')}>
+              <TouchableOpacity onPress={() => navigation.navigate('DetallesJugadorScreen', { jugador: j })}>
                 <Icon name="id-card" type="font-awesome" size={18} color="#0e1b39" />
               </TouchableOpacity>
             </View>
@@ -75,43 +150,55 @@ export default function JugadoresRegistradosDuenoScreen({ navigation }) {
         <TouchableOpacity
           style={[
             styles.btnGenerar,
-            { backgroundColor: torneoCerrado ? '#FDBA12' : '#ccc' },
+            { backgroundColor: esEditable ? '#FDBA12' : '#ccc' }
           ]}
-          onPress={() => setModalConfirmarVisible(true)}
+          onPress={() => {
+            if (esEditable) {
+              setModalConfirmarVisible(true);
+            } else {
+              mostrarAlertaNoEditable();
+            }
+          }}
         >
           <Text style={styles.btnTextoGenerar}>Generar Credenciales</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.btnAgregar}
-          onPress={() => navigation.navigate('RegistroJugadorDuenoScreen')}
+          style={[
+            styles.btnAgregar,
+            { backgroundColor: esEditable ? '#0e1b39' : '#999' }
+          ]}
+          onPress={() => {
+            if (esEditable) {
+              navigation.navigate('RegistroJugadorScreen', { equipoId: equipo?.id });
+            } else {
+              mostrarAlertaNoEditable();
+            }
+          }}
         >
           <Text style={styles.btnTextoAgregar}>AGREGAR</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal para confirmar descarga */}
       <ModalConfirmarDescargaCredenciales
         visible={modalConfirmarVisible}
         onClose={() => setModalConfirmarVisible(false)}
-        onConfirm={() => {
-          setModalConfirmarVisible(false);
-          // lógica para generar/descargar credenciales
-        }}
+        onConfirm={() => setModalConfirmarVisible(false)}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f2f2' },
+  container: { flex: 1, backgroundColor: '#fff' },
   header: {
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 30,
+    paddingTop: 50,
+    zIndex: 2,
   },
   headerText: {
     color: '#FDBA12',
@@ -119,33 +206,47 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
   },
-  triangleTopRed: {
-    position: 'absolute',
-    top: 60,
-    left: -width,
-    width: width * 2,
-    height: 50,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-    zIndex: -1,
-  },
   franja: {
     position: 'absolute',
-    width: width * 2,
+    width: width * 2.1,
     height: 50,
-    zIndex: -2,
+    zIndex: 0,
+  },
+  franjaRojaTop: {
+    top: 80,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
   },
   franjaNegraTop: {
-    top: 90,
+    top: 120,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaGrisTop: {
-    top: 120,
+    top: 160,
     left: -width,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: -10,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
   torneoCard: {
     flexDirection: 'row',
@@ -178,9 +279,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   btnPago: {
-    backgroundColor: '#d80027',
+    backgroundColor: '#C12143',
     borderRadius: 8,
     padding: 8,
+    width: 60,
+    height: 40,
   },
   encabezadoTabla: {
     flexDirection: 'row',
@@ -192,6 +295,7 @@ const styles = StyleSheet.create({
   },
   th: {
     flex: 1,
+    paddingLeft: 20,
     fontWeight: 'bold',
     color: '#FDBA12',
   },
@@ -213,7 +317,7 @@ const styles = StyleSheet.create({
   },
   td: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 18,
   },
   acciones: {
     flex: 1,
@@ -231,6 +335,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    backgroundColor: '#ECAE28',
   },
   btnAgregar: {
     flex: 1,
@@ -246,5 +351,30 @@ const styles = StyleSheet.create({
   btnTextoAgregar: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  estado: {
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  abierto: {
+    color: 'green',
+  },
+  finalizado: {
+    color: 'red',
+  },
+  cerrado: {
+    color: '#FFA500', // naranja
+  },
+  enCurso: {
+    color: '#007BFF', // azul
+  },
+  otros: {
+    color: '#FDBA12',
   },
 });

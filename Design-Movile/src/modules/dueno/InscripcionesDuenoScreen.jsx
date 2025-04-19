@@ -15,6 +15,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
+import { color } from '@rneui/base';
 
 const { width } = Dimensions.get('window');
 
@@ -22,48 +23,49 @@ export default function InscripcionesDuenoScreen({ navigation }) {
   const [busqueda, setBusqueda] = useState('');
   const [torneos, setTorneos] = useState([]);
   const [torneosInscritos, setTorneosInscritos] = useState([]);
+  const [pagosInscripcion, setPagosInscripcion] = useState([]);
 
   useEffect(() => {
     const fetchTorneos = async () => {
       try {
         const duenoId = await AsyncStorage.getItem('duenoId');
         console.log('🔑 duenoId obtenido:', duenoId);
-  
+
         if (!duenoId) {
           console.warn('⚠️ duenoId no encontrado');
           return;
         }
-  
+
         const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
-        console.log('📦 Equipos del dueño:', resEquipos.data);
-  
         const equipos = resEquipos.data || [];
-  
         const torneoIds = equipos
           .map(e => e.torneoId?.toString?.())
           .filter(id => !!id);
-  
-        console.log('🎯 torneoIds del equipo:', torneoIds);
-  
+
         const resTorneos = await API.get('/torneos');
-        console.log('📚 Todos los torneos:', resTorneos.data);
-  
         const todosTorneos = resTorneos.data || [];
-  
         const torneosInscritos = todosTorneos.filter(t =>
           torneoIds.includes(t.id)
         );
-  
-        console.log('📌 Torneos filtrados:', torneosInscritos);
-  
-        setTorneos(todosTorneos);
+        const torneosDisponibles = todosTorneos.filter(t =>
+          t.estado?.toUpperCase().trim() === "ABIERTO"
+        );
+
+        const resPagos = await API.get(`/pagos/dueno/${duenoId}`);
+        const pagos = resPagos.data || [];
+        const pagosFiltrados = pagos.filter(p => p.tipo === "inscripcion" && ["pagado", "pendiente"].includes(p.estatus));
+
+        setPagosInscripcion(pagosFiltrados);
+
+
+        setTorneos(torneosDisponibles);
         setTorneosInscritos(torneosInscritos);
         console.log('✅ Lógica completada sin errores');
       } catch (err) {
         console.log('❌ Error al cargar torneos:', err);
       }
     };
-  
+
     fetchTorneos();
   }, []);
 
@@ -109,19 +111,16 @@ export default function InscripcionesDuenoScreen({ navigation }) {
                 <Text style={styles.cardInscritoTexto}>
                   Aquí aparecerán los torneos a los que estás inscrito
                 </Text>
-              ) : (
-                torneosInscritos.map((torneo, index) => (
-                  <TouchableOpacity
+              ) : (torneosInscritos.map((torneo, index) => {
+                const pago = pagosInscripcion.find(p => p.torneoId === torneo.id);
+
+                return (
+                  <View
                     key={index}
                     style={styles.cardDisponible}
-                    onPress={() => navigation.navigate('DetalleTorneoDueno', {
-                      nombre: torneo.nombreTorneo,
-                      imagen: { uri: torneo.logoSeleccionado },
-                      torneoId: torneo._id
-                    })}
                   >
                     <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
-                    <View>
+                    <View style={{ flex: 1 }}>
                       <Text style={styles.cardTitle}>{torneo.nombreTorneo}</Text>
                       <Text
                         style={[
@@ -139,11 +138,53 @@ export default function InscripcionesDuenoScreen({ navigation }) {
                       >
                         {torneo.estado}
                       </Text>
-                      <Text style={styles.cardText}>{torneo.fechaInicio}   · {torneo.numeroEquipos} clubs</Text>
+                      {pago && (
+                        <Text
+                          style={[
+                            styles.EstatusPago,
+                            { color: pago.estatus === 'pendiente' ? '#FF4141' : '#28D914' }
+                          ]}
+                        >
+                          {pago.estatus === 'pendiente' ? 'Pago en PROCESO' : 'Pago APROBADO'}
+                        </Text>
+                      )}
+                      <Text style={styles.cardText}>
+                        {torneo.fechaInicio} · {torneo.numeroEquipos} clubs
+                      </Text>
                     </View>
-                  </TouchableOpacity>
-                ))
-              )}
+
+                    {/* Botón agregar jugador con texto */}
+                    {pago && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (pago.estatus === 'pendiente') {
+                            alert('⏳ Tu pago está en proceso. Espera confirmación para agregar jugadores.');
+                          } else {
+                            navigation.navigate('JugadoresRegistradosDueno', { torneo });
+                          }
+                        }}
+                        style={{
+                          backgroundColor: pago.estatus === 'pagado' ? '#28D914' : '#ccc',
+                          paddingVertical: 12,
+                          paddingHorizontal: 20,
+                          borderRadius: 20,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <Icon
+                          name="user-plus"
+                          type="font-awesome"
+                          color="#fff"
+                          size={16}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
+                );
+              }))}
             </View>
           </View>
 
@@ -154,10 +195,8 @@ export default function InscripcionesDuenoScreen({ navigation }) {
               key={index}
               style={styles.cardDisponible}
               onPress={() => navigation.navigate('DetalleTorneoDueno', {
-                torneo: torneo,
-                nombre: torneo.nombreTorneo,
-                imagen: { uri: torneo.logoSeleccionado },
-                torneoId: torneo._id
+                torneo,
+                yaInscrito: torneosInscritos.length > 0
               })}
             >
               <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
@@ -357,7 +396,7 @@ const styles = StyleSheet.create({
   },
   estado: {
     fontSize: 14,
-    marginVertical: 4,
+    marginTop: 4,
   },
   abierto: {
     color: '#00B61B',
@@ -379,4 +418,10 @@ const styles = StyleSheet.create({
     color: '#888',
     fontWeight: 'bold',
   },
+  EstatusPago: {
+    fontSize: 14,
+    color: '#28D914',
+    marginVertical: 5,
+    fontWeight: 'bold',
+  }
 });

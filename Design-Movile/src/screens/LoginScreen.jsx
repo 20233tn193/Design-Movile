@@ -39,26 +39,34 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      const res = await API.post('/auth/login', {
-        email,
-        password,
-      });
-
+      const controller = new AbortController();
+      const timeout = setTimeout(() => {
+        controller.abort();
+      }, 3000); // 3 segundos
+    
+      const res = await API.post(
+        '/auth/login',
+        { email, password },
+        { signal: controller.signal } // 🧠 se pasa el controller
+      );
+    
+      clearTimeout(timeout); // si responde antes de los 3 segundos
+    
       const { token, rol, usuarioId } = res.data;
-
+    
       console.log('✅ Token recibido:', token);
       console.log('🎭 Rol:', rol);
       console.log('🆔 Usuario ID:', usuarioId);
-
+    
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('rol', rol);
       await AsyncStorage.setItem('usuarioId', usuarioId);
       await AsyncStorage.setItem('correo', email);
-
+    
       if (rol === 'ARBITRO') {
         const arbitroRes = await API.get(`/arbitros/usuario/${usuarioId}`);
         await AsyncStorage.setItem('arbitroId', arbitroRes.data.id);
-        navigation.replace('ArbitroHomeScreen');
+        navigation.replace('CuentaArbitro');
       } else if (rol === 'DUENO') {
         const duenoRes = await API.get(`/duenos/usuario/${usuarioId}`);
         await AsyncStorage.setItem('duenoId', duenoRes.data.id);
@@ -66,11 +74,16 @@ export default function LoginScreen() {
       } else {
         Alert.alert('Error', 'Rol no reconocido');
       }
-
-      navigation.replace('BottomTabs');
+    
+      navigation.replace('Main'); // Cambia a la pantalla principal de la app
+    
     } catch (error) {
-      console.log('❌ Error en login:', error.response?.data || error.message);
-      Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
+      if (error.name === 'AbortError') {
+        Alert.alert('Tiempo de espera', 'La solicitud está tardando demasiado. Intenta más tarde.');
+      } else {
+        console.log('❌ Error en login:', error.response?.data || error.message);
+        Alert.alert('Error', 'Credenciales inválidas o problema de conexión');
+      }
     } finally {
       setLoading(false);
     }

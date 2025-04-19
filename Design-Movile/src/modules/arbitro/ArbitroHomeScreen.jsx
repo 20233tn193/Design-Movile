@@ -93,7 +93,7 @@ export default function ArbitroHomeScreen({ navigation }) {
       )}
 
       <View style={styles.bottomTabs}>
-        <TouchableOpacity onPress={() => navigation.replace('BottomTabs')}>
+        <TouchableOpacity onPress={() => navigation.replace('Main')}>
           <Icon name="trophy" type="font-awesome" color="#fff" size={24} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.replace('CuentaArbitro')}>
