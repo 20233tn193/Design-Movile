@@ -15,7 +15,7 @@ export default function TournamentDetail({ route, navigation }) {
   const buttons = [
     {
       label: 'Tabla de Posiciones',
-      icon: require('../../../assets/Posiciones.png'),
+      icon: require('../../../assets/TablaPosiciones .png'),
       ruta: 'TablaPosiciones',
     },
     {

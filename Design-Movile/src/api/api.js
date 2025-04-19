@@ -3,7 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: 'http://192.168.1.69:8080/api',
+  baseURL: 'http://192.168.1.12r:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,15 +32,7 @@ export const obtenerDuenoPorId = async (id) => {
   }
 };
 
-export const obtenerDuenoPorId = async (duenoId) => {
-  try {
-    const response = await API.get(`/duenos/${duenoId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error al obtener el dueño por id:', error);
-    throw error;
-  }
-};
+
 
 // 🔽 Obtener equipo por dueño
 export const obtenerEquipoPorDueno = async (duenoId) => {

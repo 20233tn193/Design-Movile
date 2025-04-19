@@ -19,8 +19,6 @@ export default function PartidosScreen({ route }) {
   const [jornadaLabel, setJornadaLabel] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const torneoId = route?.params?.torneoId || 'DEFAULT_ID';
-
   const obtenerPartidos = async () => {
     try {
       const response = await API.get(`/partidos/calendario/${torneoId}`);
@@ -225,5 +223,47 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginRight: 10,
+  },
+  franja: {
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: -1,
+  },
+  franjaGrisTop: {
+    top: 120,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegraTop: {
+    top: 90,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaRojaTop: {
+    top: 60,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
 });
