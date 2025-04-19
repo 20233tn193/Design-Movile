@@ -59,10 +59,10 @@ export default function RegistroEquipoDueno({ navigation }) {
       await API.post('/equipos', nuevoEquipo);
   
       Alert.alert('Equipo registrado', 'Tu equipo fue creado exitosamente', [
-        { text: 'OK', onPress: () => navigation.replace('BottomTabs', { screen: 'Perfil' }) },
+        { text: 'OK', onPress: () => navigation.replace('Main', { screen: 'Perfil' }) },
       ]);
     } catch (error) {
-      console.error('❌ Error al crear equipo:', error.response?.data || error.message);
+      console.log('❌ Error al crear equipo:', error.response?.data || error.message);
       Alert.alert('Error', 'No se pudo registrar el equipo');
     }
   };

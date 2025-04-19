@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,8 +9,10 @@ import {
   ScrollView,
   Platform,
   StatusBar,
+  Alert,
 } from 'react-native';
-
+import API from '../../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ModalConfirmarInscripcion from './ModalConfirmarInscripcion';
 import ModalStripeRedirect from './ModalStripeRedirect';
 
@@ -19,77 +21,125 @@ const { width } = Dimensions.get('window');
 export default function DetalleTorneoDuenoScreen({ navigation, route }) {
   const [modalInscripcionVisible, setModalInscripcionVisible] = useState(false);
   const [modalStripeVisible, setModalStripeVisible] = useState(false);
+  const [equipoId, setEquipoId] = useState(null);
 
-  const { nombre, imagen } = route.params || {
-    nombre: 'Torneo Infantil',
-    imagen: require('../../../assets/madrid.png'),
+  const { torneo, yaInscrito } = route.params || {};
+
+  useEffect(() => {
+    const obtenerEquipo = async () => {
+      try {
+        const duenoId = await AsyncStorage.getItem('duenoId');
+        const res = await API.get(`/equipos/dueño/${duenoId}`);
+        const equipos = res.data;
+        if (equipos.length > 0) {
+          setEquipoId(equipos[0].id);
+        }
+      } catch (error) {
+        console.log('❌ Error al obtener equipo:', error);
+      }
+    };
+
+    obtenerEquipo();
+  }, []);
+
+  const handleInscripcion = async () => {
+    try {
+      await API.post('/api/equipos/inscribirse', {
+        equipoId,
+        torneoId: torneo?.id,
+      });
+      Alert.alert('✅ Inscrito', 'Tu equipo fue inscrito correctamente');
+      setModalStripeVisible(true);
+    } catch (error) {
+      console.log('❌ Error al inscribirse:', error.response?.data || error.message);
+      Alert.alert('Error', 'No se pudo completar la inscripción');
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Encabezado limpio */}
+      {/* Franjas decorativas */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
+
       <View style={styles.header}>
         <Text style={styles.headerText}>🏆 Detalles del Torneo</Text>
       </View>
 
-      {/* Tarjeta del torneo */}
-      <View style={styles.card}>
-        <Image source={imagen} style={styles.logo} />
-        <View style={styles.cardInfo}>
-          <Text style={styles.cardTitle}>{nombre}</Text>
-          <Text style={styles.estado}>ACTIVO</Text>
-          <Text style={styles.cardText}>Inicio: 05/03/2025</Text>
-          <Text style={styles.cardText}>10 equipos</Text>
-          <Text style={styles.cardText}>Espacios disponibles: 3</Text>
-          <Text style={styles.cardText}>Inscripción: $900</Text>
+      <View style={styles.content}>
+        <View style={styles.card}>
+          <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>{torneo.nombreTorneo}</Text>
+            <Text style={styles.estado}>{torneo.estado}</Text>
+            <Text style={styles.cardText}>Inicio: {torneo.fechaInicio}</Text>
+            <Text style={styles.cardText}>{torneo.numeroEquipos} equipos</Text>
+            <Text style={styles.cardText}>Inscripción: ${torneo.costo}</Text>
+          </View>
+        </View>
+
+        <View style={styles.infoBox}>
+          <Text style={styles.infoTitle}>Información del Torneo</Text>
+          <Text style={styles.infoText}>{torneo.informacion}</Text>
+        </View>
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.btnGreen, { backgroundColor: equipoId ? '#ccc' : 'green' }]}
+            onPress={() => {
+              if (equipoId) {
+                Alert.alert(
+                  'Ya inscrito',
+                  'Ya estás inscrito en un torneo. No puedes inscribirte a otro.',
+                  [{ text: 'OK' }]
+                );
+              } else {
+                setModalInscripcionVisible(true);
+              }
+            }}
+          >
+            <Text style={styles.btnText}>Inscribirse</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnGray}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.btnText}>Regresar</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
-      {/* Información adicional */}
-      <View style={styles.infoBox}>
-        <Text style={styles.infoTitle}>Información del Torneo</Text>
-        <Text style={styles.infoText}>Clasificación por doble eliminación</Text>
-
-        <Text style={styles.infoTitle}>Requisitos</Text>
-        <Text style={styles.infoText}>
-          Lorem ipsum dolor sit amet consectetur adipiscing elit duis, porta mattis odio ligula
-          pulvinar habitasse variu
-        </Text>
-      </View>
-
-      {/* Botones */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.btnGreen}
-          onPress={() => setModalInscripcionVisible(true)}
-        >
-          <Text style={styles.btnText}>Inscribirse</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.btnGray}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.btnText}>Regresar</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* MODALES */}
       <ModalConfirmarInscripcion
         visible={modalInscripcionVisible}
         onClose={() => setModalInscripcionVisible(false)}
-        onConfirm={() => {
-          setModalInscripcionVisible(false);
-          setModalStripeVisible(true);
+        onConfirm={async () => {
+          try {
+            await API.post('/api/equipos/inscribir-existente', {
+              equipoId: equipoId,
+              torneoId: torneo.id,
+            });
+            Alert.alert('✅ Inscripción exitosa', 'Tu equipo fue inscrito correctamente');
+            setModalInscripcionVisible(false);
+            setModalStripeVisible(true);
+          } catch (error) {
+            console.log('❌ Error al inscribirse:', error.response?.data || error.message);
+            Alert.alert('Error', 'No se pudo completar la inscripción');
+            setModalInscripcionVisible(false);
+          }
         }}
-        torneo={nombre}
+        torneo={torneo.nombreTorneo}
+        torneoId={torneo.id}
         navigation={navigation}
       />
 
       <ModalStripeRedirect
         visible={modalStripeVisible}
         onClose={() => setModalStripeVisible(false)}
-        navigation={navigation} // ✅ navegación pasada correctamente
+        navigation={navigation}
       />
     </ScrollView>
   );
@@ -97,18 +147,68 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 80 : 80,
-    paddingHorizontal: 20,
     backgroundColor: '#fff',
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+    //paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 80 : 80,
+    paddingBottom: 60,
+  },
+  content: {
+    alignItems: 'center',
+    padding: 20,
+    zIndex: 3,
+  },
+  franja: {
+    position: 'absolute',
+    width: width * 2.1,
+    height: 50,
+    zIndex: 0,
+  },
+  franjaRojaTop: {
+    top: 80,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegraTop: {
+    top: 120,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisTop: {
+    top: 160,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
   header: {
-    position: 'absolute',
-    top: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#000',
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    zIndex: 10,
+    padding: 12,
+    paddingTop: 50,
+    width: '100%',
+    zIndex: 2,
   },
   headerText: {
     color: '#FDBA12',
@@ -117,8 +217,9 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
+    width: '90%',
     backgroundColor: '#0e1b39',
-    padding: 16,
+    padding: 20,
     borderRadius: 16,
     alignItems: 'center',
     gap: 14,
@@ -153,6 +254,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     backgroundColor: '#fff',
+    width: '90%',
     padding: 16,
     borderRadius: 12,
     elevation: 4,
@@ -174,7 +276,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 40,
+    marginTop: 10,
   },
   btnGreen: {
     flex: 1,

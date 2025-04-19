@@ -7,7 +7,6 @@ const { width } = Dimensions.get('window');
 
 export default function SplashScreen({ navigation }) {
   const rotation = useRef(new Animated.Value(0)).current;
-
   const spin = rotation.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -48,21 +47,22 @@ export default function SplashScreen({ navigation }) {
         } else {
           console.log('❓ Rol no reconocido. Redirigiendo a login...');
           await AsyncStorage.removeItem('token');
-          navigation.replace('LoginScreen');
+          navigation.replace('Main');
+          navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
         }
       } catch (error) {
-        console.error('⛔ Error al decodificar el token:', error.message);
+        console.log('⛔ Error al decodificar el token:', error.message);
         await AsyncStorage.removeItem('token');
-        navigation.replace('LoginScreen');
+        navigation.replace('Main');
+        navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
       }
     };
 
-    setTimeout(verificarSesion, 1000); // Simula carga breve de splash
+    setTimeout(verificarSesion, 1000);
   }, []);
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -70,7 +70,6 @@ export default function SplashScreen({ navigation }) {
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-      {/* Contenido principal */}
       <Animated.Image
         source={require('../../assets/logo.jpg')}
         style={[styles.logo, { transform: [{ rotate: spin }] }]}

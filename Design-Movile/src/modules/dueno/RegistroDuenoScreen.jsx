@@ -70,12 +70,12 @@ export default function RegistroDuenoScreen({ navigation }) {
       await AsyncStorage.setItem('duenoId', duenoId);
   
       Alert.alert('Cuenta creada', 'Tu cuenta fue creada correctamente');
-      navigation.replace('BottomTabs');
+      navigation.replace('Main'); // Cambia a la pantalla principal de la app
   
     } catch (error) {
       const mensaje = error.response?.data || error.message;
     
-      console.error('❌ Error al registrar o loguear:', mensaje);
+      console.log('❌ Error al registrar o loguear:', mensaje);
     
       if (mensaje && typeof mensaje === 'string' && mensaje.toLowerCase().includes('email')) {
         Alert.alert(

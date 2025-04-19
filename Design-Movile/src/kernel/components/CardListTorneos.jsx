@@ -35,7 +35,7 @@ export default function CardListTorneos({ logo, nombre, estado, fecha, clubes })
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#161F37',
+    backgroundColor: '#fff',
     marginBottom: 10,
     padding: 10,
     borderRadius: 10,
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     resizeMode: 'contain',
-    borderRadius: 10,
+    borderRadius: 60,
     backgroundColor: 'transparent',
   },
   details: {
@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
   nombre: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
   },
   estado: {
     fontSize: 14,
@@ -87,6 +86,6 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 15,
-    color: 'white',
+    color: 'gray',
   },
 });

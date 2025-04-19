@@ -57,7 +57,7 @@ export default function ActualizarEquipoScreen({ navigation, route }) {
         { text: 'OK', onPress: () => navigation.navigate('BottomTabs', { screen: 'Perfil' }) },
       ]);
     } catch (error) {
-      console.error('❌ Error actualizando equipo:', error.response?.data || error.message);
+      console.log('❌ Error actualizando equipo:', error.response?.data || error.message);
       Alert.alert('Error', 'No se pudo actualizar el equipo');
     }
   };
@@ -70,7 +70,7 @@ export default function ActualizarEquipoScreen({ navigation, route }) {
         { text: 'OK', onPress: () => navigation.navigate('BottomTabs', { screen: 'Perfil' }) },
       ]);
     } catch (error) {
-      console.error('❌ Error eliminando equipo:', error.response?.data || error.message);
+      console.log('❌ Error eliminando equipo:', error.response?.data || error.message);
       Alert.alert('Error', 'No se pudo eliminar el equipo');
     }
   };

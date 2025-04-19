@@ -14,6 +14,7 @@ import API from '../../api/api';
 const { width } = Dimensions.get('window');
 
 export default function PartidosScreen({ route }) {
+  const { torneoId } = route.params;
   const [partidos, setPartidos] = useState([]);
   const [jornadaLabel, setJornadaLabel] = useState('');
   const [loading, setLoading] = useState(true);
@@ -32,7 +33,7 @@ export default function PartidosScreen({ route }) {
         setJornadaLabel(`Jornada ${ultima}`);
       }
     } catch (error) {
-      console.error('Error cargando partidos:', error);
+      console.log('Error cargando partidos:', error);
     } finally {
       setLoading(false);
     }
@@ -40,7 +41,7 @@ export default function PartidosScreen({ route }) {
 
   useEffect(() => {
     obtenerPartidos();
-  }, []);
+  }, [torneoId]);
 
   const renderPartido = ({ item }) => {
     return (
@@ -218,48 +219,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: 'italic',
     color: '#555',
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
-  },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
   },
   icono: {
     width: 24,

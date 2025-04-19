@@ -6,22 +6,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // 🌐 Público
 import SplashScreen from './src/screens/SplashScreen';
 import BottomTabs from './src/navigation/BottomTabs';
-import TournamentDetail from './src/modules/home/TournamentDetail';
-import TablaPosiciones from './src/modules/home/TablaPosiciones';
-import PartidosScreen from './src/modules/home/PartidosScreen';
-import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
-import TarjetasScreen from './src/modules/home/TarjetasScreen';
-import Estadisticas from './src/modules/home/Estadisticas';
+import HomeTabs from './src/navigation/HomeTabs';
+import ArbitroTabs from './src/navigation/ArbitroTabs'; // ✅ Tabs árbitro
 
-// 🔐 Login único
+// 🔐 Login
 import LoginScreen from './src/screens/LoginScreen';
-
-// ⚖️ Árbitro
-import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
-import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
-import DetallePartidoScreen from './src/modules/arbitro/DetallePartidoScreen';
-import RegistroCerradoScreen from './src/modules/arbitro/RegistroCerradoScreen';
-import ModalConfirmacion from './src/modules/arbitro/ModalConfirmacion';
 
 // 📋 Dueño
 import CuentaDuenoScreen from './src/modules/dueno/CuentaDuenoScreen';
@@ -38,15 +27,14 @@ import InscripcionProcesoScreen from './src/modules/dueno/InscripcionProcesoScre
 import InscripcionAprobadoScreen from './src/modules/dueno/InscripcionAprobadoScreen';
 import ConfirmarInscripcionScreen from './src/modules/dueno/ConfirmarInscripcionScreen';
 import ConfirmarPagoScreen from './src/modules/dueno/ConfirmarPagoScreen';
+import PagosDuenoScreen from './src/modules/dueno/PagosDuenoScreen';
 import PagoStripeScreen from './src/modules/dueno/PagoStripeScreen';
 import ModalInfoCredenciales from './src/modules/dueno/ModalInfoCredenciales';
 import ModalConfirmarDescargaCredenciales from './src/modules/dueno/ModalConfirmarDescargaCredenciales';
 import ModalConfirmarEliminacion from './src/modules/dueno/ModalConfirmarEliminacion';
-
+import EsterEggScreen from './src/modules/dueno/EsterEggScreen';
 import RegistroJugadorScreen from './src/modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from './src/modules/dueno/DetallesJugadorScreen';
-
-
 
 const Stack = createNativeStackNavigator();
 
@@ -56,7 +44,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: true }}>
         {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen name="Main" component={BottomTabs} />
         <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
         <Stack.Screen name="TorneoScreen" component={BottomTabs} />
         <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
@@ -67,6 +55,11 @@ export default function App() {
         
        {  /*🔐 Login único */}
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen name="HomeTabs" component={HomeTabs} />
+        <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
+
+        {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
         
         {/* ⚖️ Árbitro */}
@@ -86,21 +79,22 @@ export default function App() {
         <Stack.Screen name="RegistroEquipoScreen" component={RegistroEquipoScreen} />
         <Stack.Screen name="ActualizarEquipoScreen" component={ActualizarEquipoScreen} />
         <Stack.Screen name="ActualizarCuentaDueno" component={ActualizarCuentaDuenoScreen} />
-        <Stack.Screen name="InscripcionesDueno" component={InscripcionesDuenoScreen} />
+        <Stack.Screen name="InscripcionesDuenoScreen" component={InscripcionesDuenoScreen} />
         <Stack.Screen name="InscripcionProceso" component={InscripcionProcesoScreen} />
         <Stack.Screen name="InscripcionAprobado" component={InscripcionAprobadoScreen} />
         <Stack.Screen name="ConfirmarInscripcion" component={ConfirmarInscripcionScreen} />
         <Stack.Screen name="ConfirmarPago" component={ConfirmarPagoScreen} />
+        <Stack.Screen name="PagosDuenoScreen" component={PagosDuenoScreen} />
         <Stack.Screen name="PagoStripe" component={PagoStripeScreen} />
         <Stack.Screen name="ModalInfoCredenciales" component={ModalInfoCredenciales} />
         <Stack.Screen name="ModalConfirmarDescargaCredenciales" component={ModalConfirmarDescargaCredenciales} />
         <Stack.Screen name="ModalConfirmarEliminacion" component={ModalConfirmarEliminacion} />
         <Stack.Screen name="RegistroJugadorScreen" component={RegistroJugadorScreen} />
         <Stack.Screen name="DetallesJugadorScreen" component={DetallesJugadorScreen} />
+        <Stack.Screen name="EsterEgg" component={EsterEggScreen} />
       </Stack.Navigator>
 
       <StatusBar style="light" />
     </NavigationContainer>
   );
 }
-

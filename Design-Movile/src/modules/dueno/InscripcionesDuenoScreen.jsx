@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import API from '../../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -13,84 +15,233 @@ import {
   StatusBar,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
+import { color } from '@rneui/base';
 
 const { width } = Dimensions.get('window');
 
 export default function InscripcionesDuenoScreen({ navigation }) {
-  const torneosDisponibles = [
-    { nombre: 'Torneo Infantil', img: require('../../../assets/madrid.png') },
-    { nombre: 'Torneo Veteranos', img: require('../../../assets/barcelona.png') },
-    { nombre: 'Campeones', img: require('../../../assets/paris.png') },
-  ];
+  const [busqueda, setBusqueda] = useState('');
+  const [torneos, setTorneos] = useState([]);
+  const [torneosInscritos, setTorneosInscritos] = useState([]);
+  const [pagosInscripcion, setPagosInscripcion] = useState([]);
+
+  useEffect(() => {
+    const fetchTorneos = async () => {
+      try {
+        const duenoId = await AsyncStorage.getItem('duenoId');
+        console.log('🔑 duenoId obtenido:', duenoId);
+
+        if (!duenoId) {
+          console.warn('⚠️ duenoId no encontrado');
+          return;
+        }
+
+        const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
+        const equipos = resEquipos.data || [];
+        const torneoIds = equipos
+          .map(e => e.torneoId?.toString?.())
+          .filter(id => !!id);
+
+        const resTorneos = await API.get('/torneos');
+        const todosTorneos = resTorneos.data || [];
+        const torneosInscritos = todosTorneos.filter(t =>
+          torneoIds.includes(t.id)
+        );
+        const torneosDisponibles = todosTorneos.filter(t =>
+          t.estado?.toUpperCase().trim() === "ABIERTO"
+        );
+
+        const resPagos = await API.get(`/pagos/dueno/${duenoId}`);
+        const pagos = resPagos.data || [];
+        const pagosFiltrados = pagos.filter(p => p.tipo === "inscripcion" && ["pagado", "pendiente"].includes(p.estatus));
+
+        setPagosInscripcion(pagosFiltrados);
+
+
+        setTorneos(torneosDisponibles);
+        setTorneosInscritos(torneosInscritos);
+        console.log('✅ Lógica completada sin errores');
+      } catch (err) {
+        console.log('❌ Error al cargar torneos:', err);
+      }
+    };
+
+    fetchTorneos();
+  }, []);
+
+  const torneosFiltrados = torneos.filter((t) =>
+    ((t.nombreTorneo || '') + ' ' + (t.estado || ''))
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Encabezado */}
-      <View style={styles.header}>
-        <Icon name="trophy" type="font-awesome" color="#FDBA12" size={18} style={{ marginRight: 8 }} />
-        <Text style={styles.headerText}>Inscripciones</Text>
-      </View>
-
-      {/* Franjas decorativas superiores */}
-      <View style={styles.decorativas}>
-        <View style={styles.triangleTopRed} />
-        <View style={[styles.franja, styles.franjaNegraTop]} />
-        <View style={[styles.franja, styles.franjaGrisTop]} />
-      </View>
-
-      {/* Contenido */}
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {/* Buscador y torneos inscritos */}
-        <View style={styles.buscadorYInscritos}>
-          <View style={styles.searchContainer}>
-            <TextInput
-              placeholder="Buscar torneos..."
-              placeholderTextColor="#888"
-              style={styles.input}
-            />
-            <TouchableOpacity style={styles.btnBuscar}>
-              <Text style={styles.btnBuscarTexto}>Buscar</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.cardInscritoBox}>
-            <Text style={styles.cardInscritoTitulo}>Torneos inscritos</Text>
-            <Text style={styles.cardInscritoTexto}>
-              Aquí aparecerán los torneos a los que estás inscrito
-            </Text>
-          </View>
+      <StatusBar style="light" backgroundColor="#000" />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Icon name="trophy" type="font-awesome" color="#FDBA12" size={18} style={{ marginRight: 8 }} />
+          <Text style={styles.headerText}>Inscripciones</Text>
         </View>
 
-        {/* Torneos disponibles */}
-        <Text style={styles.subtituloDisponible}>Torneos Disponibles</Text>
+        <View style={styles.decorativas}>
+          <View style={styles.triangleTopRed} />
+          <View style={[styles.franja, styles.franjaNegraTop]} />
+          <View style={[styles.franja, styles.franjaGrisTop]} />
+        </View>
 
-        {torneosDisponibles.map((torneo, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.cardDisponible}
-            onPress={() => navigation.navigate('DetalleTorneoDueno', {
-              nombre: torneo.nombre,
-              imagen: torneo.img
-            })}
-          >
-            <Image source={torneo.img} style={styles.logo} />
-            <View>
-              <Text style={styles.cardTitle}>{torneo.nombre}</Text>
-              <Text style={styles.estadoActivo}>ACTIVO</Text>
-              <Text style={styles.cardText}>05/03/2025   · 10 clubs</Text>
+        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.buscadorYInscritos}>
+            <View style={styles.searchContainer}>
+              <TextInput
+                placeholder="Buscar torneos..."
+                placeholderTextColor="#888"
+                style={styles.input}
+                value={busqueda}
+                onChangeText={setBusqueda}
+              />
+              <TouchableOpacity style={styles.btnBuscar}>
+                <Text style={styles.btnBuscarTexto}>Buscar</Text>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+
+            <View style={styles.cardInscritoBox}>
+              <Text style={styles.cardInscritoTitulo}>Torneos inscritos</Text>
+              {torneosInscritos.length === 0 ? (
+                <Text style={styles.cardInscritoTexto}>
+                  Aquí aparecerán los torneos a los que estás inscrito
+                </Text>
+              ) : (torneosInscritos.map((torneo, index) => {
+                const pago = pagosInscripcion.find(p => p.torneoId === torneo.id);
+
+                return (
+                  <View
+                    key={index}
+                    style={styles.cardDisponible}
+                  >
+                    <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.cardTitle}>{torneo.nombreTorneo}</Text>
+                      <Text
+                        style={[
+                          styles.estado,
+                          torneo.estado?.toUpperCase().trim() === 'ABIERTO'
+                            ? styles.abierto
+                            : torneo.estado?.toUpperCase().trim() === 'FINALIZADO'
+                              ? styles.finalizado
+                              : torneo.estado?.toUpperCase().trim() === 'CERRADO'
+                                ? styles.cerrado
+                                : torneo.estado?.toUpperCase().trim() === 'EN CURSO'
+                                  ? styles.enCurso
+                                  : styles.otros,
+                        ]}
+                      >
+                        {torneo.estado}
+                      </Text>
+                      {pago && (
+                        <Text
+                          style={[
+                            styles.EstatusPago,
+                            { color: pago.estatus === 'pendiente' ? '#FF4141' : '#28D914' }
+                          ]}
+                        >
+                          {pago.estatus === 'pendiente' ? 'Pago en PROCESO' : 'Pago APROBADO'}
+                        </Text>
+                      )}
+                      <Text style={styles.cardText}>
+                        {torneo.fechaInicio} · {torneo.numeroEquipos} clubs
+                      </Text>
+                    </View>
+
+                    {/* Botón agregar jugador con texto */}
+                    {pago && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (pago.estatus === 'pendiente') {
+                            alert('⏳ Tu pago está en proceso. Espera confirmación para agregar jugadores.');
+                          } else {
+                            navigation.navigate('JugadoresRegistradosDueno', { torneo });
+                          }
+                        }}
+                        style={{
+                          backgroundColor: pago.estatus === 'pagado' ? '#28D914' : '#ccc',
+                          paddingVertical: 12,
+                          paddingHorizontal: 20,
+                          borderRadius: 20,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 6,
+                        }}
+                      >
+                        <Icon
+                          name="user-plus"
+                          type="font-awesome"
+                          color="#fff"
+                          size={16}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+
+                );
+              }))}
+            </View>
+          </View>
+
+          <Text style={styles.subtituloDisponible}>Torneos Disponibles</Text>
+
+          {torneosFiltrados.map((torneo, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.cardDisponible}
+              onPress={() => navigation.navigate('DetalleTorneoDueno', {
+                torneo,
+                yaInscrito: torneosInscritos.length > 0
+              })}
+            >
+              <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
+              <View>
+                <Text style={styles.cardTitle}>{torneo.nombreTorneo}</Text>
+                <Text
+                  style={[
+                    styles.estado,
+                    torneo.estado?.toUpperCase().trim() === 'ABIERTO'
+                      ? styles.abierto
+                      : torneo.estado?.toUpperCase().trim() === 'FINALIZADO'
+                        ? styles.finalizado
+                        : torneo.estado?.toUpperCase().trim() === 'CERRADO'
+                          ? styles.cerrado
+                          : torneo.estado?.toUpperCase().trim() === 'EN CURSO'
+                            ? styles.enCurso
+                            : styles.otros,
+                  ]}
+                >
+                  {torneo.estado}
+                </Text>
+                <Text style={styles.cardText}>{torneo.fechaInicio}   · {torneo.numeroEquipos} clubs</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000', // esto asegura el notch oscuro
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  safeTop: {
+    flex: 1,
+    backgroundColor: '#000', // solo el notch
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff', // fondo blanco del contenido
   },
   header: {
     backgroundColor: '#000',
@@ -98,6 +249,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
+
   },
   headerText: {
     color: '#FDBA12',
@@ -105,8 +257,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   decorativas: {
-    height: 130,
+    height: 25,
     marginBottom: 10,
+    position: 'relative', // ← ¡Clave!
+    zIndex: 0,
   },
   triangleTopRed: {
     position: 'absolute',
@@ -146,8 +300,9 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 40,
     gap: 8,
+    zIndex: 2,
   },
   input: {
     flex: 1,
@@ -159,6 +314,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     elevation: 2,
+    zIndex: 2,
   },
   btnBuscar: {
     backgroundColor: '#d80027',
@@ -177,8 +333,8 @@ const styles = StyleSheet.create({
     color: '#FDBA12',
     padding: 10,
     borderRadius: 6,
-    marginTop: 10,
-    marginBottom: 6,
+    marginTop: 15,
+    marginBottom: 15,
     textAlign: 'center',
   },
   cardDisponible: {
@@ -238,4 +394,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  estado: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  abierto: {
+    color: '#00B61B',
+    fontWeight: 'bold',
+  },
+  finalizado: {
+    color: 'red',
+    fontWeight: 'bold',
+  },
+  cerrado: {
+    color: '#FFA500',
+    fontWeight: 'bold',
+  },
+  enCurso: {
+    color: '#007BFF',
+    fontWeight: 'bold',
+  },
+  otros: {
+    color: '#888',
+    fontWeight: 'bold',
+  },
+  EstatusPago: {
+    fontSize: 14,
+    color: '#28D914',
+    marginVertical: 5,
+    fontWeight: 'bold',
+  }
 });

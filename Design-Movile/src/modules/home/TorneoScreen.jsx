@@ -11,6 +11,7 @@ import {
 import CardListTorneos from '../../kernel/components/CardListTorneos';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -24,7 +25,7 @@ export default function TorneoScreen({ navigation }) {
         const response = await API.get('/torneos');
         setTorneos(response.data);
       } catch (error) {
-        console.error('Error cargando torneos:', error);
+        console.log('Error cargando torneos:', error);
       }
     };
 
@@ -39,16 +40,10 @@ export default function TorneoScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
       <View style={styles.headerFull}>
-        <Icon name="trophy" type="font-awesome" color="#FDBA12" size={22} />
+        <Icon name="chart-bar" type="font-awesome-5" color="#FDBA12" size={28} />
         <Text style={styles.title}> Torneos</Text>
       </View>
 

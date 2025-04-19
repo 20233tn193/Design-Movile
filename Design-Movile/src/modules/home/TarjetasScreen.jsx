@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator, Image } from 'react-native';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
 
@@ -14,9 +14,16 @@ export default function TarjetasScreen({ route }) {
     const fetchTarjetas = async () => {
       try {
         const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
-        setTarjetas(response.data);
+        const datos = response.data.map((item) => ({
+          nombre: `${item.nombre || ''} ${item.apellido || ''}`,
+          equipoNombre: item.equipoNombre || 'Sin equipo',
+          equipoEscudo: item.equipoEscudo || 'https://via.placeholder.com/40',
+          amarillas: item.amarillas,
+          rojas: item.rojas,
+        }));
+        setTarjetas(datos);
       } catch (error) {
-        console.error('Error al cargar tarjetas:', error);
+        console.log('Error al cargar tarjetas:', error);
       } finally {
         setLoading(false);
       }
@@ -27,13 +34,7 @@ export default function TarjetasScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
-      <View style={[styles.franja, styles.franjaRojaTop]} />
-      <View style={[styles.franja, styles.franjaNegraTop]} />
-      <View style={[styles.franja, styles.franjaGrisTop]} />
-      <View style={[styles.franja, styles.franjaGrisBottom]} />
-      <View style={[styles.franja, styles.franjaNegraBottom]} />
-      <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
       <View style={styles.header}>
         <Icon name="credit-card" type="font-awesome-5" color="#FDBA12" size={20} />
@@ -132,46 +133,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#333',
   },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
+  equipo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
+  equipoText: {
+    fontSize: 12,
+    marginLeft: 5,
+    color: '#333',
   },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
+  logo: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
   },
 });

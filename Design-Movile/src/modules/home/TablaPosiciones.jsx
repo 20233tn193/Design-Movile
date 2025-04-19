@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import API from '../../api/api';
+import FranjasDecorativas from '../../kernel/components/FranjasDecorativas'; // Ajusta la ruta según tu estructura
 
 const { width } = Dimensions.get('window');
 
@@ -15,12 +16,13 @@ export default function TablaPosiciones({ route }) {
   const [tabla, setTabla] = useState([]);
 
   useEffect(() => {
+    console.log('📦 ID del torneo recibido:', torneoId);
     const cargarTabla = async () => {
       try {
         const response = await API.get(`/estadisticas/tabla-posiciones/${torneoId}`);
         setTabla(response.data);
       } catch (error) {
-        console.error('Error al obtener tabla de posiciones:', error);
+        console.log('Error al obtener tabla de posiciones:', error);
       }
     };
 
@@ -37,6 +39,7 @@ export default function TablaPosiciones({ route }) {
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
+      <FranjasDecorativas />
 
       <View style={styles.header}>
         <Text style={styles.headerText}> Tabla de Posiciones</Text>

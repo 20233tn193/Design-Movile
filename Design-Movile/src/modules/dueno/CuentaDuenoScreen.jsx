@@ -27,14 +27,15 @@ export default function CuentaDuenoScreen() {
     try {
       await AsyncStorage.removeItem('token');
       await AsyncStorage.removeItem('rol');
-      await AsyncStorage.removeItem('duenoId'); // si guardas esto también
+      await AsyncStorage.removeItem('correo');
+      await AsyncStorage.removeItem('duenoId');
 
       navigation.reset({
         index: 0,
-        routes: [{ name: 'BottomTabs' }],
+        routes: [{ name: 'Main' }],
       });
     } catch (error) {
-      console.error('❌ Error al cerrar sesión:', error);
+      console.log('❌ Error al cerrar sesión:', error);
     }
   };
 
@@ -58,11 +59,11 @@ export default function CuentaDuenoScreen() {
           setDueno(duenoData);
 
           const equipos = await obtenerEquipoPorDueno(duenoId);
-          console.log("📦 Equipos del dueño:", equipos);
+          //console.log("📦 Equipos del dueño:", equipos);
 
           if (equipos.length > 0) {
             setEquipo(equipos[0]);
-            console.log("✅ Primer equipo:", equipos[0]);
+            //console.log("✅ Primer equipo:", equipos[0]);
           } else {
             setEquipo(null);
             console.log("ℹ️ El dueño no tiene equipos registrados.");
@@ -140,7 +141,7 @@ export default function CuentaDuenoScreen() {
                 {dueno?.nombre || ""} {dueno?.apellido || ""}
               </Text>
               <Text style={styles.dato}>
-                {dueno?.correo || correo || "Correo no disponible"}
+                {correo || "Correo no disponible"}
               </Text>
 
               <TouchableOpacity
@@ -171,11 +172,13 @@ export default function CuentaDuenoScreen() {
               <Text style={styles.botonTexto}>Cerrar Sesión</Text>
             </TouchableOpacity>
 
-            <Image
-              source={require("../../../assets/ManhattanLogoRojo.png")}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+            <TouchableOpacity onPress={() => navigation.navigate("EsterEgg")}>
+              <Image
+                source={require("../../../assets/ManhattanLogoRojo.png")}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
           </>
         )}
       </View>
@@ -190,20 +193,19 @@ const styles = StyleSheet.create({
     position: "relative",
     overflow: "hidden",
   },
-  estadoEquipoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#001F4E',
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderRadius: 12,
-    gap: 10,
-    justifyContent: 'center',
-    left: -25,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#000",
+    padding: 12,
+    paddingTop: 50,
+    width: "100%",
+    zIndex: 2,
   },
-  
-  editEquipoIcon: {
-    paddingLeft: 10,
+  headerText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 18,
   },
   franja: {
     position: "absolute",
@@ -212,21 +214,21 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   franjaRojaTop: {
-    top: 60,
+    top: 80,
     left: -width,
     backgroundColor: "#d80027",
     transform: [{ rotate: "-10deg" }],
   },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: "#1a1a1a",
-    transform: [{ rotate: "-10deg" }],
-  },
   franjaGrisTop: {
-    top: 120,
+    top: 160,
     left: -width,
     backgroundColor: "#e6e6e6",
+    transform: [{ rotate: "-10deg" }],
+  },
+  franjaNegraTop: {
+    top: 130,
+    left: -width,
+    backgroundColor: "#1a1a1a",
     transform: [{ rotate: "-10deg" }],
   },
   franjaGrisBottom: {
@@ -247,26 +249,77 @@ const styles = StyleSheet.create({
     backgroundColor: "#d80027",
     transform: [{ rotate: "10deg" }],
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#000",
-    padding: 12,
-    paddingTop: 50,
-    width: "100%",
-    zIndex: 2,
-  },
-  headerText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
   content: {
     flex: 1,
     alignItems: "center",
     padding: 20,
     paddingTop: 120,
     zIndex: 3,
+  },
+  
+  
+
+  //Extras personales de pantalla
+  estadoEquipoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#001F4E',
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 12,
+    gap: 10,
+    justifyContent: 'center',
+    left: -25,
+  },
+  editEquipoIcon: {
+    paddingLeft: 10,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    marginTop: 0,
+  },
+  botonTexto: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  botonAzul: {
+    backgroundColor: "#001F4E",
+    paddingVertical: 12,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  botonRojo: {
+    backgroundColor: "#B80000",
+    paddingVertical: 12,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center",
+  },
+  editIcon: {
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+  },
+  
+  estadoTexto: {
+    color: "#FDBA12",
+    fontWeight: "bold",
+    fontSize: 24,
+  },
+  nombre: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginTop: 10,
+    textAlign: "center",
+  },
+  dato: {
+    fontSize: 18,
+    color: "#333",
+    textAlign: "center",
   },
   card: {
     backgroundColor: "#fff",
@@ -295,64 +348,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 6,
     borderRadius: 12,
-
-  },
-  estadoTexto: {
-    color: "#FDBA12",
-    fontWeight: "bold",
-    fontSize: 24,
-  },
-  nombre: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginTop: 10,
-    textAlign: "center",
-  },
-  dato: {
-    fontSize: 18,
-    color: "#333",
-    textAlign: "center",
-  },
-  editIcon: {
-    position: "absolute",
-    bottom: 12,
-    right: 12,
-
-  },
-  botonAzul: {
-    backgroundColor: "#001F4E",
-    paddingVertical: 12,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  botonRojo: {
-    backgroundColor: "#B80000",
-    paddingVertical: 12,
-    borderRadius: 10,
-    width: "80%",
-    alignItems: "center",
-  },
-  botonTexto: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  logo: {
-    width: 200,
-    height: 200,
-    marginTop: 50,
-  },
-  bottomTabs: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    height: 60,
-    backgroundColor: "#1a1a1a",
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    zIndex: 5,
   },
 });

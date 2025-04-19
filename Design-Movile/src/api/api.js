@@ -3,7 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: 'http://192.168.1.12:8080/api',
+  baseURL: 'http://192.168.1.69:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,12 +22,22 @@ API.interceptors.request.use(
 );
 
 // 🔽 Obtener dueño por ID
-export const obtenerDuenoPorId = async (usuarioId) => {
+export const obtenerDuenoPorId = async (id) => {
   try {
     const response = await API.get(`/duenos/usuario/${usuarioId}`);
     return response.data; // debe incluir _id
   } catch (error) {
     console.error('❌ Error al obtener dueño por usuarioId:', error);
+    throw error;
+  }
+};
+
+export const obtenerDuenoPorId = async (duenoId) => {
+  try {
+    const response = await API.get(`/duenos/${duenoId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener el dueño por id:', error);
     throw error;
   }
 };
@@ -38,7 +48,7 @@ export const obtenerEquipoPorDueno = async (duenoId) => {
     const response = await API.get(`/equipos/dueño/${duenoId}`);
     return response.data;
   } catch (error) {
-    console.error('Error al obtener equipo del dueño:', error);
+    console.log('Error al obtener equipo del dueño:', error);
     return [];
   }
 };
@@ -49,7 +59,7 @@ export const obtenerPartidosPorArbitro = async (arbitroId) => {
     const response = await API.get(`/partidos/arbitro/${arbitroId}`);
     return response.data;
   } catch (error) {
-    console.error('Error al obtener partidos del árbitro:', error);
+    console.log('Error al obtener partidos del árbitro:', error);
     return [];
   }
 };
@@ -60,7 +70,7 @@ export const obtenerPartidoPorId = async (partidoId) => {
     const response = await API.get(`/partidos/${partidoId}`);
     return response.data;
   } catch (error) {
-    console.error('Error al obtener partido por ID:', error);
+    console.log('Error al obtener partido por ID:', error);
     throw error;
   }
 };
@@ -71,7 +81,7 @@ export const obtenerJugadoresPorEquipo = async (equipoId) => {
     const response = await API.get(`/jugadores/equipo/${equipoId}`);
     return response.data;
   } catch (error) {
-    console.error('Error al obtener jugadores del equipo:', error);
+    console.log('Error al obtener jugadores del equipo:', error);
     return [];
   }
 };
@@ -81,7 +91,7 @@ export const registrarResultadoPartido = async (partidoId, registro) => {
   try {
     await API.put(`/partidos/registrar-resultado/${partidoId}`, { registro });
   } catch (error) {
-    console.error('Error al registrar resultado del partido:', error);
+    console.log('Error al registrar resultado del partido:', error);
     throw error;
   }
 };
