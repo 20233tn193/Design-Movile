@@ -68,26 +68,31 @@ export default function TorneoScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {torneosFiltrados.map((torneo, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.cardTorneo}
-            onPress={() =>
-              navigation.navigate('TournamentDetail', {
-                torneoId: torneo._id,
-                nombre: torneo.nombreTorneo,
-              })
-            }
-          >
-            <CardListTorneos
-              logo={{ uri: torneo.logoSeleccionado }}
-              nombre={torneo.nombreTorneo}
-              estado={torneo.estado}
-              fecha={torneo.fechaInicio}
-              clubes={torneo.numeroEquipos}
-            />
-          </TouchableOpacity>
-        ))}
+        {torneosFiltrados.map((torneo, i) => {
+          console.log("🧾 Torneo:", torneo); // <-- Imprime el objeto torneo
+
+          return (
+            <TouchableOpacity
+              key={i}
+              style={styles.cardTorneo}
+              onPress={() =>
+                navigation.navigate('TournamentDetail', {
+                  torneoId: torneo.id, // <-- Usa 'id' si ese es el campo correcto
+                  nombre: torneo.nombreTorneo,
+                  logo: torneo.logoSeleccionado,
+                })
+              }
+            >
+              <CardListTorneos
+                logo={{ uri: torneo.logoSeleccionado }}
+                nombre={torneo.nombreTorneo}
+                estado={torneo.estado}
+                fecha={torneo.fechaInicio}
+                clubes={torneo.numeroEquipos}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -106,7 +111,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,
-    paddingTop: 50, //Aqui modificamos para que se baje mas el header
+    paddingTop: 30,
     zIndex: 10,
   },
   title: {

@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // Asegúrate que la ruta sea correcta
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
@@ -10,14 +18,14 @@ export default function PartidosScreen({ route }) {
   const [jornadaLabel, setJornadaLabel] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const torneoId = route?.params?.torneoId || 'DEFAULT_ID'; // Cambia esto por un ID real
+  const torneoId = route?.params?.torneoId || 'DEFAULT_ID';
 
   const obtenerPartidos = async () => {
     try {
       const response = await API.get(`/partidos/calendario/${torneoId}`);
       const calendario = response.data;
 
-      const jornadas = Object.keys(calendario).sort((a, b) => b - a); // Última jornada
+      const jornadas = Object.keys(calendario).sort((a, b) => b - a);
       if (jornadas.length > 0) {
         const ultima = jornadas[0];
         setPartidos(calendario[ultima]);
@@ -34,33 +42,54 @@ export default function PartidosScreen({ route }) {
     obtenerPartidos();
   }, []);
 
-  const renderPartido = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.row}>
-        <Image source={{ uri: item.logoLocal }} style={styles.logo} />
-        <Text style={styles.resultado}>{item.golesLocal ?? 0} : {item.golesVisitante ?? 0}</Text>
-        <Image source={{ uri: item.logoVisitante }} style={styles.logo} />
-      </View>
-
-      <View style={styles.nombres}>
-        <Text style={styles.nombreEquipo}>{item.nombreLocal}</Text>
-        <Text style={styles.nombreEquipo}>{item.nombreVisitante}</Text>
-      </View>
-
-      <View style={styles.infoContainer}>
-        <View>
-          <Text style={styles.infoText}>{item.nombreCampo} - {item.nombreCancha}</Text>
-          <Text style={styles.infoText}>{item.hora}</Text>
-          <Text style={styles.arbitro}>{item.nombreArbitro}</Text>
+  const renderPartido = ({ item }) => {
+    return (
+      <View style={styles.card}>
+        <View style={styles.row}>
+          <Image
+            source={{
+              uri:
+                item.logoLocal && item.logoLocal.startsWith('http')
+                  ? item.logoLocal
+                  : 'https://via.placeholder.com/60x60?text=L',
+            }}
+            style={styles.logo}
+          />
+          <Text style={styles.resultado}>
+            {item.golesLocal ?? 0} : {item.golesVisitante ?? 0}
+          </Text>
+          <Image
+            source={{
+              uri:
+                item.logoVisitante && item.logoVisitante.startsWith('http')
+                  ? item.logoVisitante
+                  : 'https://via.placeholder.com/60x60?text=V',
+            }}
+            style={styles.logo}
+          />
         </View>
-        <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={20} />
+
+        <View style={styles.nombres}>
+          <Text style={styles.nombreEquipo}>{item.nombreLocal}</Text>
+          <Text style={styles.nombreEquipo}>{item.nombreVisitante}</Text>
+        </View>
+
+        <View style={styles.infoContainer}>
+          <View>
+            <Text style={styles.infoText}>
+              {item.nombreCampo} - {item.nombreCancha}
+            </Text>
+            <Text style={styles.infoText}>{item.hora}</Text>
+            <Text style={styles.arbitro}>{item.nombreArbitro}</Text>
+          </View>
+          <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={20} />
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -68,13 +97,11 @@ export default function PartidosScreen({ route }) {
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-      {/* Header */}
       <View style={styles.header}>
         <Image source={require('../../../assets/ProximosPartidos.png')} style={styles.icono} />
         <Text style={styles.headerText}> Partidos</Text>
       </View>
 
-      {/* Jornada */}
       <View style={styles.jornadaContainer}>
         <Text style={styles.jornadaText}>
           <Text style={styles.jornadaBold}>{jornadaLabel}</Text>
@@ -86,7 +113,7 @@ export default function PartidosScreen({ route }) {
       ) : (
         <FlatList
           data={partidos}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => item.id?.toString() || index.toString()}
           contentContainerStyle={{ paddingBottom: 120 }}
           renderItem={renderPartido}
         />
@@ -170,9 +197,11 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   logo: {
-    width: 40,
-    height: 40,
+    width: 60,
+    height: 60,
     resizeMode: 'contain',
+    backgroundColor: '#eee',
+    borderRadius: 5,
   },
   infoContainer: {
     flexDirection: 'row',

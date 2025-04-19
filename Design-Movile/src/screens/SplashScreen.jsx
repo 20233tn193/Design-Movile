@@ -7,10 +7,11 @@ const { width } = Dimensions.get('window');
 
 export default function SplashScreen({ navigation }) {
   const rotation = useRef(new Animated.Value(0)).current;
-    const spin = rotation.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '360deg'],
-    });
+
+  const spin = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
 
   useEffect(() => {
     Animated.loop(
@@ -21,7 +22,6 @@ export default function SplashScreen({ navigation }) {
       })
     ).start();
 
-
     const verificarSesion = async () => {
       const token = await AsyncStorage.getItem('token');
       console.log('🪪 Token recuperado:', token);
@@ -29,7 +29,7 @@ export default function SplashScreen({ navigation }) {
       if (!token || token.split('.').length !== 3) {
         console.warn('⚠️ Token inválido o mal formado:', token);
         await AsyncStorage.removeItem('token');
-        navigation.replace('LoginScreen');
+        navigation.replace('BottomTabs'); // ← corregido aquí
         return;
       }
 
@@ -56,12 +56,9 @@ export default function SplashScreen({ navigation }) {
         navigation.replace('LoginScreen');
       }
     };
-  
 
     setTimeout(verificarSesion, 1000); // Simula carga breve de splash
   }, []);
-
-
 
   return (
     <View style={styles.container}>
@@ -79,7 +76,7 @@ export default function SplashScreen({ navigation }) {
         style={[styles.logo, { transform: [{ rotate: spin }] }]}
       />
       <Text style={styles.text}>GTF</Text>
-      <Text style={styles.subtext} >Sistema de Gestión de Torneos de Fútbol</Text>
+      <Text style={styles.subtext}>Sistema de Gestión de Torneos de Fútbol</Text>
     </View>
   );
 }
@@ -93,11 +90,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   logo: {
-    width: 100, height: 100, borderRadius: 50,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   text: {
-    fontSize: 48, // 👈 más grande
-    fontWeight: '900', // 👈 extra negrita
+    fontSize: 48,
+    fontWeight: '900',
     color: '#d80027',
     marginTop: 20,
     letterSpacing: 2,
@@ -116,7 +115,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: width * 2,
     height: 50,
-    zIndex: 10, // << subimos esto para ver si aparecen
+    zIndex: 10,
   },
   franjaRojaTop: {
     top: 0,

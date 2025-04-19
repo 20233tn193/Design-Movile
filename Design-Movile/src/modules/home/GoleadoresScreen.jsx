@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
-import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // Ajusta si es necesario
+import { View, Text, StyleSheet, FlatList, Dimensions, Image } from 'react-native';
+import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
@@ -24,7 +23,6 @@ export default function GoleadoresScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -32,13 +30,11 @@ export default function GoleadoresScreen({ route }) {
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-      {/* Header */}
       <View style={styles.header}>
         <Image source={require('../../../assets/Goleadores.png')} style={styles.icono} />
         <Text style={styles.title}> Goleadores</Text>
       </View>
 
-      {/* Encabezados */}
       <View style={styles.tableHeader}>
         <Text style={styles.columnHeader}>Nombre</Text>
         <Text style={styles.columnHeader}>Equipo</Text>
@@ -51,13 +47,16 @@ export default function GoleadoresScreen({ route }) {
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <Text style={styles.column}>{item.nombreJugador}</Text>
+            <Text style={styles.column}>{item.nombre} {item.apellido}</Text>
             <View style={styles.equipo}>
               <Image
-                source={{ uri: item.logoEquipo || 'https://via.placeholder.com/40' }}
+                source={{
+                  uri: item.equipoEscudo && item.equipoEscudo.startsWith('http')
+                    ? item.equipoEscudo
+                    : 'https://via.placeholder.com/24/cccccc/ffffff?text=⚽'
+                }}
                 style={styles.logo}
               />
-              <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
             <Text style={styles.column}>{item.goles}</Text>
           </View>
@@ -125,15 +124,14 @@ const styles = StyleSheet.create({
   equipo: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  equipoText: {
-    marginLeft: 5,
-    fontSize: 12,
+    justifyContent: 'center',
+    width: 90,
   },
   logo: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#ddd',
   },
   franja: {
     position: 'absolute',

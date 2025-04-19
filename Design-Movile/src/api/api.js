@@ -3,13 +3,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: 'http://192.168.1.69:8080/api',
+  baseURL: 'http://192.168.1.12:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// ✅ Interceptor para incluir el token JWT en cada petición
+// ✅ Interceptor para incluir el token JWT solo si existe
 API.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem('token');
@@ -22,22 +22,12 @@ API.interceptors.request.use(
 );
 
 // 🔽 Obtener dueño por ID
-export const obtenerDuenoPorId = async (id) => {
+export const obtenerDuenoPorId = async (usuarioId) => {
   try {
     const response = await API.get(`/duenos/usuario/${usuarioId}`);
     return response.data; // debe incluir _id
   } catch (error) {
     console.error('❌ Error al obtener dueño por usuarioId:', error);
-    throw error;
-  }
-};
-
-export const obtenerDuenoPorId = async (duenoId) => {
-  try {
-    const response = await API.get(`/duenos/${duenoId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error al obtener el dueño por id:', error);
     throw error;
   }
 };

@@ -53,21 +53,22 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: true }}>
         {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
+        <Stack.Screen name="TorneoScreen" component={BottomTabs} />
         <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
         <Stack.Screen name="Partidos" component={PartidosScreen} />
         <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
         <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
         <Stack.Screen name="Estadisticas" component={Estadisticas} />
         
-        {/* 🔐 Login único 
+       {  /*🔐 Login único */}
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        */}
+        
         {/* ⚖️ Árbitro */}
         <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
         <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   FlatList,
   Dimensions,
 } from 'react-native';
@@ -25,30 +24,28 @@ export default function TablaPosiciones({ route }) {
       }
     };
 
-    cargarTabla();
+    if (torneoId) {
+      cargarTabla();
+    }
   }, [torneoId]);
 
   return (
     <View style={styles.container}>
-      {/* Franjas superiores */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
-      {/* Franjas inferiores */}
       <View style={[styles.franja, styles.franjaGrisBottom]} />
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/Posiciones.png')} style={styles.icono} />
         <Text style={styles.headerText}> Tabla de Posiciones</Text>
       </View>
 
       <View style={styles.tableHeader}>
-        <Text style={[styles.columnHeader, { width: 100 }]}>Equipo</Text>
+        <Text style={[styles.columnHeader, { flex: 2 }]}>Equipo</Text>
         <Text style={styles.columnHeader}>PJ</Text>
         <Text style={styles.columnHeader}>PG</Text>
-        <Text style={styles.columnHeader}>PE</Text>
         <Text style={styles.columnHeader}>PP</Text>
         <Text style={styles.columnHeader}>GF</Text>
         <Text style={styles.columnHeader}>GC</Text>
@@ -57,33 +54,31 @@ export default function TablaPosiciones({ route }) {
 
       <FlatList
         data={tabla}
-        keyExtractor={(item, index) => item.equipoId + index}
+        keyExtractor={(item, index) => `${item.nombreEquipo}_${index}`}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <View style={styles.equipo}>
-              <Image
-                source={{ uri: item.logoEquipo }}
-                style={styles.logo}
-              />
-              <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
-            </View>
-            <Text style={styles.column}>{item.pj}</Text>
-            <Text style={styles.column}>{item.pg}</Text>
-            <Text style={styles.column}>{item.pe}</Text>
-            <Text style={styles.column}>{item.pp}</Text>
-            <Text style={styles.column}>{item.gf}</Text>
-            <Text style={styles.column}>{item.gc}</Text>
+            <Text style={[styles.column, styles.equipoText, { flex: 2 }]}>{item.nombreEquipo}</Text>
+            <Text style={styles.column}>{item.partidosJugados}</Text>
+            <Text style={styles.column}>{item.ganados}</Text>
+            <Text style={styles.column}>{item.perdidos}</Text>
+            <Text style={styles.column}>{item.golesFavor}</Text>
+            <Text style={styles.column}>{item.golesContra}</Text>
             <Text style={styles.column}>{item.puntos}</Text>
           </View>
         )}
       />
+
+      {tabla.length === 0 && (
+        <Text style={styles.emptyText}>
+          No hay datos disponibles para este torneo.
+        </Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // ... (misma definición de estilos que ya tienes)
   container: {
     flex: 1,
     backgroundColor: '#f2f2f2',
@@ -103,7 +98,6 @@ const styles = StyleSheet.create({
     color: '#FDBA12',
     fontWeight: 'bold',
     fontSize: 18,
-    marginLeft: 10,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -113,13 +107,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 20,
     zIndex: 10,
+    justifyContent: 'space-between'
   },
   columnHeader: {
     color: '#FDBA12',
     fontWeight: 'bold',
     fontSize: 12,
     textAlign: 'center',
-    width: 30,
+    flex: 1,
   },
   row: {
     flexDirection: 'row',
@@ -131,31 +126,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 2,
   },
-  equipo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 100,
-  },
   equipoText: {
-    marginLeft: 5,
-    fontSize: 12,
     fontWeight: 'bold',
-  },
-  logo: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    fontSize: 12,
   },
   column: {
-    width: 30,
     textAlign: 'center',
     fontSize: 12,
-  },
-  icono: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
-    marginRight: 10,
+    flex: 1,
   },
   franja: {
     position: 'absolute',
@@ -198,5 +176,11 @@ const styles = StyleSheet.create({
     left: -width,
     backgroundColor: '#d80027',
     transform: [{ rotate: '10deg' }],
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 40,
+    color: 'gray',
+    fontSize: 14,
   },
 });

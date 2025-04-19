@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api'; // ajusta si tu ruta es distinta
+import API from '../../api/api';
+
 const { width } = Dimensions.get('window');
 
 export default function TarjetasScreen({ route }) {
@@ -40,11 +41,11 @@ export default function TarjetasScreen({ route }) {
       </View>
 
       <View style={styles.tableHeader}>
-        <Text style={[styles.columnHeader, { width: 120 }]}>Nombre</Text>
-        <Text style={[styles.columnHeader, { width: 80 }]}>Equipo</Text>
-        <View style={styles.cardIcons}>
+        <Text style={[styles.columnHeader, { flex: 2 }]}>Nombre</Text>
+        <Text style={[styles.columnHeader, { flex: 2 }]}>Equipo</Text>
+        <View style={[styles.cardIcons, { flex: 1, justifyContent: 'flex-end' }]}>
           <Icon name="square" type="font-awesome" color="#FDBA12" size={16} />
-          <Icon name="square" type="font-awesome" color="red" style={{ marginLeft: 8 }} size={16} />
+          <Icon name="square" type="font-awesome" color="red" style={{ marginLeft: 10 }} size={16} />
         </View>
       </View>
 
@@ -57,10 +58,16 @@ export default function TarjetasScreen({ route }) {
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
           renderItem={({ item }) => (
             <View style={styles.row}>
-              <Text style={[styles.text, { width: 120 }]}>{item.jugadorId || 'Sin nombre'}</Text>
-              <Text style={[styles.text, { width: 80 }]}>{item.torneoId}</Text>
-              <Text style={styles.text}>{item.amarillas}</Text>
-              <Text style={styles.text}>{item.rojas}</Text>
+              <Text style={[styles.text, { flex: 2 }]}>
+                {item.nombre ? `${item.nombre} ${item.apellido}` : 'Sin nombre'}
+              </Text>
+              <Text style={[styles.text, { flex: 2 }]}>
+                {item.equipoNombre || 'Sin equipo'}
+              </Text>
+              <View style={[styles.cardIcons, { flex: 1, justifyContent: 'flex-end' }]}>
+                <Text style={[styles.text, { marginRight: 15 }]}>{item.amarillas}</Text>
+                <Text style={styles.text}>{item.rojas}</Text>
+              </View>
             </View>
           )}
         />
@@ -105,12 +112,11 @@ const styles = StyleSheet.create({
     color: '#FDBA12',
     fontWeight: 'bold',
     fontSize: 13,
+    textAlign: 'left',
   },
   cardIcons: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 15,
   },
   row: {
     flexDirection: 'row',
@@ -124,7 +130,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    marginRight: 20,
     color: '#333',
   },
   franja: {

@@ -1,16 +1,37 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 export default function TournamentDetail({ route, navigation }) {
-  const { nombre, torneoId } = route.params; // ahora también recibimos torneoId
+  const { nombre, torneoId, logo } = route.params;
+
+  useEffect(() => {
+    console.log("🧾 Parámetros recibidos en TournamentDetail:", route.params);
+    console.log("📦 ID del torneo recibido en TournamentDetail:", torneoId);
+  }, []);
 
   const buttons = [
-    { label: 'Tabla de Posiciones', icon: require('../../../assets/Posiciones.png'), ruta: 'TablaPosiciones' },
-    { label: 'Próximos Partidos', icon: require('../../../assets/ProximosPartidos.png'), ruta: 'Partidos' },
-    { label: 'Maximos Goleadores', icon: require('../../../assets/Goleadores.png'), ruta: 'Goleadores' },
-    { label: 'Tarjetas', icon: require('../../../assets/Tarjetas.png'), ruta: 'Tarjetas' },
+    {
+      label: 'Tabla de Posiciones',
+      icon: require('../../../assets/Posiciones.png'),
+      ruta: 'TablaPosiciones',
+    },
+    {
+      label: 'Próximos Partidos',
+      icon: require('../../../assets/ProximosPartidos.png'),
+      ruta: 'Partidos',
+    },
+    {
+      label: 'Maximos Goleadores',
+      icon: require('../../../assets/Goleadores.png'),
+      ruta: 'Goleadores',
+    },
+    {
+      label: 'Tarjetas',
+      icon: require('../../../assets/Tarjetas.png'),
+      ruta: 'Tarjetas',
+    },
   ];
 
   return (
@@ -26,7 +47,7 @@ export default function TournamentDetail({ route, navigation }) {
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
-        <Image source={require('../../../assets/TorneoABC.jpg')} style={styles.icono} />
+        <Image source={{ uri: logo }} style={styles.icono} />
         <Text style={styles.title}> {nombre}</Text>
       </View>
 
@@ -35,7 +56,10 @@ export default function TournamentDetail({ route, navigation }) {
           <TouchableOpacity
             key={i}
             style={styles.card}
-            onPress={() => navigation.navigate(btn.ruta, { torneoId })} // pasamos torneoId
+            onPress={() => {
+              console.log(`🧭 Navegando a ${btn.ruta} con torneoId:`, torneoId);
+              navigation.navigate(btn.ruta, { torneoId });
+            }}
           >
             <Image source={btn.icon} style={styles.iconoBoton} />
             <Text style={styles.text}>{btn.label}</Text>
@@ -71,6 +95,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginRight: 10,
+    borderRadius: 5,
   },
   options: {
     paddingHorizontal: 20,
