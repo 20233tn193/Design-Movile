@@ -11,6 +11,7 @@ import BottomTabs from './src/navigation/BottomTabs';
 import LoginScreen from './src/screens/LoginScreen';
 
 // ⚖️ Árbitro
+import ArbitroTabs from './src/navigation/ArbitroTabs';
 import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
 import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
 import DetallePartidoScreen from './src/modules/arbitro/DetallePartidoScreen';
@@ -47,28 +48,19 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: true }}>
-        {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Main" component={BottomTabs} />
-
-        {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
-
-        {/* ⚖️ Árbitro */}
+        
+        {/* Árbitro */}
+        <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
         <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
         <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
         <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
         <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
         <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
 
-        {/* ⚖️ Árbitro */}
-        <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
-        <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
-        <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
-        <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
-        <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
-
-        {/* 📋 Dueño */}
+        {/* Dueño */}
         <Stack.Screen name="CuentaDuenoScreen" component={CuentaDuenoScreen} />
         <Stack.Screen name="CuentaDuenoEquipo" component={CuentaDuenoEquipoScreen} />
         <Stack.Screen name="DetalleTorneoDueno" component={DetalleTorneoDuenoScreen} />
