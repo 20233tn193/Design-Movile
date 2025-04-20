@@ -9,18 +9,7 @@ import BottomTabs from './src/navigation/BottomTabs';
 import HomeTabs from './src/navigation/HomeTabs';
 import ArbitroTabs from './src/navigation/ArbitroTabs';
 
-// 🧭 Pantallas públicas que faltaban importar
-import TournamentDetail from './src/modules/home/TournamentDetail';
-import TablaPosiciones from './src/modules/home/TablaPosiciones';
-import PartidosScreen from './src/modules/home/PartidosScreen';
-import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
-import TarjetasScreen from './src/modules/home/TarjetasScreen';
-import Estadisticas from './src/modules/home/Estadisticas';
-
-// 🔐 Login
-import LoginScreen from './src/screens/LoginScreen';
-
-// 🏆 Home (Estadísticas y Torneos)
+// 📋 Público - Home (Estadísticas y Torneos)
 import TournamentDetail from './src/modules/home/TournamentDetail';
 import TablaPosiciones from './src/modules/home/TablaPosiciones';
 import PartidosScreen from './src/modules/home/PartidosScreen';
@@ -28,6 +17,9 @@ import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
 import TarjetasScreen from './src/modules/home/TarjetasScreen';
 import Estadisticas from './src/modules/home/Estadisticas';
 import TorneoScreen from './src/modules/home/TorneoScreen';
+
+// 🔐 Login
+import LoginScreen from './src/screens/LoginScreen';
 
 // ⚖️ Árbitro
 import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
@@ -82,6 +74,13 @@ export default function App() {
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="HomeTabs" component={HomeTabs} />
         <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
+
+        {/* ⚖️ Árbitro */}
+        <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
+        <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
+        <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
+        <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
+        <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
 
         {/* 📋 Dueño */}
         <Stack.Screen name="CuentaDuenoScreen" component={CuentaDuenoScreen} />
