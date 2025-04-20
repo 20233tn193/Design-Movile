@@ -11,7 +11,6 @@ import {
 import CardListTorneos from '../../kernel/components/CardListTorneos';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -25,7 +24,7 @@ export default function TorneoScreen({ navigation }) {
         const response = await API.get('/torneos');
         setTorneos(response.data);
       } catch (error) {
-        console.log('Error cargando torneos:', error);
+        console.error('Error cargando torneos:', error);
       }
     };
 
@@ -40,10 +39,16 @@ export default function TorneoScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <FranjasDecorativas />
+      {/* Franjas decorativas */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.headerFull}>
-        <Icon name="chart-bar" type="font-awesome-5" color="#FDBA12" size={28} />
+        <Icon name="trophy" type="font-awesome" color="#FDBA12" size={22} />
         <Text style={styles.title}> Torneos</Text>
       </View>
 
@@ -63,30 +68,31 @@ export default function TorneoScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {torneosFiltrados.map((torneo, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.cardTorneo}
-            onPress={() =>
-              navigation.navigate('Torneos', {
-                screen: 'TournamentDetail',
-                params: {
-                  torneoId: torneo._id,
+        {torneosFiltrados.map((torneo, i) => {
+          console.log("🧾 Torneo:", torneo); // <-- Imprime el objeto torneo
+
+          return (
+            <TouchableOpacity
+              key={i}
+              style={styles.cardTorneo}
+              onPress={() =>
+                navigation.navigate('TournamentDetail', {
+                  torneoId: torneo.id, // <-- Usa 'id' si ese es el campo correcto
                   nombre: torneo.nombreTorneo,
                   logo: torneo.logoSeleccionado,
-                },
-              })
-            }
-          >
-            <CardListTorneos
-              logo={{ uri: torneo.logoSeleccionado }}
-              nombre={torneo.nombreTorneo}
-              estado={torneo.estado}
-              fecha={torneo.fechaInicio}
-              clubes={torneo.numeroEquipos}
-            />
-          </TouchableOpacity>
-        ))}
+                })
+              }
+            >
+              <CardListTorneos
+                logo={{ uri: torneo.logoSeleccionado }}
+                nombre={torneo.nombreTorneo}
+                estado={torneo.estado}
+                fecha={torneo.fechaInicio}
+                clubes={torneo.numeroEquipos}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -105,7 +111,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,
-    paddingTop: 50,
+    paddingTop: 30,
     zIndex: 10,
   },
   title: {
@@ -148,5 +154,47 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 14,
     padding: 10,
+  },
+  franja: {
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: -1,
+  },
+  franjaGrisTop: {
+    top: 170,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegraTop: {
+    top: 120,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaRojaTop: {
+    top: 80,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
 });

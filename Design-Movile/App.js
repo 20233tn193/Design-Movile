@@ -9,6 +9,14 @@ import BottomTabs from './src/navigation/BottomTabs';
 import HomeTabs from './src/navigation/HomeTabs';
 import ArbitroTabs from './src/navigation/ArbitroTabs'; // ✅ Tabs árbitro
 
+// 🧭 Pantallas públicas que faltaban importar
+import TournamentDetail from './src/modules/home/TournamentDetail';
+import TablaPosiciones from './src/modules/home/TablaPosiciones';
+import PartidosScreen from './src/modules/home/PartidosScreen';
+import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
+import TarjetasScreen from './src/modules/home/TarjetasScreen';
+import Estadisticas from './src/modules/home/Estadisticas';
+
 // 🔐 Login
 import LoginScreen from './src/screens/LoginScreen';
 
@@ -41,7 +49,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: true }}>
         {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Main" component={BottomTabs} />
@@ -51,15 +59,12 @@ export default function App() {
         <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
         <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
         <Stack.Screen name="Estadisticas" component={Estadisticas} />
-        
-        {/* 🔐 Login único 
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="BottomTabs" component={BottomTabs} />
-        <Stack.Screen name="HomeTabs" component={HomeTabs} />
-        <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
 
         {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
+        <Stack.Screen name="BottomTabs" component={BottomTabs} />
+        <Stack.Screen name="HomeTabs" component={HomeTabs} />
+        <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
 
         {/* 📋 Dueño */}
         <Stack.Screen name="CuentaDuenoScreen" component={CuentaDuenoScreen} />

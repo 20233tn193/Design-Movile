@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, Dimensions } from 'react-native';
-import { Icon } from '@rneui/themed';
+import { View, Text, StyleSheet, FlatList, Dimensions, Image } from 'react-native';
 import API from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -14,15 +12,9 @@ export default function GoleadoresScreen({ route }) {
     const cargarGoleadores = async () => {
       try {
         const response = await API.get(`/estadisticas/goleadores/${torneoId}`);
-        const data = response.data.map((item) => ({
-          nombreJugador: `${item.nombre} ${item.apellido}`,
-          nombreEquipo: item.equipoNombre || 'Sin equipo',
-          logoEquipo: item.equipoEscudo || 'https://via.placeholder.com/40',
-          goles: item.goles,
-        }));
-        setGoleadores(data);
+        setGoleadores(response.data);
       } catch (error) {
-        console.log('Error al obtener goleadores:', error);
+        console.error('Error al obtener goleadores:', error);
       }
     };
 
@@ -31,7 +23,12 @@ export default function GoleadoresScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <FranjasDecorativas />
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
         <Image source={require('../../../assets/Goleadores.png')} style={styles.icono} />
@@ -50,13 +47,16 @@ export default function GoleadoresScreen({ route }) {
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <Text style={styles.column}>{item.nombreJugador}</Text>
+            <Text style={styles.column}>{item.nombre} {item.apellido}</Text>
             <View style={styles.equipo}>
               <Image
-                source={{ uri: item.logoEquipo }}
+                source={{
+                  uri: item.equipoEscudo && item.equipoEscudo.startsWith('http')
+                    ? item.equipoEscudo
+                    : 'https://via.placeholder.com/24/cccccc/ffffff?text=⚽'
+                }}
                 style={styles.logo}
               />
-              <Text style={styles.equipoText}>{item.nombreEquipo}</Text>
             </View>
             <Text style={styles.column}>{item.goles}</Text>
           </View>
@@ -124,15 +124,56 @@ const styles = StyleSheet.create({
   equipo: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  equipoText: {
-    marginLeft: 5,
-    fontSize: 12,
+    justifyContent: 'center',
+    width: 90,
   },
   logo: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#ddd',
+  },
+  franja: {
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: -1,
+  },
+  franjaGrisTop: {
+    top: 120,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaNegraTop: {
+    top: 90,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaRojaTop: {
+    top: 60,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
   icono: {
     width: 24,

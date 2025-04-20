@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
-import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
 const { width } = Dimensions.get('window');
 
@@ -15,16 +14,9 @@ export default function TarjetasScreen({ route }) {
     const fetchTarjetas = async () => {
       try {
         const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
-        const datos = response.data.map((item) => ({
-          nombre: `${item.nombre || ''} ${item.apellido || ''}`,
-          equipoNombre: item.equipoNombre || 'Sin equipo',
-          equipoEscudo: item.equipoEscudo || 'https://via.placeholder.com/40',
-          amarillas: item.amarillas,
-          rojas: item.rojas,
-        }));
-        setTarjetas(datos);
+        setTarjetas(response.data);
       } catch (error) {
-        console.log('Error al cargar tarjetas:', error);
+        console.error('Error al cargar tarjetas:', error);
       } finally {
         setLoading(false);
       }
@@ -35,7 +27,13 @@ export default function TarjetasScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <FranjasDecorativas />
+      {/* Franjas decorativas */}
+      <View style={[styles.franja, styles.franjaRojaTop]} />
+      <View style={[styles.franja, styles.franjaNegraTop]} />
+      <View style={[styles.franja, styles.franjaGrisTop]} />
+      <View style={[styles.franja, styles.franjaGrisBottom]} />
+      <View style={[styles.franja, styles.franjaNegraBottom]} />
+      <View style={[styles.franja, styles.franjaRojaBottom]} />
 
       <View style={styles.header}>
         <Icon name="credit-card" type="font-awesome-5" color="#FDBA12" size={20} />
@@ -43,11 +41,11 @@ export default function TarjetasScreen({ route }) {
       </View>
 
       <View style={styles.tableHeader}>
-        <Text style={[styles.columnHeader, { width: 120 }]}>Nombre</Text>
-        <Text style={[styles.columnHeader, { width: 80 }]}>Equipo</Text>
-        <View style={styles.cardIcons}>
+        <Text style={[styles.columnHeader, { flex: 2 }]}>Nombre</Text>
+        <Text style={[styles.columnHeader, { flex: 2 }]}>Equipo</Text>
+        <View style={[styles.cardIcons, { flex: 1, justifyContent: 'flex-end' }]}>
           <Icon name="square" type="font-awesome" color="#FDBA12" size={16} />
-          <Icon name="square" type="font-awesome" color="red" style={{ marginLeft: 8 }} size={16} />
+          <Icon name="square" type="font-awesome" color="red" style={{ marginLeft: 10 }} size={16} />
         </View>
       </View>
 
@@ -60,13 +58,16 @@ export default function TarjetasScreen({ route }) {
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
           renderItem={({ item }) => (
             <View style={styles.row}>
-              <Text style={[styles.text, { width: 120 }]}>{item.nombre}</Text>
-              <View style={[styles.equipo, { width: 80 }]}>
-                <Image source={{ uri: item.equipoEscudo }} style={styles.logo} />
-                <Text style={styles.equipoText}>{item.equipoNombre}</Text>
+              <Text style={[styles.text, { flex: 2 }]}>
+                {item.nombre ? `${item.nombre} ${item.apellido}` : 'Sin nombre'}
+              </Text>
+              <Text style={[styles.text, { flex: 2 }]}>
+                {item.equipoNombre || 'Sin equipo'}
+              </Text>
+              <View style={[styles.cardIcons, { flex: 1, justifyContent: 'flex-end' }]}>
+                <Text style={[styles.text, { marginRight: 15 }]}>{item.amarillas}</Text>
+                <Text style={styles.text}>{item.rojas}</Text>
               </View>
-              <Text style={styles.text}>{item.amarillas}</Text>
-              <Text style={styles.text}>{item.rojas}</Text>
             </View>
           )}
         />
@@ -111,12 +112,11 @@ const styles = StyleSheet.create({
     color: '#FDBA12',
     fontWeight: 'bold',
     fontSize: 13,
+    textAlign: 'left',
   },
   cardIcons: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 15,
   },
   row: {
     flexDirection: 'row',
@@ -130,21 +130,48 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    marginRight: 20,
     color: '#333',
   },
-  equipo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  franja: {
+    position: 'absolute',
+    width: width * 2,
+    height: 50,
+    zIndex: -1,
   },
-  equipoText: {
-    fontSize: 12,
-    marginLeft: 5,
-    color: '#333',
+  franjaGrisTop: {
+    top: 120,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '-10deg' }],
   },
-  logo: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+  franjaNegraTop: {
+    top: 90,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaRojaTop: {
+    top: 60,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '-10deg' }],
+  },
+  franjaGrisBottom: {
+    bottom: 70,
+    left: -width,
+    backgroundColor: '#e6e6e6',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaNegraBottom: {
+    bottom: 35,
+    left: -width,
+    backgroundColor: '#1a1a1a',
+    transform: [{ rotate: '10deg' }],
+  },
+  franjaRojaBottom: {
+    bottom: 0,
+    left: -width,
+    backgroundColor: '#d80027',
+    transform: [{ rotate: '10deg' }],
   },
 });
