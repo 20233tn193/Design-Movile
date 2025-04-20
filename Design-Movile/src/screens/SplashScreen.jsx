@@ -28,7 +28,7 @@ export default function SplashScreen({ navigation }) {
       if (!token || token.split('.').length !== 3) {
         console.warn('⚠️ Token inválido o mal formado:', token);
         await AsyncStorage.removeItem('token');
-        navigation.replace('BottomTabs'); // ← corregido aquí
+        navigation.replace('Main'); // ← corregido aquí
         return;
       }
 
@@ -47,14 +47,14 @@ export default function SplashScreen({ navigation }) {
         } else {
           console.log('❓ Rol no reconocido. Redirigiendo a login...');
           await AsyncStorage.removeItem('token');
-          navigation.replace('Main');
-          navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
+         navigation.replace('Main');
+   //       navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
         }
       } catch (error) {
         console.log('⛔ Error al decodificar el token:', error.message);
         await AsyncStorage.removeItem('token');
-        navigation.replace('Main');
-        navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
+      navigation.replace('Main');
+//        navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
       }
     };
 

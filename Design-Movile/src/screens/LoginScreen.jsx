@@ -75,7 +75,7 @@ export default function LoginScreen() {
         Alert.alert('Error', 'Rol no reconocido');
       }
     
-      navigation.replace('Main'); // Cambia a la pantalla principal de la app
+     // navigation.replace('Main'); // Cambia a la pantalla principal de la app
     
     } catch (error) {
       if (error.name === 'AbortError') {
