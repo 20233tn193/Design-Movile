@@ -89,9 +89,9 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
 
         <View style={styles.buttonRow}>
           <TouchableOpacity
-            style={[styles.btnGreen, { backgroundColor: equipoId ? '#ccc' : 'green' }]}
+            style={[styles.btnGreen, { backgroundColor: yaInscrito ? '#ccc' : 'green' }]}
             onPress={() => {
-              if (equipoId) {
+              if (yaInscrito) {
                 Alert.alert(
                   'Ya inscrito',
                   'Ya estás inscrito en un torneo. No puedes inscribirte a otro.',
@@ -118,13 +118,26 @@ export default function DetalleTorneoDuenoScreen({ navigation, route }) {
         onClose={() => setModalInscripcionVisible(false)}
         onConfirm={async () => {
           try {
-            await API.post('/api/equipos/inscribir-existente', {
-              equipoId: equipoId,
+            console.log('🧾 Enviando inscripción con:', {
+              equipoId,
               torneoId: torneo.id,
             });
-            Alert.alert('✅ Inscripción exitosa', 'Tu equipo fue inscrito correctamente');
+            await API.post('/equipos/inscribir-existente', null, {
+              params: {
+                equipoId: equipoId,
+                torneoId: torneo.id,
+              },
+            });
+
             setModalInscripcionVisible(false);
-            setModalStripeVisible(true);
+            Alert.alert('Inscripción exitosa', 'Tu equipo fue inscrito correctamente', [
+              {
+                text: 'OK',
+                onPress: () => {
+                  navigation.navigate('InscripcionesDuenoScreen', { recargar: true });
+                },
+              },
+            ]);
           } catch (error) {
             console.log('❌ Error al inscribirse:', error.response?.data || error.message);
             Alert.alert('Error', 'No se pudo completar la inscripción');

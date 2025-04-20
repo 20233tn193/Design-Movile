@@ -54,7 +54,7 @@ export default function ActualizarEquipoScreen({ navigation, route }) {
       await API.put(`/equipos/${equipo.id}`, actualizado);
 
       Alert.alert('Actualizado', 'El equipo se actualizó correctamente', [
-        { text: 'OK', onPress: () => navigation.navigate('BottomTabs', { screen: 'Perfil' }) },
+        { text: 'OK', onPress: () => navigation.navigate('Main', { screen: 'Perfil' }) },
       ]);
     } catch (error) {
       console.log('❌ Error actualizando equipo:', error.response?.data || error.message);
@@ -67,7 +67,7 @@ export default function ActualizarEquipoScreen({ navigation, route }) {
       await API.delete(`/equipos/${equipo.id}`);
       setModalVisible(false);
       Alert.alert('Eliminado', 'El equipo ha sido eliminado', [
-        { text: 'OK', onPress: () => navigation.navigate('BottomTabs', { screen: 'Perfil' }) },
+        { text: 'OK', onPress: () => navigation.navigate('Main', { screen: 'Perfil' }) },
       ]);
     } catch (error) {
       console.log('❌ Error eliminando equipo:', error.response?.data || error.message);

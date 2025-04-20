@@ -92,10 +92,10 @@ export default function RegistroJugadorScreen() {
 
       if (jugador) {
         await API.put(`/jugadores/${jugador.id}`, { id: jugador.id, ...payload });
-        Alert.alert('✅ Jugador actualizado correctamente');
+        Alert.alert('Jugador actualizado correctamente');
       } else {
         await API.post('/jugadores', payload);
-        Alert.alert('✅ Jugador registrado correctamente');
+        Alert.alert('Jugador registrado correctamente');
       }
 
       navigation.goBack();

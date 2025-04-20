@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import CardListTorneos from '../../kernel/components/CardListTorneos';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
@@ -18,18 +19,20 @@ export default function TorneoScreen({ navigation }) {
   const [busqueda, setBusqueda] = useState('');
   const [torneos, setTorneos] = useState([]);
 
-  useEffect(() => {
-    const obtenerTorneos = async () => {
-      try {
-        const response = await API.get('/torneos');
-        setTorneos(response.data);
-      } catch (error) {
-        console.error('Error cargando torneos:', error);
-      }
-    };
+  useFocusEffect(
+    React.useCallback(() => {
+      const obtenerTorneos = async () => {
+        try {
+          const response = await API.get('/torneos');
+          setTorneos(response.data);
+        } catch (error) {
+          console.error('Error cargando torneos:', error);
+        }
+      };
 
-    obtenerTorneos();
-  }, []);
+      obtenerTorneos();
+    }, [])
+  );
 
   const torneosFiltrados = torneos.filter((t) =>
     ((t.nombreTorneo || '') + ' ' + (t.estado || ''))
@@ -68,31 +71,27 @@ export default function TorneoScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {torneosFiltrados.map((torneo, i) => {
-          console.log("🧾 Torneo:", torneo); // <-- Imprime el objeto torneo
-
-          return (
-            <TouchableOpacity
-              key={i}
-              style={styles.cardTorneo}
-              onPress={() =>
-                navigation.navigate('TournamentDetail', {
-                  torneoId: torneo.id, // <-- Usa 'id' si ese es el campo correcto
-                  nombre: torneo.nombreTorneo,
-                  logo: torneo.logoSeleccionado,
-                })
-              }
-            >
-              <CardListTorneos
-                logo={{ uri: torneo.logoSeleccionado }}
-                nombre={torneo.nombreTorneo}
-                estado={torneo.estado}
-                fecha={torneo.fechaInicio}
-                clubes={torneo.numeroEquipos}
-              />
-            </TouchableOpacity>
-          );
-        })}
+        {torneosFiltrados.map((torneo, i) => (
+          <TouchableOpacity
+            key={i}
+            style={styles.cardTorneo}
+            onPress={() =>
+              navigation.navigate('TournamentDetail', {
+                torneoId: torneo.id,
+                nombre: torneo.nombreTorneo,
+                logo: torneo.logoSeleccionado,
+              })
+            }
+          >
+            <CardListTorneos
+              logo={{ uri: torneo.logoSeleccionado }}
+              nombre={torneo.nombreTorneo}
+              estado={torneo.estado}
+              fecha={torneo.fechaInicio}
+              clubes={torneo.numeroEquipos}
+            />
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </View>
   );

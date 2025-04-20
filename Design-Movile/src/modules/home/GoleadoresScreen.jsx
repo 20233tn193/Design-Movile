@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions, Image, ActivityIndicator } from 'react-native';
 import API from '../../api/api';
 
 const { width } = Dimensions.get('window');
@@ -7,6 +7,7 @@ const { width } = Dimensions.get('window');
 export default function GoleadoresScreen({ route }) {
   const { torneoId } = route.params;
   const [goleadores, setGoleadores] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cargarGoleadores = async () => {
@@ -15,6 +16,8 @@ export default function GoleadoresScreen({ route }) {
         setGoleadores(response.data);
       } catch (error) {
         console.error('Error al obtener goleadores:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -41,27 +44,31 @@ export default function GoleadoresScreen({ route }) {
         <Text style={styles.columnHeader}>Goles</Text>
       </View>
 
-      <FlatList
-        data={goleadores}
-        keyExtractor={(_, i) => i.toString()}
-        contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
-        renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={styles.column}>{item.nombre} {item.apellido}</Text>
-            <View style={styles.equipo}>
-              <Image
-                source={{
-                  uri: item.equipoEscudo && item.equipoEscudo.startsWith('http')
-                    ? item.equipoEscudo
-                    : 'https://via.placeholder.com/24/cccccc/ffffff?text=⚽'
-                }}
-                style={styles.logo}
-              />
+      {loading ? (
+        <ActivityIndicator color="#d80027" size="large" style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          data={goleadores}
+          keyExtractor={(_, i) => i.toString()}
+          contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
+          renderItem={({ item }) => (
+            <View style={styles.row}>
+              <Text style={styles.column}>{item.nombre} {item.apellido}</Text>
+              <View style={styles.equipo}>
+                <Image
+                  source={{
+                    uri: item.equipoEscudo && item.equipoEscudo.startsWith('http')
+                      ? item.equipoEscudo
+                      : 'https://via.placeholder.com/24/cccccc/ffffff?text=⚽'
+                  }}
+                  style={styles.logo}
+                />
+              </View>
+              <Text style={styles.column}>{item.goles}</Text>
             </View>
-            <Text style={styles.column}>{item.goles}</Text>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
     </View>
   );
 }

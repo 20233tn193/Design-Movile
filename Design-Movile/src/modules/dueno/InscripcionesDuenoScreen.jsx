@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { color } from '@rneui/base';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -25,49 +26,57 @@ export default function InscripcionesDuenoScreen({ navigation }) {
   const [torneosInscritos, setTorneosInscritos] = useState([]);
   const [pagosInscripcion, setPagosInscripcion] = useState([]);
 
-  useEffect(() => {
-    const fetchTorneos = async () => {
-      try {
-        const duenoId = await AsyncStorage.getItem('duenoId');
-        console.log('🔑 duenoId obtenido:', duenoId);
+  const route = useRoute();
 
-        if (!duenoId) {
-          console.warn('⚠️ duenoId no encontrado');
-          return;
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchTorneos = async () => {
+        try {
+          const duenoId = await AsyncStorage.getItem('duenoId');
+          console.log('🔑 duenoId obtenido:', duenoId);
+
+          if (!duenoId) {
+            console.warn('⚠️ duenoId no encontrado');
+            return;
+          }
+
+          const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
+          const equipos = resEquipos.data || [];
+          const torneoIds = equipos
+            .map(e => e.torneoId?.toString?.())
+            .filter(id => !!id);
+
+          const resTorneos = await API.get('/torneos');
+          const todosTorneos = resTorneos.data || [];
+          const torneosInscritos = todosTorneos.filter(t =>
+            torneoIds.includes(t.id)
+          );
+          const torneosDisponibles = todosTorneos.filter(t =>
+            t.estado?.toUpperCase().trim() === "ABIERTO" &&
+            !torneoIds.includes(t.id) 
+          );
+
+          const resPagos = await API.get(`/pagos/dueno/${duenoId}`);
+          const pagos = resPagos.data || [];
+          const pagosFiltrados = pagos.filter(p => p.tipo === "inscripcion" && ["pagado", "pendiente"].includes(p.estatus));
+
+          setPagosInscripcion(pagosFiltrados);
+          setTorneos(torneosDisponibles);
+          setTorneosInscritos(torneosInscritos);
+          //console.log('Lógica completada sin errores');
+        } catch (err) {
+          //console.log('Error al cargar torneos:', err);
         }
+      };
 
-        const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
-        const equipos = resEquipos.data || [];
-        const torneoIds = equipos
-          .map(e => e.torneoId?.toString?.())
-          .filter(id => !!id);
+      fetchTorneos();
 
-        const resTorneos = await API.get('/torneos');
-        const todosTorneos = resTorneos.data || [];
-        const torneosInscritos = todosTorneos.filter(t =>
-          torneoIds.includes(t.id)
-        );
-        const torneosDisponibles = todosTorneos.filter(t =>
-          t.estado?.toUpperCase().trim() === "ABIERTO"
-        );
-
-        const resPagos = await API.get(`/pagos/dueno/${duenoId}`);
-        const pagos = resPagos.data || [];
-        const pagosFiltrados = pagos.filter(p => p.tipo === "inscripcion" && ["pagado", "pendiente"].includes(p.estatus));
-
-        setPagosInscripcion(pagosFiltrados);
-
-
-        setTorneos(torneosDisponibles);
-        setTorneosInscritos(torneosInscritos);
-        console.log('✅ Lógica completada sin errores');
-      } catch (err) {
-        console.log('❌ Error al cargar torneos:', err);
+      if (route.params?.recargar) {
+        //console.log('Recargando por parámetro de inscripción...');
       }
-    };
 
-    fetchTorneos();
-  }, []);
+    }, [route.params?.recargar])
+  );
 
   const torneosFiltrados = torneos.filter((t) =>
     ((t.nombreTorneo || '') + ' ' + (t.estado || ''))
@@ -158,7 +167,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
                       <TouchableOpacity
                         onPress={() => {
                           if (pago.estatus === 'pendiente') {
-                            alert('⏳ Tu pago está en proceso. Espera confirmación para agregar jugadores.');
+                            alert('Tu pago está en proceso. Espera confirmación para agregar jugadores.');
                           } else {
                             navigation.navigate('JugadoresRegistradosDueno', { torneo });
                           }

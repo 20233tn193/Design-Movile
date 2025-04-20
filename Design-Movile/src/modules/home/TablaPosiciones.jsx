@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import API from '../../api/api';
 
@@ -13,6 +14,7 @@ const { width } = Dimensions.get('window');
 export default function TablaPosiciones({ route }) {
   const { torneoId } = route.params;
   const [tabla, setTabla] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cargarTabla = async () => {
@@ -21,6 +23,8 @@ export default function TablaPosiciones({ route }) {
         setTabla(response.data);
       } catch (error) {
         console.error('Error al obtener tabla de posiciones:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -52,27 +56,27 @@ export default function TablaPosiciones({ route }) {
         <Text style={styles.columnHeader}>Pts</Text>
       </View>
 
-      <FlatList
-        data={tabla}
-        keyExtractor={(item, index) => `${item.nombreEquipo}_${index}`}
-        contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
-        renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={[styles.column, styles.equipoText, { flex: 2 }]}>{item.nombreEquipo}</Text>
-            <Text style={styles.column}>{item.partidosJugados}</Text>
-            <Text style={styles.column}>{item.ganados}</Text>
-            <Text style={styles.column}>{item.perdidos}</Text>
-            <Text style={styles.column}>{item.golesFavor}</Text>
-            <Text style={styles.column}>{item.golesContra}</Text>
-            <Text style={styles.column}>{item.puntos}</Text>
-          </View>
-        )}
-      />
-
-      {tabla.length === 0 && (
-        <Text style={styles.emptyText}>
-          No hay datos disponibles para este torneo.
-        </Text>
+      {loading ? (
+        <ActivityIndicator color="#d80027" size="large" style={{ marginTop: 40 }} />
+      ) : tabla.length === 0 ? (
+        <Text style={styles.emptyText}>No hay datos disponibles para este torneo.</Text>
+      ) : (
+        <FlatList
+          data={tabla}
+          keyExtractor={(item, index) => `${item.nombreEquipo}_${index}`}
+          contentContainerStyle={{ paddingBottom: 100, paddingTop: 10 }}
+          renderItem={({ item }) => (
+            <View style={styles.row}>
+              <Text style={[styles.column, styles.equipoText, { flex: 2 }]}>{item.nombreEquipo}</Text>
+              <Text style={styles.column}>{item.partidosJugados}</Text>
+              <Text style={styles.column}>{item.ganados}</Text>
+              <Text style={styles.column}>{item.perdidos}</Text>
+              <Text style={styles.column}>{item.golesFavor}</Text>
+              <Text style={styles.column}>{item.golesContra}</Text>
+              <Text style={styles.column}>{item.puntos}</Text>
+            </View>
+          )}
+        />
       )}
     </View>
   );
@@ -107,7 +111,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 20,
     zIndex: 10,
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   columnHeader: {
     color: '#FDBA12',

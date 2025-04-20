@@ -1,46 +1,37 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, Alert } from 'react-native';
-import API from '../../api/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 
-export default function ModalConfirmarInscripcion({ visible, onClose, onConfirm, torneo, torneoId, navigation }) {
-  const handleInscribirse = async () => {
-    try {
-      const duenoId = await AsyncStorage.getItem('duenoId');
-      const res = await API.get(`/equipos/dueño/${duenoId}`);
-      const equipo = res.data[0];
+const { width } = Dimensions.get('window');
 
-      if (!equipo || !equipo.id) {
-        Alert.alert('Error', 'No se encontró el equipo del dueño.');
-        return;
-      }
-
-      await API.post('/equipos/inscribirse', {
-        equipoId: equipo.id,
-        torneoId,
-      });
-
-      Alert.alert('¡Inscripción exitosa!', `Te has inscrito al torneo ${torneo}`, [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
-    } catch (error) {
-      console.log('❌ Error al inscribirse:', error);
-      Alert.alert('Error', 'No se pudo realizar la inscripción.');
-    }
-  };
-
+export default function ModalConfirmarInscripcion({
+  visible,
+  onClose,
+  onConfirm,
+  torneo,
+}) {
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.title}>¿Confirmar inscripción?</Text>
-          <Text style={styles.text}>¿Deseas inscribirte al torneo "{torneo}"?</Text>
-          <View style={styles.buttons}>
-            <TouchableOpacity onPress={onClose} style={styles.cancel}>
-              <Text style={styles.btnText}>Cancelar</Text>
+          <Text style={styles.titulo}>Confirmar Inscripción</Text>
+          <Text style={styles.texto}>
+            ¿Deseas inscribirte al torneo <Text style={styles.destacado}>{torneo}</Text>?
+          </Text>
+
+          <View style={styles.botones}>
+            <TouchableOpacity style={styles.botonCancelar} onPress={onClose}>
+              <Text style={styles.textoBoton}>Cancelar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleInscribirse} style={styles.confirm}>
-              <Text style={styles.btnText}>Confirmar</Text>
+
+            <TouchableOpacity style={styles.botonConfirmar} onPress={onConfirm}>
+              <Text style={styles.textoBoton}>Confirmar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -50,12 +41,56 @@ export default function ModalConfirmarInscripcion({ visible, onClose, onConfirm,
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000000aa' },
-  modal: { backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '80%' },
-  title: { fontWeight: 'bold', fontSize: 18, marginBottom: 10 },
-  text: { fontSize: 14, marginBottom: 20 },
-  buttons: { flexDirection: 'row', justifyContent: 'space-between' },
-  cancel: { backgroundColor: '#aaa', padding: 10, borderRadius: 6 },
-  confirm: { backgroundColor: 'green', padding: 10, borderRadius: 6 },
-  btnText: { color: '#fff', fontWeight: 'bold' },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal: {
+    backgroundColor: '#fff',
+    width: width * 0.85,
+    borderRadius: 12,
+    padding: 24,
+    alignItems: 'center',
+    elevation: 6,
+  },
+  titulo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0e1b39',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  texto: {
+    fontSize: 15,
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  destacado: {
+    fontWeight: 'bold',
+    color: '#d80027',
+  },
+  botones: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  botonCancelar: {
+    backgroundColor: '#1a1a1a',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  botonConfirmar: {
+    backgroundColor: '#d80027',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  textoBoton: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
 });

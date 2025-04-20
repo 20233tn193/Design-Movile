@@ -23,6 +23,7 @@ import ModalConfirmarEliminacion from '../modules/dueno/ModalConfirmarEliminacio
 import RegistroJugadorScreen from '../modules/dueno/RegistroJugadorScreen';
 import DetallesJugadorScreen from '../modules/dueno/DetallesJugadorScreen';
 import EsterEggScreen from '../modules/dueno/EsterEggScreen';
+import PagosDuenoScreen from '../modules/dueno/PagosDuenoScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ export default function PerfilStack() {
       <Stack.Screen name="RegistroJugadorScreen" component={RegistroJugadorScreen} />
       <Stack.Screen name="DetallesJugadorScreen" component={DetallesJugadorScreen} />
       <Stack.Screen name="EsterEgg" component={EsterEggScreen} />
+      <Stack.Screen name="PagosDuenoScreen" component={PagosDuenoScreen} />
     </Stack.Navigator>
   );
 }

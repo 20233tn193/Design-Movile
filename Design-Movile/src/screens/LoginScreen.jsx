@@ -70,7 +70,7 @@ export default function LoginScreen() {
       } else if (rol === 'DUENO') {
         const duenoRes = await API.get(`/duenos/usuario/${usuarioId}`);
         await AsyncStorage.setItem('duenoId', duenoRes.data.id);
-        navigation.replace('CuentaDuenoScreen');
+        navigation.replace('Main');
       } else {
         Alert.alert('Error', 'Rol no reconocido');
       }

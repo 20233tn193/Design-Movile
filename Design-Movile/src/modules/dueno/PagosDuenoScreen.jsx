@@ -21,6 +21,7 @@ export default function PagosDuenoScreen({ navigation }) {
   const route = useRoute();
   const { equipo, torneo } = route.params || {};
   const [pagos, setPagos] = useState([]);
+  const [nombreEquipoConcepto, setNombreEquipoConcepto] = useState('NombreEquipo');
 
   useEffect(() => {
     const fetchPagos = async () => {
@@ -59,11 +60,11 @@ export default function PagosDuenoScreen({ navigation }) {
             <Text style={styles.nombreTorneo}>{torneo?.nombreTorneo || 'Nombre torneo'}</Text>
             <Text
               style={[styles.estado,
-                torneo.estado?.toUpperCase().trim() === 'ABIERTO' ? styles.abierto
-                  : torneo.estado?.toUpperCase().trim() === 'FINALIZADO' ? styles.finalizado
-                    : torneo.estado?.toUpperCase().trim() === 'CERRADO' ? styles.cerrado
-                      : torneo.estado?.toUpperCase().trim() === 'EN CURSO' ? styles.enCurso
-                        : styles.otros]}
+              torneo.estado?.toUpperCase().trim() === 'ABIERTO' ? styles.abierto
+                : torneo.estado?.toUpperCase().trim() === 'FINALIZADO' ? styles.finalizado
+                  : torneo.estado?.toUpperCase().trim() === 'CERRADO' ? styles.cerrado
+                    : torneo.estado?.toUpperCase().trim() === 'EN CURSO' ? styles.enCurso
+                      : styles.otros]}
             >
               {torneo.estado}
             </Text>
@@ -80,23 +81,51 @@ export default function PagosDuenoScreen({ navigation }) {
 
         {pagos.length === 0 ? (
           <Text style={{ textAlign: 'center', marginVertical: 20 }}>No hay pagos disponibles.</Text>
-        ) : (
-          pagos.map((pago, i) => (
-            <View key={i} style={styles.fila}>
-              <Text style={styles.td}>
-                {pago.tipo === 'inscripcion' ? 'Inscripción' : pago.tipo === 'arbitraje' ? 'Arbitraje' : pago.tipo === 'uso_de_cancha' ? 'Cancha' : pago.tipo}
-              </Text>
-              <Text style={styles.td}>{pago.partidoId ? `P${pago.partidoId}` : '-'}</Text>
-              <Text style={styles.td}>${pago.monto}</Text>
-              <Text style={[styles.td, { color: pago.estatus === 'pendiente' ? 'red' : 'green' }]}>
-                {pago.estatus.charAt(0).toUpperCase() + pago.estatus.slice(1)}
-              </Text>
-            </View>
-          ))
-        )}
+        ) : (() => {
+          let arbitrajeCount = 1;
+          let canchaCount = 1;
+
+          return pagos.map((pago, i) => {
+            let numeroPartido = '-';
+            if (pago.tipo === 'arbitraje') {
+              numeroPartido = arbitrajeCount++;
+            } else if (pago.tipo === 'uso_de_cancha') {
+              numeroPartido = canchaCount++;
+            }
+
+            return (
+              <View key={i} style={styles.fila}>
+                <Text style={styles.td}>
+                  {pago.tipo === 'inscripcion'
+                    ? 'Inscripción'
+                    : pago.tipo === 'arbitraje'
+                      ? 'Arbitraje'
+                      : pago.tipo === 'uso_de_cancha'
+                        ? 'Cancha'
+                        : pago.tipo}
+                </Text>
+                <Text style={styles.td}>
+                  {numeroPartido !== '-' ? `P${numeroPartido}` : '-'}
+                </Text>
+                <Text style={styles.td}>${pago.monto}</Text>
+                <Text style={[styles.td, { color: pago.estatus === 'pendiente' ? 'red' : 'green' }]}>
+                  {pago.estatus.charAt(0).toUpperCase() + pago.estatus.slice(1)}
+                </Text>
+              </View>
+            );
+          });
+        })()}
 
         <View style={styles.botones}>
-          <TouchableOpacity style={styles.btnAccion} onPress={() => setModalStripeVisible(true)}>
+          <TouchableOpacity
+            style={styles.btnAccion}
+            onPress={() => {
+              if (equipo?.nombre) {
+                setNombreEquipoConcepto(equipo.nombre); // ✅ guarda el nombre real
+              }
+              setModalStripeVisible(true);
+            }}
+          >
             <Text style={styles.btnTexto}>Datos de Pago</Text>
           </TouchableOpacity>
         </View>
@@ -106,7 +135,7 @@ export default function PagosDuenoScreen({ navigation }) {
         visible={modalStripeVisible}
         onClose={() => setModalStripeVisible(false)}
         navigation={navigation}
-        nombreEquipo={equipo?.nombre || 'NombreEquipo'}
+        nombreEquipo={nombreEquipoConcepto}
       />
     </View>
   );

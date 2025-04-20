@@ -7,6 +7,7 @@ import {
   Image,
   Dimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +15,8 @@ import API from '../../api/api';
 import ModalConfirmarDescargaCredenciales from './ModalConfirmarDescargaCredenciales';
 import { ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 const { width } = Dimensions.get('window');
 
@@ -22,9 +25,9 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
   const [equipo, setEquipo] = useState(null);
   const [jugadores, setJugadores] = useState([]);
   const [pagoEstatus, setPagoEstatus] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const torneo = route.params?.torneo;
-
   const estadoValido = torneo?.estado?.toUpperCase().trim();
   const esEditable = estadoValido === 'ABIERTO' || estadoValido === 'CERRADO';
 
@@ -32,12 +35,37 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
     alert('Esta acción solo está disponible si el torneo está ABIERTO o CERRADO.');
   };
 
-  const [loading, setLoading] = useState(false);
+  const descargarCredencialesPDF = async (equipoId) => {
+    try {
+      console.log('📥 Iniciando descarga de credenciales para:', equipoId);
+      const url = `${API.defaults.baseURL}/equipos/${equipoId}/credenciales`;
+      const fileUri = FileSystem.documentDirectory + 'credenciales.pdf';
+  
+      const response = await FileSystem.downloadAsync(url, fileUri, {
+        headers: {
+          Accept: 'application/pdf',
+        },
+      });
+  
+      console.log('✅ Archivo descargado en:', response.uri);
+  
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(response.uri);
+      } else {
+        Alert.alert('Descarga completa', 'Archivo guardado pero no se pudo compartir automáticamente.');
+      }
+    } catch (error) {
+      console.error('❌ Error al descargar credenciales:', error);
+      Alert.alert('Error', 'No se pudieron generar las credenciales. Asegúrate de que el torneo esté cerrado y el pago aprobado.');
+      throw error; // 🔥 Importante: para que el modal sepa que falló
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
         try {
-          setJugadores([]); // limpia antes de volver a cargar
+          setJugadores([]);
           setLoading(true);
           const duenoId = await AsyncStorage.getItem('duenoId');
 
@@ -67,12 +95,10 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      {/* Encabezado */}
       <View style={styles.header}>
         <Text style={styles.headerText}>🏆 Jugadores Registrados</Text>
       </View>
 
-      {/* Franjas decorativas */}
       <View style={[styles.franja, styles.franjaRojaTop]} />
       <View style={[styles.franja, styles.franjaNegraTop]} />
       <View style={[styles.franja, styles.franjaGrisTop]} />
@@ -80,43 +106,30 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
       <View style={[styles.franja, styles.franjaNegraBottom]} />
       <View style={[styles.franja, styles.franjaRojaBottom]} />
 
-      {/* Tarjeta del torneo */}
       <View style={styles.torneoCard}>
         <Image source={{ uri: torneo.logoSeleccionado }} style={styles.logo} />
         <View style={styles.torneoInfo}>
           <Text style={styles.nombreTorneo}>{torneo.nombreTorneo}</Text>
           <Text
-            style={[
-              styles.estado,
-              torneo.estado?.toUpperCase().trim() === 'ABIERTO'
-                ? styles.abierto
-                : torneo.estado?.toUpperCase().trim() === 'FINALIZADO'
-                  ? styles.finalizado
-                  : torneo.estado?.toUpperCase().trim() === 'CERRADO'
-                    ? styles.cerrado
-                    : torneo.estado?.toUpperCase().trim() === 'EN CURSO'
-                      ? styles.enCurso
-                      : styles.otros,
-            ]}
+            style={[styles.estado,
+              torneo.estado?.toUpperCase().trim() === 'ABIERTO' ? styles.abierto :
+              torneo.estado?.toUpperCase().trim() === 'FINALIZADO' ? styles.finalizado :
+              torneo.estado?.toUpperCase().trim() === 'CERRADO' ? styles.cerrado :
+              torneo.estado?.toUpperCase().trim() === 'EN CURSO' ? styles.enCurso :
+              styles.otros]}
           >
             {torneo.estado}
           </Text>
-          <Text style={styles.subtexto}>
-            {torneo.fechaInicio} · {torneo.numeroEquipos} clubs
-          </Text>
+          <Text style={styles.subtexto}>{torneo.fechaInicio} · {torneo.numeroEquipos} clubs</Text>
         </View>
         <TouchableOpacity
-          style={[
-            styles.btnPago,
-            { backgroundColor: '#C12143' },
-          ]}
+          style={[styles.btnPago, { backgroundColor: '#C12143' }]}
           onPress={() => navigation.navigate('PagosDuenoScreen', { equipo, torneo })}
         >
           <Icon name="dollar" type="font-awesome" color="#fff" size={20} />
         </TouchableOpacity>
       </View>
 
-      {/* Tabla */}
       <View style={styles.encabezadoTabla}>
         <Text style={styles.th}>Nombre</Text>
         <Text style={styles.th}>Apellido</Text>
@@ -145,13 +158,9 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
         ))}
       </ScrollView>
 
-      {/* Botones */}
       <View style={styles.botones}>
         <TouchableOpacity
-          style={[
-            styles.btnGenerar,
-            { backgroundColor: esEditable ? '#FDBA12' : '#ccc' }
-          ]}
+          style={[styles.btnGenerar, { backgroundColor: esEditable ? '#FDBA12' : '#ccc' }]}
           onPress={() => {
             if (esEditable) {
               setModalConfirmarVisible(true);
@@ -164,10 +173,7 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.btnAgregar,
-            { backgroundColor: esEditable ? '#0e1b39' : '#999' }
-          ]}
+          style={[styles.btnAgregar, { backgroundColor: esEditable ? '#0e1b39' : '#999' }]}
           onPress={() => {
             if (esEditable) {
               navigation.navigate('RegistroJugadorScreen', { equipoId: equipo?.id });
@@ -181,13 +187,14 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
       </View>
 
       <ModalConfirmarDescargaCredenciales
-        visible={modalConfirmarVisible}
-        onClose={() => setModalConfirmarVisible(false)}
-        onConfirm={() => setModalConfirmarVisible(false)}
-      />
+  visible={modalConfirmarVisible}
+  onClose={() => setModalConfirmarVisible(false)}
+  onConfirm={() => descargarCredencialesPDF(equipo.id)} // sin async ni setModalConfirmarVisible
+/>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },

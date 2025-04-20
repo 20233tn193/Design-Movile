@@ -39,9 +39,9 @@ export default function ModalStripeRedirect({ visible, onClose, navigation, nomb
           <View style={styles.concepto}>
             <Text style={styles.label}>Concepto:</Text>
             <Text style={styles.valor}>
-              {nombreEquipo} 
+              {nombreEquipo}a
             </Text>
-            <Text style={styles.ejemplo}>Ejemplo: {nombreEquipo || 'Barcelona'} Partido 1</Text>
+            <Text style={styles.ejemplo}>Ejemplo: {nombreEquipo || 'Barcelona'} P1</Text>
             
           </View>
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Modal,
   View,
@@ -6,11 +6,28 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
 export default function ModalConfirmarDescargaCredenciales({ visible, onClose, onConfirm }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleDescargar = async () => {
+    try {
+      setLoading(true);
+      await onConfirm(); // se espera que onConfirm haga la descarga real
+      Alert.alert('✅ Descarga completa', 'El archivo se descargó correctamente.');
+      onClose();
+    } catch (error) {
+      Alert.alert('❌ Error', 'No se pudieron generar las credenciales.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
@@ -21,11 +38,23 @@ export default function ModalConfirmarDescargaCredenciales({ visible, onClose, o
           </Text>
 
           <View style={styles.botonesContainer}>
-            <TouchableOpacity style={styles.btnVerde} onPress={onConfirm}>
-              <Text style={styles.textoBoton}>DESCARGAR</Text>
+            <TouchableOpacity
+              style={[styles.btnVerde, loading && { opacity: 0.6 }]}
+              onPress={handleDescargar}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.textoBoton}>DESCARGAR</Text>
+              )}
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.btnGris} onPress={onClose}>
+            <TouchableOpacity
+              style={[styles.btnGris, loading && { opacity: 0.6 }]}
+              onPress={onClose}
+              disabled={loading}
+            >
               <Text style={styles.textoBoton}>CANCELAR</Text>
             </TouchableOpacity>
           </View>

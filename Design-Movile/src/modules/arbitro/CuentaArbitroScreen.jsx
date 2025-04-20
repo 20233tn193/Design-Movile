@@ -61,7 +61,7 @@ export default function CuentaArbitroScreen() {
           style: 'destructive',
           onPress: async () => {
             await AsyncStorage.clear();
-            navigation.replace('LoginScreen');
+            navigation.replace('Main');
           },
         },
       ]
