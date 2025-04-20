@@ -28,8 +28,7 @@ export default function SplashScreen({ navigation }) {
       if (!token || token.split('.').length !== 3) {
         console.warn('⚠️ Token inválido o mal formado:', token);
         await AsyncStorage.removeItem('token');
-        navigation.replace('Main');
-        navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
+        navigation.replace('BottomTabs'); // ← corregido aquí
         return;
       }
 
@@ -90,7 +89,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   logo: {
-    width: 100, height: 100, borderRadius: 50,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   text: {
     fontSize: 48,
