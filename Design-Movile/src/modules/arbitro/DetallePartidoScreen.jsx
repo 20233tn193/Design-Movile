@@ -20,6 +20,7 @@ export default function DetallePartidoScreen() {
   const [amarillas, setAmarillas] = useState([]);
   const [seccion, setSeccion] = useState('Asistencia');
   const [loading, setLoading] = useState(true);
+  const [guardando, setGuardando] = useState(false);
   const [registroCerrado, setRegistroCerrado] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -58,7 +59,10 @@ export default function DetallePartidoScreen() {
 
   const aumentar = (arr, setArr, i) => {
     if (registroCerrado) return;
-
+    if (!asistencias[i]) {
+      Alert.alert('Jugador ausente', 'No se puede asignar valores a un jugador que no está presente.');
+      return;
+    }
     const nuevo = [...arr];
 
     if (seccion === 'Amarilla') {
@@ -83,6 +87,10 @@ export default function DetallePartidoScreen() {
 
   const disminuir = (arr, setArr, i) => {
     if (registroCerrado) return;
+    if (!asistencias[i]) {
+      Alert.alert('Jugador ausente', 'No se puede modificar valores a un jugador que no está presente.');
+      return;
+    }
     const nuevo = [...arr];
     if (nuevo[i] > 0) {
       nuevo[i]--;
@@ -100,6 +108,18 @@ export default function DetallePartidoScreen() {
     const nuevo = [...asistencias];
     nuevo[index] = !nuevo[index];
     setAsistencias(nuevo);
+
+    if (!nuevo[index]) {
+      const resetGoles = [...goles];
+      const resetRojas = [...rojas];
+      const resetAmarillas = [...amarillas];
+      resetGoles[index] = 0;
+      resetRojas[index] = 0;
+      resetAmarillas[index] = 0;
+      setGoles(resetGoles);
+      setRojas(resetRojas);
+      setAmarillas(resetAmarillas);
+    }
   };
 
   const handleTerminarPartido = () => {
@@ -109,9 +129,10 @@ export default function DetallePartidoScreen() {
   const confirmarCierre = async () => {
     setModalVisible(false);
     setRegistroCerrado(true);
+    setGuardando(true);
 
     try {
-      const registro = jugadores.map((jugador, index) => ({
+      const resultados = jugadores.map((jugador, index) => ({
         jugadorId: jugador.id,
         asistencia: asistencias[index],
         goles: goles[index],
@@ -119,28 +140,32 @@ export default function DetallePartidoScreen() {
         rojas: rojas[index],
       }));
 
-      console.log('📤 Enviando resultado del partido:', {
-        partidoId,
-        registro,
-      });
+      console.log('📥 jugadores enviados:', jugadores);
+      console.log('📥 resultados enviados:', resultados);
 
-      await registrarResultadoPartido(partidoId, registro);
+      await registrarResultadoPartido(partidoId, resultados);
 
       navigation.replace('RegistroCerrado', {
-        asistencias,
-        goles,
-        rojas,
-        amarillas,
-        jugadores, // ✅ AÑADIDO AQUÍ
+        jugadores,
+        resultados,
       });
     } catch (err) {
       console.log('❌ Error al registrar resultado:', err);
       Alert.alert('Error', 'No se pudo guardar el resultado.');
+    } finally {
+      setGuardando(false);
     }
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 40 }} />;
+  if (loading || guardando) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#d80027" />
+        <Text style={{ marginTop: 10, fontWeight: 'bold' }}>
+          {loading ? 'Cargando datos...' : 'Guardando resultado...'}
+        </Text>
+      </View>
+    );
   }
 
   return (
@@ -191,44 +216,50 @@ export default function DetallePartidoScreen() {
         data={jugadores}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingBottom: 60 }}
-        renderItem={({ item, index }) => (
-          <View style={[
-            styles.jugadorRow,
-            item.equipo === 'local' ? { backgroundColor: '#e0f7ff' } : { backgroundColor: '#fff0f0' }
-          ]}>
-            <Text style={styles.jugadorNombre}>{item.nombre} {item.apellido} {rojas[index] > 0 ? '⚠️ Expulsado' : ''}</Text>
-            {seccion === 'Asistencia' ? (
-              <TouchableOpacity onPress={() => toggleAsistencia(index)}>
-                <Icon
-                  name={asistencias[index] ? 'check-circle' : 'circle-o'}
-                  type="font-awesome"
-                  color={asistencias[index] ? 'green' : '#999'}
-                  size={22}
-                />
-              </TouchableOpacity>
-            ) : (
-              <View style={styles.contadorContainer}>
-                <TouchableOpacity onPress={() => disminuir(
-                  seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
-                  seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
-                  index
-                )}>
-                  <Text style={styles.operador}>−</Text>
+        renderItem={({ item, index }) => {
+          const noAsistio = !asistencias[index];
+          return (
+            <View style={[
+              styles.jugadorRow,
+              item.equipo === 'local' ? { backgroundColor: '#e0f7ff' } : { backgroundColor: '#fff0f0' },
+              noAsistio && { opacity: 0.4 }
+            ]}>
+              <Text style={styles.jugadorNombre}>
+                {item.nombre} {item.apellido} {rojas[index] > 0 ? '⚠️ Expulsado' : ''}
+              </Text>
+              {seccion === 'Asistencia' ? (
+                <TouchableOpacity onPress={() => toggleAsistencia(index)}>
+                  <Icon
+                    name={asistencias[index] ? 'check-circle' : 'circle-o'}
+                    type="font-awesome"
+                    color={asistencias[index] ? 'green' : '#999'}
+                    size={22}
+                  />
                 </TouchableOpacity>
-                <Text style={styles.valorContador}>
-                  {seccion === 'Goles' ? goles[index] : seccion === 'Roja' ? rojas[index] : amarillas[index]}
-                </Text>
-                <TouchableOpacity onPress={() => aumentar(
-                  seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
-                  seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
-                  index
-                )}>
-                  <Text style={styles.operador}>＋</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-        )}
+              ) : (
+                <View style={styles.contadorContainer}>
+                  <TouchableOpacity onPress={() => disminuir(
+                    seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
+                    seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
+                    index
+                  )}>
+                    <Text style={styles.operador}>−</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.valorContador}>
+                    {seccion === 'Goles' ? goles[index] : seccion === 'Roja' ? rojas[index] : amarillas[index]}
+                  </Text>
+                  <TouchableOpacity onPress={() => aumentar(
+                    seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
+                    seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
+                    index
+                  )}>
+                    <Text style={styles.operador}>＋</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          );
+        }}
       />
 
       <ModalConfirmacion

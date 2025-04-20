@@ -1,4 +1,3 @@
-// ✅ ArbitroHomeScreen corregido sin bottomTabs (usa ArbitroTabs.js)
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -8,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,6 +39,12 @@ export default function ArbitroHomeScreen({ navigation }) {
     fetchPartidos();
   }, []);
 
+  const abrirUbicacionEnMaps = (nombreCampo, nombreCancha) => {
+    const query = `Campo ${nombreCampo || ''} ${nombreCancha || ''}`.trim();
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    Linking.openURL(url);
+  };
+
   return (
     <View style={styles.container}>
       <FranjasDecorativas />
@@ -66,30 +72,49 @@ export default function ArbitroHomeScreen({ navigation }) {
           data={partidos}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => navigation.navigate('DetallePartido', { partidoId: item.id })}>
-              <View style={styles.card}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.vsText}>
-                    {item.equipoLocal?.nombre || 'Local'} vs {item.equipoVisitante?.nombre || 'Visitante'}
-                  </Text>
-                  <Text style={styles.cardSubText}>
-                    {item.nombreCampo} - {item.nombreCancha}
-                  </Text>
-                  <Text style={styles.cardSubText}>
-                    {item.fecha}   {item.hora}
-                  </Text>
+          renderItem={({ item }) => {
+            const finalizado = item.estado === 'finalizado';
+            return (
+              <TouchableOpacity
+                onPress={() => {
+                  if (!finalizado) {
+                    navigation.navigate('DetallePartido', { partidoId: item.id });
+                  }
+                }}
+                disabled={finalizado}
+              >
+                <View style={[styles.card, finalizado && styles.cardFinalizado]}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.vsText, finalizado && styles.textFinalizado]}>
+                      {item.equipoLocal?.nombre || 'Local'} vs {item.equipoVisitante?.nombre || 'Visitante'}
+                    </Text>
+                    <Text style={[styles.cardSubText, finalizado && styles.textFinalizado]}>
+                      {item.nombreCampo} - {item.nombreCancha}
+                    </Text>
+                    <Text style={[styles.cardSubText, finalizado && styles.textFinalizado]}>
+                      {item.fecha}   {item.hora}
+                    </Text>
+                    {finalizado && (
+                      <Text style={[styles.cardSubText, { fontStyle: 'italic', color: '#bbb' }]}>
+                        Partido terminado
+                      </Text>
+                    )}
+                  </View>
+                  {!finalizado && (
+                    <TouchableOpacity onPress={() => abrirUbicacionEnMaps(item.nombreCampo, item.nombreCancha)}>
+                      <Icon
+                        name="map-marker"
+                        type="font-awesome"
+                        color="#ff4d4d"
+                        size={28}
+                        containerStyle={{ marginLeft: 10 }}
+                      />
+                    </TouchableOpacity>
+                  )}
                 </View>
-                <Icon
-                  name="map-marker"
-                  type="font-awesome"
-                  color="#ff4d4d"
-                  size={28}
-                  containerStyle={{ marginLeft: 10 }}
-                />
-              </View>
-            </TouchableOpacity>
-          )}
+              </TouchableOpacity>
+            );
+          }}
         />
       )}
     </View>
@@ -145,6 +170,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
   },
+  cardFinalizado: {
+    backgroundColor: '#d9d9d9',
+  },
   vsText: {
     color: '#FDBA12',
     fontWeight: 'bold',
@@ -152,4 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardSubText: { color: '#fff', fontSize: 12, marginBottom: 2 },
+  textFinalizado: {
+    color: '#666',
+  },
 });
