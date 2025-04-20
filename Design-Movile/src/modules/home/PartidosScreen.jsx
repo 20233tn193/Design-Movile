@@ -49,8 +49,8 @@ export default function PartidosScreen({ route }) {
           <Image
             source={{
               uri:
-                item.logoLocal && item.logoLocal.startsWith('http')
-                  ? item.logoLocal
+                item.logoEquipoA && item.logoEquipoA.startsWith('http')
+                  ? item.logoEquipoA
                   : 'https://via.placeholder.com/60x60?text=L',
             }}
             style={styles.logo}
@@ -61,8 +61,8 @@ export default function PartidosScreen({ route }) {
           <Image
             source={{
               uri:
-                item.logoVisitante && item.logoVisitante.startsWith('http')
-                  ? item.logoVisitante
+                item.logoEquipoB && item.logoEquipoB.startsWith('http')
+                  ? item.logoEquipoB
                   : 'https://via.placeholder.com/60x60?text=V',
             }}
             style={styles.logo}
@@ -70,8 +70,8 @@ export default function PartidosScreen({ route }) {
         </View>
 
         <View style={styles.nombres}>
-          <Text style={styles.nombreEquipo}>{item.nombreLocal}</Text>
-          <Text style={styles.nombreEquipo}>{item.nombreVisitante}</Text>
+          <Text style={styles.nombreEquipo}>{item.nombreEquipoA}</Text>
+          <Text style={styles.nombreEquipo}>{item.nombreEquipoB}</Text>
         </View>
 
         <View style={styles.infoContainer}>

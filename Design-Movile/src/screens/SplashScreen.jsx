@@ -28,8 +28,7 @@ export default function SplashScreen({ navigation }) {
       if (!token || token.split('.').length !== 3) {
         console.warn('⚠️ Token inválido o mal formado:', token);
         await AsyncStorage.removeItem('token');
-        navigation.replace('Main'); // ← corregido aquí
-        return;
+        return navigation.replace('Main');
       }
 
       try {
@@ -40,21 +39,19 @@ export default function SplashScreen({ navigation }) {
 
         if (roles.includes('ARBITRO')) {
           console.log('⏩ Redirigiendo a ArbitroHomeScreen...');
-          navigation.replace('ArbitroHomeScreen');
+          return navigation.replace('ArbitroHomeScreen');
         } else if (roles.includes('DUENO')) {
           console.log('⏩ Redirigiendo a CuentaDuenoScreen...');
-          navigation.replace('CuentaDuenoScreen');
+          return navigation.replace('CuentaDuenoScreen');
         } else {
-          console.log('❓ Rol no reconocido. Redirigiendo a login...');
+          console.log('❓ Rol no reconocido. Redirigiendo a Main...');
           await AsyncStorage.removeItem('token');
-         navigation.replace('Main');
-   //       navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
+          return navigation.replace('Main');
         }
       } catch (error) {
         console.log('⛔ Error al decodificar el token:', error.message);
         await AsyncStorage.removeItem('token');
-      navigation.replace('Main');
-//        navigation.replace('HomeTabs'); // ⬅️ CORREGIDO
+        return navigation.replace('Main');
       }
     };
 
