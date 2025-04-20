@@ -6,17 +6,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // 🌐 Público
 import SplashScreen from './src/screens/SplashScreen';
 import BottomTabs from './src/navigation/BottomTabs';
-import HomeTabs from './src/navigation/HomeTabs';
-import ArbitroTabs from './src/navigation/ArbitroTabs';
-
-// 📋 Público - Home (Estadísticas y Torneos)
-import TournamentDetail from './src/modules/home/TournamentDetail';
-import TablaPosiciones from './src/modules/home/TablaPosiciones';
-import PartidosScreen from './src/modules/home/PartidosScreen';
-import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
-import TarjetasScreen from './src/modules/home/TarjetasScreen';
-import Estadisticas from './src/modules/home/Estadisticas';
-import TorneoScreen from './src/modules/home/TorneoScreen';
 
 // 🔐 Login
 import LoginScreen from './src/screens/LoginScreen';
@@ -61,19 +50,9 @@ export default function App() {
         {/* 🌐 Público */}
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Main" component={BottomTabs} />
-        <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
-        <Stack.Screen name="TorneoScreen" component={TorneoScreen} />
-        <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
-        <Stack.Screen name="Partidos" component={PartidosScreen} />
-        <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
-        <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
-        <Stack.Screen name="Estadisticas" component={Estadisticas} />
 
         {/* 🔐 Login */}
         <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        <Stack.Screen name="BottomTabs" component={BottomTabs} />
-        <Stack.Screen name="HomeTabs" component={HomeTabs} />
-        <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
 
         {/* ⚖️ Árbitro */}
         <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />

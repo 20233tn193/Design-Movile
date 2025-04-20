@@ -1,12 +1,34 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, ActivityIndicator } from 'react-native';
 
 import TorneoScreen from '../modules/home/TorneoScreen';
+import TournamentDetail from '../modules/home/TournamentDetail';
+import TablaPosiciones from '../modules/home/TablaPosiciones';
+import PartidosScreen from '../modules/home/PartidosScreen';
+import GoleadoresScreen from '../modules/home/GoleadoresScreen';
+import TarjetasScreen from '../modules/home/TarjetasScreen';
 import Estadisticas from '../modules/home/Estadisticas';
 import PerfilStack from './PerfilStack';
+
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function TorneosStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="TorneoScreen" component={TorneoScreen} />
+      <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
+      <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
+      <Stack.Screen name="Partidos" component={PartidosScreen} />
+      <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
+      <Stack.Screen name="Tarjetas" component={TarjetasScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function PerfilScreenWrapper() {
   const [pantalla, setPantalla] = React.useState(null);
@@ -47,8 +69,6 @@ function PerfilScreenWrapper() {
   );
 }
 
-const Tab = createBottomTabNavigator();
-
 export default function BottomTabs() {
   return (
     <Tab.Navigator
@@ -70,7 +90,7 @@ export default function BottomTabs() {
     >
       <Tab.Screen
         name="Torneos"
-        component={TorneoScreen}
+        component={TorneosStack}
         options={{
           tabBarIcon: ({ color }) => (
             <Icon name="trophy" type="font-awesome" color={color} size={20} />
@@ -86,15 +106,6 @@ export default function BottomTabs() {
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Estadísticas"
-        component={Estadisticas}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Icon name="bar-chart" type="font-awesome" color={color} size={20} />
-          ),
-        }}
-      /> */}
     </Tab.Navigator>
   );
 }
