@@ -14,7 +14,10 @@ export default function TarjetasScreen({ route }) {
     const fetchTarjetas = async () => {
       try {
         const response = await API.get(`/estadisticas/tarjetas/${torneoId}`);
-        setTarjetas(response.data);
+        const tarjetasConValor = response.data.filter(
+          (t) => (t.amarillas || 0) > 0 || (t.rojas || 0) > 0
+        );
+        setTarjetas(tarjetasConValor);
       } catch (error) {
         console.error('Error al cargar tarjetas:', error);
       } finally {
