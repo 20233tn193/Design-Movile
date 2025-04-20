@@ -56,15 +56,7 @@ export default function ArbitroTabs() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Estadísticas"
-        component={Estadisticas}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Icon name="bar-chart" type="font-awesome" color={color} size={24} />
-          ),
-        }}
-      />
+      
     </Tab.Navigator>
   );
 }

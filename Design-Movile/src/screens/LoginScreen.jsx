@@ -8,8 +8,8 @@ import {
   Dimensions,
   Image,
   SafeAreaView,
-  Alert,
   ActivityIndicator,
+  Alert
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -20,7 +20,8 @@ const { width } = Dimensions.get('window');
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // ✅ ESTA LÍNEA FALTABA
+
   const navigation = useNavigation();
 
   const handleLogin = async () => {
@@ -74,7 +75,7 @@ export default function LoginScreen() {
         Alert.alert('Error', 'Rol no reconocido');
       }
     
-      navigation.replace('Main'); // Cambia a la pantalla principal de la app
+     // navigation.replace('Main'); // Cambia a la pantalla principal de la app
     
     } catch (error) {
       if (error.name === 'AbortError') {

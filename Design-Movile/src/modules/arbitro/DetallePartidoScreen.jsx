@@ -73,7 +73,7 @@ export default function DetallePartidoScreen() {
         setRojas(nuevasRojas);
       }
     } else if (seccion === 'Roja') {
-      nuevo[i] = 1; // Solo una roja
+      nuevo[i] = 1;
     } else {
       nuevo[i]++;
     }
@@ -119,15 +119,22 @@ export default function DetallePartidoScreen() {
         rojas: rojas[index],
       }));
 
+      console.log('📤 Enviando resultado del partido:', {
+        partidoId,
+        registro,
+      });
+
       await registrarResultadoPartido(partidoId, registro);
+
       navigation.replace('RegistroCerrado', {
         asistencias,
         goles,
         rojas,
         amarillas,
+        jugadores, // ✅ AÑADIDO AQUÍ
       });
     } catch (err) {
-      console.log('Error al registrar resultado:', err);
+      console.log('❌ Error al registrar resultado:', err);
       Alert.alert('Error', 'No se pudo guardar el resultado.');
     }
   };

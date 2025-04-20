@@ -6,31 +6,49 @@ import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 const { width } = Dimensions.get('window');
 
 export default function RegistroCerrado({ route }) {
-  const { asistencias, goles, rojas, amarillas, jugadores = [] } = route.params;
+  const {
+    asistencias = [],
+    goles = [],
+    rojas = [],
+    amarillas = [],
+    jugadores = [],
+  } = route.params;
 
-  const renderSeccion = (titulo, icono, color, valores) => (
-    <View style={styles.seccionContainer}>
-      <View style={styles.seccionHeader}>
-        <Icon name={icono} type="font-awesome" color={color} size={20} style={{ marginRight: 8 }} />
-        <Text style={styles.seccionTitle}>{titulo}</Text>
+  const renderSeccion = (titulo, icono, color, valores) => {
+    return (
+      <View style={styles.seccionContainer}>
+        <View style={styles.seccionHeader}>
+          <Icon name={icono} type="font-awesome" color={color} size={20} style={{ marginRight: 8 }} />
+          <Text style={styles.seccionTitle}>{titulo}</Text>
+        </View>
+        <FlatList
+          data={jugadores}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item, index }) => {
+            let valorVisual = '—';
+
+            if (titulo === 'Asistencias') {
+              valorVisual = asistencias[index] ? '✅' : '❌';
+            } else if (titulo === 'Goles') {
+              valorVisual = goles[index] > 0 ? `⚽ ${goles[index]}` : '—';
+            } else if (titulo === 'Tarjetas Rojas') {
+              valorVisual = rojas[index] > 0 ? '🟥' : '—';
+            } else if (titulo === 'Tarjetas Amarillas') {
+              valorVisual = amarillas[index] > 0 ? `🟨 ${amarillas[index]}` : '—';
+            }
+
+            return (
+              <View style={styles.itemRow}>
+                <Text style={styles.itemNombre}>{item.nombre} {item.apellido}</Text>
+                <Text style={styles.itemValor}>{valorVisual}</Text>
+              </View>
+            );
+          }}
+        />
       </View>
-      <FlatList
-        data={jugadores}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item, index }) => (
-          <View style={styles.itemRow}>
-            <Text style={styles.itemNombre}>{item.nombre} {item.apellido}</Text>
-            <Text style={styles.itemValor}>
-              {titulo === 'Asistencias'
-                ? (asistencias[index] ? '✅' : '❌')
-                : valores[index]}
-            </Text>
-          </View>
-        )}
-      />
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -53,7 +71,8 @@ export default function RegistroCerrado({ route }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, backgroundColor: '#fff',
+    flex: 1,
+    backgroundColor: '#fff',
   },
   header: {
     backgroundColor: '#000',

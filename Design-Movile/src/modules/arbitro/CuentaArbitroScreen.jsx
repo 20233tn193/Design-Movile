@@ -12,8 +12,8 @@ import {
 import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
+import { obtenerArbitroPorUsuarioId } from '../../api/api'; // ✅ Importación correcta
 
 const { width } = Dimensions.get('window');
 
@@ -28,23 +28,19 @@ export default function CuentaArbitroScreen() {
         const usuarioId = await AsyncStorage.getItem('usuarioId');
         const token = await AsyncStorage.getItem('token');
 
+        console.log('📦 usuarioId:', usuarioId);
+        console.log('🔐 token:', token);
+
         if (!usuarioId || !token) {
           Alert.alert('Error', 'No hay sesión activa');
           return;
         }
 
-        const response = await axios.get(
-          `http://192.168.1.65:8080/api/arbitros/usuario/${usuarioId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("🎯 Datos del árbitro recibidos:", response.data);
-        setArbitro(response.data);
+        const data = await obtenerArbitroPorUsuarioId(usuarioId); // ✅ Llamada correcta
+        console.log('🎯 Datos del árbitro recibidos:', data);
+        setArbitro(data);
       } catch (error) {
-        console.log('Error al cargar árbitro:', error);
+        console.log('❌ Error al cargar árbitro:', error.response?.data || error.message);
         Alert.alert('Error', 'No se pudo obtener la información del árbitro');
       } finally {
         setLoading(false);
@@ -91,7 +87,7 @@ export default function CuentaArbitroScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.welcome}>¡Bienvenido, {arbitro?.nombre}!</Text>
+        <Text style={styles.welcome}>¡Bienvenido, {arbitro?.nombre || 'Árbitro'}!</Text>
 
         <View style={styles.profileContainer}>
           <Image
@@ -110,7 +106,7 @@ export default function CuentaArbitroScreen() {
         <View style={styles.cardInfo}>
           <Text style={styles.name}>{arbitro?.nombre} {arbitro?.apellido}</Text>
           <Text style={styles.text}>{arbitro?.correo}</Text>
-          <Text style={styles.text}>{arbitro?.celular || 'Sin número registrado'}</Text>
+         { /*<Text style={styles.text}>{arbitro?.celular || 'Sin número registrado'}</Text>*/}
         </View>
 
         <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>

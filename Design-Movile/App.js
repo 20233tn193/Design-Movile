@@ -7,18 +7,26 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from './src/screens/SplashScreen';
 import BottomTabs from './src/navigation/BottomTabs';
 import HomeTabs from './src/navigation/HomeTabs';
-import ArbitroTabs from './src/navigation/ArbitroTabs'; // ✅ Tabs árbitro
+import ArbitroTabs from './src/navigation/ArbitroTabs';
 
-// 🧭 Pantallas públicas que faltaban importar
+// 📋 Público - Home (Estadísticas y Torneos)
 import TournamentDetail from './src/modules/home/TournamentDetail';
 import TablaPosiciones from './src/modules/home/TablaPosiciones';
 import PartidosScreen from './src/modules/home/PartidosScreen';
 import GoleadoresScreen from './src/modules/home/GoleadoresScreen';
 import TarjetasScreen from './src/modules/home/TarjetasScreen';
 import Estadisticas from './src/modules/home/Estadisticas';
+import TorneoScreen from './src/modules/home/TorneoScreen';
 
 // 🔐 Login
 import LoginScreen from './src/screens/LoginScreen';
+
+// ⚖️ Árbitro
+import ArbitroHomeScreen from './src/modules/arbitro/ArbitroHomeScreen';
+import CuentaArbitroScreen from './src/modules/arbitro/CuentaArbitroScreen';
+import DetallePartidoScreen from './src/modules/arbitro/DetallePartidoScreen';
+import RegistroCerradoScreen from './src/modules/arbitro/RegistroCerradoScreen';
+import ModalConfirmacion from './src/modules/arbitro/ModalConfirmacion';
 
 // 📋 Dueño
 import CuentaDuenoScreen from './src/modules/dueno/CuentaDuenoScreen';
@@ -54,6 +62,7 @@ export default function App() {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Main" component={BottomTabs} />
         <Stack.Screen name="TournamentDetail" component={TournamentDetail} />
+        <Stack.Screen name="TorneoScreen" component={TorneoScreen} />
         <Stack.Screen name="TablaPosiciones" component={TablaPosiciones} />
         <Stack.Screen name="Partidos" component={PartidosScreen} />
         <Stack.Screen name="Goleadores" component={GoleadoresScreen} />
@@ -65,6 +74,13 @@ export default function App() {
         <Stack.Screen name="BottomTabs" component={BottomTabs} />
         <Stack.Screen name="HomeTabs" component={HomeTabs} />
         <Stack.Screen name="ArbitroTabs" component={ArbitroTabs} />
+
+        {/* ⚖️ Árbitro */}
+        <Stack.Screen name="ArbitroHomeScreen" component={ArbitroHomeScreen} />
+        <Stack.Screen name="CuentaArbitro" component={CuentaArbitroScreen} />
+        <Stack.Screen name="DetallePartido" component={DetallePartidoScreen} />
+        <Stack.Screen name="RegistroCerrado" component={RegistroCerradoScreen} />
+        <Stack.Screen name="ModalConfirmacion" component={ModalConfirmacion} />
 
         {/* 📋 Dueño */}
         <Stack.Screen name="CuentaDuenoScreen" component={CuentaDuenoScreen} />

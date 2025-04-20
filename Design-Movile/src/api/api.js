@@ -9,7 +9,7 @@ const API = axios.create({
   },
 });
 
-// ✅ Interceptor para incluir el token JWT en cada petición
+// ✅ Interceptor para incluir el token JWT solo si existe
 API.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem('token');
@@ -22,27 +22,17 @@ API.interceptors.request.use(
 );
 
 // 🔽 Obtener dueño por ID
-// Removed duplicate function declaration
-// // 🔽 Obtener dueño por ID
-// export const obtenerDuenoPorId = async (id) => {
-//   try {
-//     const response = await API.get(`/duenos/usuario/${usuarioId}`);
-//     return response.data; // debe incluir _id
-//   } catch (error) {
-//     console.log('❌ Error al obtener dueño por usuarioId:', error);
-//     throw error;
-//   }
-// };
-
-export const obtenerDuenoPorId = async (duenoId) => {
+export const obtenerDuenoPorId = async (id) => {
   try {
-    const response = await API.get(`/duenos/${duenoId}`);
-    return response.data;
+    const response = await API.get(`/duenos/usuario/${usuarioId}`);
+    return response.data; // debe incluir _id
   } catch (error) {
-    console.log('Error al obtener el dueño por id:', error);
+    console.error('❌ Error al obtener dueño por usuarioId:', error);
     throw error;
   }
 };
+
+
 
 // 🔽 Obtener equipo por dueño
 export const obtenerEquipoPorDueno = async (duenoId) => {
@@ -97,5 +87,14 @@ export const registrarResultadoPartido = async (partidoId, registro) => {
     throw error;
   }
 };
-
+// 🔽 Obtener árbitro por usuarioId
+export const obtenerArbitroPorUsuarioId = async (usuarioId) => {
+  try {
+    const response = await API.get(`/arbitros/usuario/${usuarioId}`);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error al obtener árbitro por usuarioId:', error);
+    throw error;
+  }
+};
 export default API;
