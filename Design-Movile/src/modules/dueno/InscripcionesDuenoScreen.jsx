@@ -40,6 +40,22 @@ export default function InscripcionesDuenoScreen({ navigation }) {
             return;
           }
 
+          const token = await AsyncStorage.getItem('token');
+
+          if (!token) {
+            console.warn('❌ Token no encontrado en almacenamiento');
+            return;
+          }
+
+          const res = await fetch(`http://192.168.100.192:8080/api/equipos/dueño/${duenoId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
+          const data = await res.json();
+          console.log('✅ Datos recibidos con fetch:', data);
+
           const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
           const equipos = resEquipos.data || [];
           const torneoIds = equipos
@@ -53,7 +69,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
           );
           const torneosDisponibles = todosTorneos.filter(t =>
             t.estado?.toUpperCase().trim() === "ABIERTO" &&
-            !torneoIds.includes(t.id) 
+            !torneoIds.includes(t.id)
           );
 
           const resPagos = await API.get(`/pagos/dueno/${duenoId}`);
@@ -63,16 +79,16 @@ export default function InscripcionesDuenoScreen({ navigation }) {
           setPagosInscripcion(pagosFiltrados);
           setTorneos(torneosDisponibles);
           setTorneosInscritos(torneosInscritos);
-          //console.log('Lógica completada sin errores');
+          console.log('Lógica completada sin errores');
         } catch (err) {
-          //console.log('Error al cargar torneos:', err);
+          console.log('Error al cargar torneos:', err);
         }
       };
 
       fetchTorneos();
 
       if (route.params?.recargar) {
-        //console.log('Recargando por parámetro de inscripción...');
+        console.log('Recargando por parámetro de inscripción...');
       }
 
     }, [route.params?.recargar])

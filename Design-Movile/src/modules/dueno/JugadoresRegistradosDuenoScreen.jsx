@@ -38,12 +38,14 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
   const descargarCredencialesPDF = async (equipoId) => {
     try {
       console.log('📥 Iniciando descarga de credenciales para:', equipoId);
+      const token = await AsyncStorage.getItem('token'); // 🧠 recuperamos el token
       const url = `${API.defaults.baseURL}/equipos/${equipoId}/credenciales`;
       const fileUri = FileSystem.documentDirectory + 'credenciales.pdf';
   
       const response = await FileSystem.downloadAsync(url, fileUri, {
         headers: {
           Accept: 'application/pdf',
+          Authorization: `Bearer ${token}`, // ✅ IMPORTANTE
         },
       });
   
@@ -57,7 +59,7 @@ export default function JugadoresRegistradosDuenoScreen({ navigation, route }) {
     } catch (error) {
       console.error('❌ Error al descargar credenciales:', error);
       Alert.alert('Error', 'No se pudieron generar las credenciales. Asegúrate de que el torneo esté cerrado y el pago aprobado.');
-      throw error; // 🔥 Importante: para que el modal sepa que falló
+      throw error;
     }
   };
 
