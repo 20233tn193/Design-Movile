@@ -54,7 +54,7 @@ export default function ActualizarEquipoScreen({ navigation, route }) {
       await API.put(`/equipos/${equipo.id}`, actualizado);
 
       Alert.alert('Actualizado', 'El equipo se actualizó correctamente', [
-        { text: 'OK', onPress: () => navigation.navigate('Main', { screen: 'Perfil' }) },
+        { text: 'OK', onPress: () => navigation.goBack()},
       ]);
     } catch (error) {
       console.log('❌ Error actualizando equipo:', error.response?.data || error.message);

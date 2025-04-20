@@ -47,14 +47,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
             return;
           }
 
-          const res = await fetch(`http://192.168.100.192:8080/api/equipos/dueño/${duenoId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
           
-          const data = await res.json();
-          console.log('✅ Datos recibidos con fetch:', data);
 
           const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
           const equipos = resEquipos.data || [];
