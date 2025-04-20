@@ -49,8 +49,8 @@ export default function PartidosScreen({ route }) {
           <Image
             source={{
               uri:
-                item.logoLocal && item.logoLocal.startsWith('http')
-                  ? item.logoLocal
+                item.logoEquipoA && item.logoEquipoA.startsWith('http')
+                  ? item.logoEquipoA
                   : 'https://via.placeholder.com/60x60?text=L',
             }}
             style={styles.logo}
@@ -61,8 +61,8 @@ export default function PartidosScreen({ route }) {
           <Image
             source={{
               uri:
-                item.logoVisitante && item.logoVisitante.startsWith('http')
-                  ? item.logoVisitante
+                item.logoEquipoB && item.logoEquipoB.startsWith('http')
+                  ? item.logoEquipoB
                   : 'https://via.placeholder.com/60x60?text=V',
             }}
             style={styles.logo}
@@ -70,8 +70,8 @@ export default function PartidosScreen({ route }) {
         </View>
 
         <View style={styles.nombres}>
-          <Text style={styles.nombreEquipo}>{item.nombreLocal}</Text>
-          <Text style={styles.nombreEquipo}>{item.nombreVisitante}</Text>
+          <Text style={styles.nombreEquipo}>{item.nombreEquipoA}</Text>
+          <Text style={styles.nombreEquipo}>{item.nombreEquipoB}</Text>
         </View>
 
         <View style={styles.infoContainer}>
@@ -266,47 +266,5 @@ const styles = StyleSheet.create({
     height: 24,
     resizeMode: 'contain',
     marginRight: 10,
-  },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
-  },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
-  },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
   },
 });
