@@ -86,7 +86,7 @@ export default function ArbitroHomeScreen({ navigation }) {
                 <View style={[styles.card, finalizado && styles.cardFinalizado]}>
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.vsText, finalizado && styles.textFinalizado]}>
-                      {item.equipoLocal?.nombre || 'Local'} vs {item.equipoVisitante?.nombre || 'Visitante'}
+                      {item.nombreEquipoA || 'Equipo A'} vs {item.nombreEquipoB || 'Equipo B'}
                     </Text>
                     <Text style={[styles.cardSubText, finalizado && styles.textFinalizado]}>
                       {item.nombreCampo} - {item.nombreCancha}
@@ -95,9 +95,7 @@ export default function ArbitroHomeScreen({ navigation }) {
                       {item.fecha}   {item.hora}
                     </Text>
                     {finalizado && (
-                      <Text style={[styles.cardSubText, { fontStyle: 'italic', color: '#bbb' }]}>
-                        Partido terminado
-                      </Text>
+                      <Text style={[styles.cardSubText, { fontStyle: 'italic', color: '#bbb' }]}>Partido terminado</Text>
                     )}
                   </View>
                   {!finalizado && (

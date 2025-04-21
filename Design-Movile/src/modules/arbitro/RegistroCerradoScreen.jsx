@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity } from 'react-native';
 import { Icon } from '@rneui/themed';
 import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 
-export default function RegistroCerrado({ route }) {
+export default function RegistroCerrado({ route, navigation }) {
   const { jugadores = [], resultados = [] } = route.params;
 
   const renderSeccionEquipo = (equipoNombre, jugadoresFiltrados) => (
@@ -19,10 +19,11 @@ export default function RegistroCerrado({ route }) {
 
       {jugadoresFiltrados.map((item) => {
         const r = resultados.find(res => res.jugadorId === item.id);
+        console.log(`Jugador: ${item.nombre} ${item.apellido}, Asistencia: ${r?.asistencia}`);
         return (
           <View style={styles.row} key={item.id}>
             <Text style={[styles.text, { flex: 2 }]}>{item.nombre} {item.apellido}</Text>
-            <Text style={[styles.text, { flex: 1 }]}>{r?.asistencia ? '✅' : '❌'}</Text>
+            <Text style={[styles.text, { flex: 1 }]}>{r?.asistencia === true ? '✅' : '❌'}</Text>
             <Text style={[styles.text, { flex: 1 }]}>{r?.goles > 0 ? `⚽ ${r.goles}` : '—'}</Text>
             <Text style={[styles.text, { flex: 1 }]}>{r?.amarillas > 0 ? `🟨 ${r.amarillas}` : '—'}</Text>
             <Text style={[styles.text, { flex: 1 }]}>{r?.rojas > 0 ? '🟥' : '—'}</Text>
@@ -47,6 +48,17 @@ export default function RegistroCerrado({ route }) {
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
         {renderSeccionEquipo('Equipo Local', locales)}
         {renderSeccionEquipo('Equipo Visitante', visitantes)}
+
+        <TouchableOpacity
+          style={styles.btnCerrar}
+          onPress={() =>
+            navigation.navigate('Inicio', {
+              screen: 'ArbitroHomeScreen',
+            })
+          }
+        >
+          <Text style={styles.btnCerrarTexto}>Cerrar</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -100,5 +112,18 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 13,
     color: '#333',
+  },
+  btnCerrar: {
+    marginTop: 30,
+    alignSelf: 'center',
+    backgroundColor: '#d80027',
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+  },
+  btnCerrarTexto: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
