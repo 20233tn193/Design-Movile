@@ -32,16 +32,23 @@ export default function DetallePartidoScreen() {
     const cargarDatos = async () => {
       try {
         const p = await obtenerPartidoPorId(partidoId);
-        setPartido(p);
-
+    
         const jugadoresLocal = await obtenerJugadoresPorEquipo(p.equipoAId);
         const jugadoresVisitante = await obtenerJugadoresPorEquipo(p.equipoBId);
-        jugadoresLocal.forEach(j => j.equipo = 'local');
-        jugadoresVisitante.forEach(j => j.equipo = 'visitante');
-
+    
+        jugadoresLocal.forEach(j => {
+          j.equipo = 'local';
+          j.equipoId = p.equipoAId;
+        });
+        jugadoresVisitante.forEach(j => {
+          j.equipo = 'visitante';
+          j.equipoId = p.equipoBId;
+        });
+    
         const todos = [...jugadoresLocal, ...jugadoresVisitante];
+    
+        setPartido(p); // 👉 después de haber usado `p`
         setJugadores(todos);
-
         setAsistencias(todos.map(() => false));
         setGoles(todos.map(() => 0));
         setRojas(todos.map(() => 0));
@@ -134,11 +141,14 @@ export default function DetallePartidoScreen() {
     try {
       const resultados = jugadores.map((jugador, index) => ({
         jugadorId: jugador.id,
-        asistencia: asistencias[index],
+        equipoId: jugador.equipoId,
+        asistio: asistencias[index], // ✅ CAMBIO aquí
         goles: goles[index],
         amarillas: amarillas[index],
         rojas: rojas[index],
       }));
+
+      console.log('✅ Payload enviado al backend:', JSON.stringify(resultados, null, 2));
 
       console.log('📥 jugadores enviados:', jugadores);
       console.log('📥 resultados enviados:', resultados);
