@@ -25,6 +25,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
   const [torneos, setTorneos] = useState([]);
   const [torneosInscritos, setTorneosInscritos] = useState([]);
   const [pagosInscripcion, setPagosInscripcion] = useState([]);
+  const [equipos, setEquipos] = useState([]);
 
   const route = useRoute();
 
@@ -51,6 +52,7 @@ export default function InscripcionesDuenoScreen({ navigation }) {
 
           const resEquipos = await API.get(`/equipos/dueño/${duenoId}`);
           const equipos = resEquipos.data || [];
+          setEquipos(equipos);
           const torneoIds = equipos
             .map(e => e.torneoId?.toString?.())
             .filter(id => !!id);
@@ -131,7 +133,8 @@ export default function InscripcionesDuenoScreen({ navigation }) {
                 </Text>
               ) : (torneosInscritos.map((torneo, index) => {
                 const pago = pagosInscripcion.find(p => p.torneoId === torneo.id);
-
+                const equipo = equipos.find(e => e.torneoId === torneo.id);
+              
                 return (
                   <View
                     key={index}
@@ -146,12 +149,12 @@ export default function InscripcionesDuenoScreen({ navigation }) {
                           torneo.estado?.toUpperCase().trim() === 'ABIERTO'
                             ? styles.abierto
                             : torneo.estado?.toUpperCase().trim() === 'FINALIZADO'
-                              ? styles.finalizado
-                              : torneo.estado?.toUpperCase().trim() === 'CERRADO'
-                                ? styles.cerrado
-                                : torneo.estado?.toUpperCase().trim() === 'EN CURSO'
-                                  ? styles.enCurso
-                                  : styles.otros,
+                            ? styles.finalizado
+                            : torneo.estado?.toUpperCase().trim() === 'CERRADO'
+                            ? styles.cerrado
+                            : torneo.estado?.toUpperCase().trim() === 'EN CURSO'
+                            ? styles.enCurso
+                            : styles.otros,
                         ]}
                       >
                         {torneo.estado}
@@ -170,37 +173,45 @@ export default function InscripcionesDuenoScreen({ navigation }) {
                         {torneo.fechaInicio} · {torneo.numeroEquipos} clubs
                       </Text>
                     </View>
-
-                    {/* Botón agregar jugador con texto */}
+              
                     {pago && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          if (pago.estatus === 'pendiente') {
-                            alert('Tu pago está en proceso. Espera confirmación para agregar jugadores.');
-                          } else {
-                            navigation.navigate('JugadoresRegistradosDueno', { torneo });
-                          }
-                        }}
-                        style={{
-                          backgroundColor: pago.estatus === 'pagado' ? '#28D914' : '#ccc',
-                          paddingVertical: 12,
-                          paddingHorizontal: 20,
-                          borderRadius: 20,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          gap: 6,
-                        }}
-                      >
-                        <Icon
-                          name="user-plus"
-                          type="font-awesome"
-                          color="#fff"
-                          size={16}
-                        />
-                      </TouchableOpacity>
+                      <View style={{ alignItems: 'center', gap: 8 }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (pago.estatus === 'pendiente') {
+                              alert('Tu pago está en proceso. Espera confirmación para agregar jugadores.');
+                            } else {
+                              navigation.navigate('JugadoresRegistradosDueno', { torneo });
+                            }
+                          }}
+                          style={{
+                            backgroundColor: pago.estatus === 'pagado' ? '#28D914' : '#ccc',
+                            paddingVertical: 12,
+                            paddingHorizontal: 20,
+                            borderRadius: 20,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <Icon name="user-plus" type="font-awesome" color="#fff" size={16} />
+                        </TouchableOpacity>
+              
+                        <TouchableOpacity
+                          style={[styles.btnPago, { backgroundColor: '#C12143' }]}
+                          onPress={() => {
+                            if (equipo) {
+                              navigation.navigate('PagosDuenoScreen', { equipo, torneo });
+                            } else {
+                              alert('No se encontró el equipo correspondiente.');
+                            }
+                          }}
+                        >
+                          <Icon name="dollar" type="font-awesome" color="#fff" size={20} />
+                        </TouchableOpacity>
+                      </View>
                     )}
                   </View>
-
                 );
               }))}
             </View>
@@ -441,5 +452,13 @@ const styles = StyleSheet.create({
     color: '#28D914',
     marginVertical: 5,
     fontWeight: 'bold',
-  }
+  },
+  btnPago: {
+    padding: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 40,
+  },
 });

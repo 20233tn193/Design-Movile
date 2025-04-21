@@ -7,30 +7,66 @@ import {
   FlatList,
   Dimensions,
   ActivityIndicator,
+  ScrollView,
+  TouchableOpacity
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import API from '../../api/api';
+import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
+
 export default function PartidosScreen({ route }) {
-  const [partidos, setPartidos] = useState([]);
-  const [jornadaLabel, setJornadaLabel] = useState('');
+  const [calendarioCompleto, setCalendarioCompleto] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const torneoId = route?.params?.torneoId || 'DEFAULT_ID';
+  const navigation = useNavigation();
+  const [campeon, setCampeon] = useState(null);
+
 
   const obtenerPartidos = async () => {
     try {
-      const response = await API.get(`/partidos/calendario/${torneoId}`);
-      const calendario = response.data;
+      const [partidosRes, logosRes] = await Promise.all([
+        API.get(`/partidos/torneo/${torneoId}`),
+        API.get(`/partidos/calendario/${torneoId}`)
+      ]);
 
-      const jornadas = Object.keys(calendario).sort((a, b) => b - a);
-      if (jornadas.length > 0) {
-        const ultima = jornadas[0];
-        setPartidos(calendario[ultima]);
-        setJornadaLabel(`Jornada ${ultima}`);
-      }
+      const partidosConRegistro = partidosRes.data;
+      const logosPorId = {};
+
+      // Recorremos el calendario para obtener los logos por ID
+      Object.values(logosRes.data).flat().forEach(p => {
+        logosPorId[p.id] = {
+          logoEquipoA: p.logoEquipoA,
+          logoEquipoB: p.logoEquipoB,
+        };
+      });
+
+      // Agrupamos partidos por jornada y agregamos los logos
+      const partidosPorJornada = {};
+
+      partidosConRegistro.forEach(partido => {
+        const jornada = partido.jornada || 'Sin jornada';
+        const logos = logosPorId[partido.id] || {};
+
+        partido.logoEquipoA = logos.logoEquipoA || '';
+        partido.logoEquipoB = logos.logoEquipoB || '';
+
+        if (!partidosPorJornada[jornada]) partidosPorJornada[jornada] = [];
+        partidosPorJornada[jornada].push(partido);
+      });
+
+      const jornadasOrdenadas = Object.keys(partidosPorJornada)
+        .sort((a, b) => b - a)
+        .map(jornada => ({
+          jornada,
+          partidos: partidosPorJornada[jornada],
+        }));
+
+      setCalendarioCompleto(jornadasOrdenadas);
     } catch (error) {
       console.error('Error cargando partidos:', error);
     } finally {
@@ -38,33 +74,81 @@ export default function PartidosScreen({ route }) {
     }
   };
 
+  const obtenerTorneo = async () => {
+    try {
+      const response = await API.get(`/torneos/${torneoId}`);
+      const data = response.data;
+
+      if (data.estado?.toUpperCase() === 'FINALIZADO' && data.campeonId) {
+        const equipoResponse = await API.get(`/equipos/${data.campeonId}`);
+        const equipo = equipoResponse.data;
+        console.log("🏆 Campeón obtenido:", equipo);
+
+        setCampeon({
+          nombre: equipo.nombre,
+          logo: equipo.logoUrl?.startsWith('data:image')
+            ? equipo.logoUrl
+            : `data:image/jpeg;base64,${equipo.logoUrl}`
+        });
+      }
+    } catch (error) {
+      console.error('Error al obtener torneo o campeón:', error);
+    }
+  };
+
   useEffect(() => {
+    obtenerTorneo();
     obtenerPartidos();
   }, []);
 
-  const renderPartido = ({ item }) => {
+
+
+  const renderPartido = (item) => {
     return (
-      <View style={styles.card}>
+      <TouchableOpacity
+        style={styles.card}
+        key={item.id}
+        onPress={() => {
+          API.get(`/partidos/completo/${item.id}`).then((response) => {
+            const { registro, jugadoresLocal, jugadoresVisitante } = response.data;
+
+            const jugadores = [
+              ...jugadoresLocal.map(j => ({ ...j, equipo: 'local', equipoNombre: item.nombreEquipoA })),
+              ...jugadoresVisitante.map(j => ({ ...j, equipo: 'visitante', equipoNombre: item.nombreEquipoB }))
+            ];
+
+            if (!registro || registro.length === 0) {
+              console.log('📭 Partido aún sin registro');
+              Alert.alert(
+                'Registro no disponible',
+                'Este partido aún no ha sido registrado.',
+                [{ text: 'OK', style: 'cancel' }]
+              );
+              return;
+            }
+
+            navigation.navigate('RegistroCerrado', {
+              jugadores,
+              resultados: registro
+            });
+          }).catch((error) => {
+            console.error('❌ Error al obtener detalles del partido:', error);
+          });
+        }}
+      >
+
         <View style={styles.row}>
           <Image
-            source={{
-              uri:
-                item.logoEquipoA && item.logoEquipoA.startsWith('http')
-                  ? item.logoEquipoA
-                  : 'https://via.placeholder.com/60x60?text=L',
-            }}
+            source={{ uri: item.logoEquipoA?.startsWith('http') || item.logoEquipoA?.startsWith('data:image') ? item.logoEquipoA : 'https://via.placeholder.com/60x60?text=L' }}
             style={styles.logo}
           />
           <Text style={styles.resultado}>
-            {item.golesLocal ?? 0} : {item.golesVisitante ?? 0}
+            {(item.golesEquipoA == null || item.golesEquipoB == null || (item.golesEquipoA === 0 && item.golesEquipoB === 0))
+              ? 'Pendiente'
+              : `${item.golesEquipoA} : ${item.golesEquipoB}`}
           </Text>
           <Image
-            source={{
-              uri:
-                item.logoEquipoB && item.logoEquipoB.startsWith('http')
-                  ? item.logoEquipoB
-                  : 'https://via.placeholder.com/60x60?text=V',
-            }}
+            source={{ uri: item.logoEquipoB?.startsWith('http') || item.logoEquipoB?.startsWith('data:image') ? item.logoEquipoB : 'https://via.placeholder.com/60x60?text=V' }}
             style={styles.logo}
           />
         </View>
@@ -76,15 +160,13 @@ export default function PartidosScreen({ route }) {
 
         <View style={styles.infoContainer}>
           <View>
-            <Text style={styles.infoText}>
-              {item.nombreCampo} - {item.nombreCancha}
-            </Text>
+            <Text style={styles.infoText}>{item.nombreCampo} - {item.nombreCancha}</Text>
             <Text style={styles.infoText}>{item.hora}</Text>
             <Text style={styles.arbitro}>{item.nombreArbitro}</Text>
           </View>
           <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={20} />
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -99,24 +181,44 @@ export default function PartidosScreen({ route }) {
 
       <View style={styles.header}>
         <Image source={require('../../../assets/ProximosPartidos.png')} style={styles.icono} />
-        <Text style={styles.headerText}> Partidos</Text>
+        <Text style={styles.headerText}>Partidos</Text>
       </View>
 
-      <View style={styles.jornadaContainer}>
-        <Text style={styles.jornadaText}>
-          <Text style={styles.jornadaBold}>{jornadaLabel}</Text>
-        </Text>
-      </View>
+      {campeon && (
+        <View style={styles.campeonContainer}>
+          <Text style={styles.campeonTitulo}>🏆 Campeón del Torneo</Text>
+          <View style={styles.campeonCard}>
+            <Image
+              source={{
+                uri:
+                  campeon.logo && (campeon.logo.startsWith('data:image') || campeon.logo.startsWith('http'))
+                    ? campeon.logo
+                    : 'https://via.placeholder.com/60x60?text=🏆',
+              }}
+              style={styles.logoCampeon}
+            />
+            <Text style={styles.campeonNombre}>{campeon.nombre}</Text>
+          </View>
+        </View>
+      )}
 
       {loading ? (
         <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 30 }} />
       ) : (
-        <FlatList
-          data={partidos}
-          keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-          contentContainerStyle={{ paddingBottom: 120 }}
-          renderItem={renderPartido}
-        />
+
+
+        <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+          {calendarioCompleto.map(({ jornada, partidos }) => (
+            <View key={jornada}>
+              <View style={styles.jornadaContainer}>
+                <Text style={styles.jornadaText}>
+                  <Text style={styles.jornadaBold}>Jornada {jornada}</Text>
+                </Text>
+              </View>
+              {partidos.map(renderPartido)}
+            </View>
+          ))}
+        </ScrollView>
       )}
     </View>
   );
@@ -267,46 +369,43 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginRight: 10,
   },
-  franja: {
-    position: 'absolute',
-    width: width * 2,
-    height: 50,
-    zIndex: -1,
+  campeonContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    marginHorizontal: 15,
   },
-  franjaGrisTop: {
-    top: 120,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '-10deg' }],
+  campeonTitulo: {
+    backgroundColor: '#0e1b39',
+    color: '#FDBA12',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 10,
   },
-  franjaNegraTop: {
-    top: 90,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '-10deg' }],
+  campeonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0e1b39', // verde bonito opaco
+    padding: 7,
+    borderRadius: 5,
+    width: '80%',
+    justifyContent: 'center',
   },
-  franjaRojaTop: {
-    top: 60,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '-10deg' }],
+  campeonNombre: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    color: '#FDBA12',
   },
-  franjaGrisBottom: {
-    bottom: 70,
-    left: -width,
-    backgroundColor: '#e6e6e6',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaNegraBottom: {
-    bottom: 35,
-    left: -width,
-    backgroundColor: '#1a1a1a',
-    transform: [{ rotate: '10deg' }],
-  },
-  franjaRojaBottom: {
-    bottom: 0,
-    left: -width,
-    backgroundColor: '#d80027',
-    transform: [{ rotate: '10deg' }],
-  },
+  logoCampeon: {
+    width: 70,
+    height: 70,
+    resizeMode: 'contain',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    marginRight: 12,
+  }
 });

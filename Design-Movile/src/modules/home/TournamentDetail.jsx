@@ -18,12 +18,12 @@ export default function TournamentDetail({ route, navigation }) {
       ruta: 'TablaPosiciones',
     },
     {
-      label: 'Próximos Partidos',
+      label: 'Partidos',
       icon: require('../../../assets/ProximosPartidos.png'),
       ruta: 'Partidos',
     },
     {
-      label: 'Maximos Goleadores',
+      label: 'Goleadores',
       icon: require('../../../assets/Goleadores.png'),
       ruta: 'Goleadores',
     },

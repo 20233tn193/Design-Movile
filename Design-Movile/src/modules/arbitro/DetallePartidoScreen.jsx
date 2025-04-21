@@ -8,6 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import ModalConfirmacion from './ModalConfirmacion';
 import { obtenerPartidoPorId, obtenerJugadoresPorEquipo, registrarResultadoPartido } from '../../api/api';
 import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
+import ModalResumenResultados from './ModalResumenResultados';
 
 const { width } = Dimensions.get('window');
 
@@ -28,14 +29,17 @@ export default function DetallePartidoScreen() {
   const route = useRoute();
   const { partidoId } = route.params;
 
+  const [resumenVisible, setResumenVisible] = useState(false);
+  const [resultadosTemp, setResultadosTemp] = useState([]);
+
   useEffect(() => {
     const cargarDatos = async () => {
       try {
         const p = await obtenerPartidoPorId(partidoId);
-    
+
         const jugadoresLocal = await obtenerJugadoresPorEquipo(p.equipoAId);
         const jugadoresVisitante = await obtenerJugadoresPorEquipo(p.equipoBId);
-    
+
         jugadoresLocal.forEach(j => {
           j.equipo = 'local';
           j.equipoId = p.equipoAId;
@@ -44,12 +48,15 @@ export default function DetallePartidoScreen() {
           j.equipo = 'visitante';
           j.equipoId = p.equipoBId;
         });
-    
+
         const todos = [...jugadoresLocal, ...jugadoresVisitante];
-    
+
         setPartido(p); // 👉 después de haber usado `p`
         setJugadores(todos);
+        console.log('🔍 Estado de asistencias:', asistencias);
+        console.log('🔍 Jugadores:', jugadores.map(j => j.nombre));
         setAsistencias(todos.map(() => false));
+
         setGoles(todos.map(() => 0));
         setRojas(todos.map(() => 0));
         setAmarillas(todos.map(() => 0));
@@ -130,20 +137,28 @@ export default function DetallePartidoScreen() {
   };
 
   const handleTerminarPartido = () => {
-    const golesLocal = jugadores
-      .map((j, i) => j.equipo === 'local' ? goles[i] : 0)
-      .reduce((a, b) => a + b, 0);
-
-    const golesVisitante = jugadores
-      .map((j, i) => j.equipo === 'visitante' ? goles[i] : 0)
-      .reduce((a, b) => a + b, 0);
+    const golesLocal = jugadores.map((j, i) => j.equipo === 'local' ? goles[i] : 0).reduce((a, b) => a + b, 0);
+    const golesVisitante = jugadores.map((j, i) => j.equipo === 'visitante' ? goles[i] : 0).reduce((a, b) => a + b, 0);
 
     if (golesLocal === golesVisitante) {
       Alert.alert('Empate no permitido', 'Para cerrar el partido uno de los equipos debe tener más goles que el otro.');
       return;
     }
 
-    setModalVisible(true);
+    const resultados = jugadores.map((jugador, index) => {
+      console.log(`🧾 Jugador: ${jugador.nombre} ${jugador.apellido}, Asistencia: ${asistencias[index]}`);
+      return {
+        jugadorId: jugador.id,
+        equipoId: jugador.equipoId,
+        asistio: asistencias[index],
+        goles: goles[index],
+        amarillas: amarillas[index],
+        rojas: rojas[index],
+      };
+    });
+
+    setResultadosTemp(resultados); // 🟡 Aquí sí se guarda bien
+    setResumenVisible(true);       // 🟢 Y luego se usa en el modal
   };
 
   const confirmarCierre = async () => {
@@ -151,6 +166,10 @@ export default function DetallePartidoScreen() {
     setRegistroCerrado(true);
     setGuardando(true);
 
+
+    jugadores.forEach((jugador, index) => {
+      console.log(`Jugador: ${jugador.nombre} ${jugador.apellido}, Asistencia: ${asistencias[index]}`);
+    });
     try {
       const resultados = jugadores.map((jugador, index) => ({
         jugadorId: jugador.id,
@@ -237,8 +256,8 @@ export default function DetallePartidoScreen() {
           const noAsistio = !asistencias[index];
           return (
             <View style={[styles.jugadorRow,
-              item.equipo === 'local' ? { backgroundColor: '#e0f7ff' } : { backgroundColor: '#fff0f0' },
-              noAsistio && { opacity: 0.4 }]}
+            item.equipo === 'local' ? { backgroundColor: '#e0f7ff' } : { backgroundColor: '#fff0f0' },
+            noAsistio && { opacity: 0.4 }]}
             >
               <Text style={styles.jugadorNombre}>
                 {item.nombre} {item.apellido} {rojas[index] > 0 ? '⚠️ Expulsado' : ''}
@@ -280,6 +299,37 @@ export default function DetallePartidoScreen() {
         visible={modalVisible}
         onCancelar={() => setModalVisible(false)}
         onConfirmar={confirmarCierre}
+      />
+
+      <ModalResumenResultados
+        visible={resumenVisible}
+        jugadores={jugadores}
+        resultados={resultadosTemp}
+        onCancelar={() => setResumenVisible(false)}
+        onConfirmar={async () => {
+          setResumenVisible(false);
+          setRegistroCerrado(true);
+          setGuardando(true);
+        
+          try {
+            const resultadosFinales = jugadores.map((jugador, index) => ({
+              jugadorId: jugador.id,
+              equipoId: jugador.equipoId,
+              asistio: asistencias[index], // ← esta es la fuente real de verdad
+              goles: goles[index],
+              amarillas: amarillas[index],
+              rojas: rojas[index],
+            }));
+        
+            await registrarResultadoPartido(partidoId, resultadosFinales);
+            navigation.replace('RegistroCerrado', { jugadores, resultados: resultadosFinales });
+          } catch (err) {
+            console.log('❌ Error al registrar resultado:', err);
+            Alert.alert('Error', 'No se pudo guardar el resultado.');
+          } finally {
+            setGuardando(false);
+          }
+        }}
       />
     </View>
   );

@@ -57,8 +57,10 @@ export default function GoleadoresScreen({ route }) {
               <View style={styles.equipo}>
                 <Image
                   source={{
-                    uri: item.equipoEscudo && item.equipoEscudo.startsWith('http')
-                      ? item.equipoEscudo
+                    uri: item.equipoEscudo
+                      ? item.equipoEscudo.startsWith('data:image') || item.equipoEscudo.startsWith('http')
+                        ? item.equipoEscudo
+                        : `data:image/jpeg;base64,${item.equipoEscudo}`
                       : 'https://via.placeholder.com/24/cccccc/ffffff?text=⚽'
                   }}
                   style={styles.logo}

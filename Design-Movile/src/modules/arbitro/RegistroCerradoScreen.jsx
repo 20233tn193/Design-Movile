@@ -19,11 +19,11 @@ export default function RegistroCerrado({ route, navigation }) {
 
       {jugadoresFiltrados.map((item) => {
         const r = resultados.find(res => res.jugadorId === item.id);
-        console.log(`Jugador: ${item.nombre} ${item.apellido}, Asistencia: ${r?.asistencia}`);
+        console.log(`Jugador: ${item.nombre} ${item.apellido}, Asistencia: ${r?.asistio}`);
         return (
           <View style={styles.row} key={item.id}>
             <Text style={[styles.text, { flex: 2 }]}>{item.nombre} {item.apellido}</Text>
-            <Text style={[styles.text, { flex: 1 }]}>{r?.asistencia === true ? '✅' : '❌'}</Text>
+            <Text style={[styles.text, { flex: 1 }]}>{r?.asistio === true ? '✅' : '❌'}</Text>
             <Text style={[styles.text, { flex: 1 }]}>{r?.goles > 0 ? `⚽ ${r.goles}` : '—'}</Text>
             <Text style={[styles.text, { flex: 1 }]}>{r?.amarillas > 0 ? `🟨 ${r.amarillas}` : '—'}</Text>
             <Text style={[styles.text, { flex: 1 }]}>{r?.rojas > 0 ? '🟥' : '—'}</Text>
@@ -36,6 +36,9 @@ export default function RegistroCerrado({ route, navigation }) {
   const locales = jugadores.filter(j => j.equipo === 'local');
   const visitantes = jugadores.filter(j => j.equipo === 'visitante');
 
+  const nombreEquipoLocal = locales[0]?.equipoNombre || 'Equipo Local';
+  const nombreEquipoVisitante = visitantes[0]?.equipoNombre || 'Equipo Visitante';
+
   return (
     <View style={styles.container}>
       <View style={StyleSheet.absoluteFill}><FranjasDecorativas /></View>
@@ -46,16 +49,20 @@ export default function RegistroCerrado({ route, navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {renderSeccionEquipo('Equipo Local', locales)}
-        {renderSeccionEquipo('Equipo Visitante', visitantes)}
+        {renderSeccionEquipo(nombreEquipoLocal, locales)}
+        {renderSeccionEquipo(nombreEquipoVisitante, visitantes)}
 
         <TouchableOpacity
           style={styles.btnCerrar}
-          onPress={() =>
-            navigation.navigate('Inicio', {
-              screen: 'ArbitroHomeScreen',
-            })
-          }
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('ArbitroTabs', {
+                screen: 'ArbitroHomeScreen',
+              });
+            }
+          }}
         >
           <Text style={styles.btnCerrarTexto}>Cerrar</Text>
         </TouchableOpacity>
@@ -83,7 +90,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 15,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 20,
     color: '#0e1b39',
   },
   tableHeader: {
