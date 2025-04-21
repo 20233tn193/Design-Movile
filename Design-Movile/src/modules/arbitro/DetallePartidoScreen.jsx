@@ -130,6 +130,19 @@ export default function DetallePartidoScreen() {
   };
 
   const handleTerminarPartido = () => {
+    const golesLocal = jugadores
+      .map((j, i) => j.equipo === 'local' ? goles[i] : 0)
+      .reduce((a, b) => a + b, 0);
+
+    const golesVisitante = jugadores
+      .map((j, i) => j.equipo === 'visitante' ? goles[i] : 0)
+      .reduce((a, b) => a + b, 0);
+
+    if (golesLocal === golesVisitante) {
+      Alert.alert('Empate no permitido', 'Para cerrar el partido uno de los equipos debe tener más goles que el otro.');
+      return;
+    }
+
     setModalVisible(true);
   };
 
@@ -180,9 +193,7 @@ export default function DetallePartidoScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={StyleSheet.absoluteFill}>
-        <FranjasDecorativas />
-      </View>
+      <View style={StyleSheet.absoluteFill}><FranjasDecorativas /></View>
 
       <View style={styles.header}>
         <Icon name="fire" type="font-awesome" color="#FDBA12" size={18} style={{ marginRight: 8 }} />
@@ -190,17 +201,13 @@ export default function DetallePartidoScreen() {
       </View>
 
       <View style={styles.matchCard}>
-        <Text style={styles.matchTitle}>
-          {partido?.nombreEquipoA} vs {partido?.nombreEquipoB}
-        </Text>
+        <Text style={styles.matchTitle}>{partido?.nombreEquipoA} vs {partido?.nombreEquipoB}</Text>
         <TouchableOpacity
           style={[styles.btnTerminar, registroCerrado && { backgroundColor: '#aaa' }]}
           onPress={handleTerminarPartido}
           disabled={registroCerrado}
         >
-          <Text style={styles.btnTerminarText}>
-            {registroCerrado ? 'Registro Cerrado' : 'Terminar Partido'}
-          </Text>
+          <Text style={styles.btnTerminarText}>{registroCerrado ? 'Registro Cerrado' : 'Terminar Partido'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -229,11 +236,10 @@ export default function DetallePartidoScreen() {
         renderItem={({ item, index }) => {
           const noAsistio = !asistencias[index];
           return (
-            <View style={[
-              styles.jugadorRow,
+            <View style={[styles.jugadorRow,
               item.equipo === 'local' ? { backgroundColor: '#e0f7ff' } : { backgroundColor: '#fff0f0' },
-              noAsistio && { opacity: 0.4 }
-            ]}>
+              noAsistio && { opacity: 0.4 }]}
+            >
               <Text style={styles.jugadorNombre}>
                 {item.nombre} {item.apellido} {rojas[index] > 0 ? '⚠️ Expulsado' : ''}
               </Text>
@@ -252,19 +258,17 @@ export default function DetallePartidoScreen() {
                     seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
                     seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
                     index
-                  )}>
-                    <Text style={styles.operador}>−</Text>
-                  </TouchableOpacity>
+                  )}><Text style={styles.operador}>−</Text></TouchableOpacity>
+
                   <Text style={styles.valorContador}>
                     {seccion === 'Goles' ? goles[index] : seccion === 'Roja' ? rojas[index] : amarillas[index]}
                   </Text>
+
                   <TouchableOpacity onPress={() => aumentar(
                     seccion === 'Goles' ? goles : seccion === 'Roja' ? rojas : amarillas,
                     seccion === 'Goles' ? setGoles : seccion === 'Roja' ? setRojas : setAmarillas,
                     index
-                  )}>
-                    <Text style={styles.operador}>＋</Text>
-                  </TouchableOpacity>
+                  )}><Text style={styles.operador}>＋</Text></TouchableOpacity>
                 </View>
               )}
             </View>
@@ -284,106 +288,41 @@ export default function DetallePartidoScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    paddingTop: 30,
-    backgroundColor: '#000',
-    zIndex: 1,
+    flexDirection: 'row', alignItems: 'center', padding: 14, paddingTop: 30,
+    backgroundColor: '#000', zIndex: 1,
   },
-  headerText: {
-    color: '#FDBA12',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  headerText: { color: '#FDBA12', fontSize: 16, fontWeight: 'bold' },
   matchCard: {
-    backgroundColor: '#0e1b39',
-    margin: 15,
-    borderRadius: 10,
-    padding: 10,
-    alignItems: 'center',
-    zIndex: 1,
+    backgroundColor: '#0e1b39', margin: 15, borderRadius: 10,
+    padding: 10, alignItems: 'center', zIndex: 1,
   },
-  matchTitle: {
-    color: '#FDBA12',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
+  matchTitle: { color: '#FDBA12', fontWeight: 'bold', fontSize: 16 },
   btnTerminar: {
-    backgroundColor: '#d80027',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    marginTop: 6,
+    backgroundColor: '#d80027', paddingHorizontal: 12,
+    paddingVertical: 8, borderRadius: 10, marginTop: 6,
   },
-  btnTerminarText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
+  btnTerminarText: { color: '#fff', fontWeight: 'bold', fontSize: 12 },
   iconosRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 10,
-    paddingHorizontal: 10,
+    flexDirection: 'row', justifyContent: 'space-around',
+    marginVertical: 10, paddingHorizontal: 10,
   },
   iconoContainer: {
-    backgroundColor: '#f2f2f2',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 12,
-    width: 70,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
+    backgroundColor: '#f2f2f2', alignItems: 'center', padding: 10,
+    borderRadius: 12, width: 70,
+    shadowColor: '#000', shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 2,
   },
-  iconoActivo: {
-    borderWidth: 2,
-    borderColor: '#FDBA12',
-  },
-  iconLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginTop: 5,
-    textAlign: 'center',
-  },
+  iconoActivo: { borderWidth: 2, borderColor: '#FDBA12' },
+  iconLabel: { fontSize: 12, fontWeight: 'bold', marginTop: 5, textAlign: 'center' },
   jugadorRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: 15,
-    marginBottom: 8,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#eee',
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 10, paddingHorizontal: 20, marginHorizontal: 15, marginBottom: 8,
+    borderRadius: 12, shadowColor: '#000', shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 1 }, shadowRadius: 2, elevation: 2,
+    borderWidth: 1, borderColor: '#eee',
   },
-  jugadorNombre: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#222',
-  },
-  contadorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  operador: {
-    fontSize: 18,
-    color: '#000',
-    paddingHorizontal: 8,
-  },
-  valorContador: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  jugadorNombre: { fontSize: 14, fontWeight: 'bold', color: '#222' },
+  contadorContainer: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  operador: { fontSize: 18, color: '#000', paddingHorizontal: 8 },
+  valorContador: { fontSize: 16, fontWeight: 'bold', color: '#000' },
 });
