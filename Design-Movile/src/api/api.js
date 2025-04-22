@@ -3,7 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: 'http://192.168.100.192:8080/api',
+  baseURL: 'http://3.229.167.160/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -106,6 +106,15 @@ export const obtenerArbitroPorUsuarioId = async (usuarioId) => {
     return response.data;
   } catch (error) {
     console.error('❌ Error al obtener árbitro por usuarioId:', error);
+    throw error;
+  }
+};
+export const obtenerCampoPorId = async (campoId) => {
+  try {
+    const response = await API.get(`/campos/${campoId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener campo:', error);
     throw error;
   }
 };

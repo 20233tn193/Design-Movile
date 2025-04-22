@@ -11,21 +11,38 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { Icon } from '@rneui/themed';
-import API from '../../api/api';
+import API, { obtenerCampoPorId } from '../../api/api';
 import { useNavigation } from '@react-navigation/native';
 import { Alert } from 'react-native';
+import ModalMapa from '../../kernel/components/ModalMapa';
 
 const { width } = Dimensions.get('window');
-
 
 export default function PartidosScreen({ route }) {
   const [calendarioCompleto, setCalendarioCompleto] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const torneoId = route?.params?.torneoId || 'DEFAULT_ID';
   const navigation = useNavigation();
   const [campeon, setCampeon] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [coordenadas, setCoordenadas] = useState({ latitud: null, longitud: null });
 
+  const abrirModalConMapa = async (campoId) => {
+    try {
+      const response = await API.get(`/campos/${campoId}`);
+      const campo = response.data;
+
+      console.log('🌍 Campo ID:', campoId);
+      console.log('📍 Latitud:', campo.latitud);
+      console.log('📍 Longitud:', campo.longitud);
+
+      setCoordenadas({ latitud: campo.latitud, longitud: campo.longitud });
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Error al obtener campo:', error);
+      Alert.alert('Error', 'No se pudo cargar la ubicación del campo');
+    }
+  };
 
   const obtenerPartidos = async () => {
     try {
@@ -37,7 +54,6 @@ export default function PartidosScreen({ route }) {
       const partidosConRegistro = partidosRes.data;
       const logosPorId = {};
 
-      // Recorremos el calendario para obtener los logos por ID
       Object.values(logosRes.data).flat().forEach(p => {
         logosPorId[p.id] = {
           logoEquipoA: p.logoEquipoA,
@@ -45,19 +61,27 @@ export default function PartidosScreen({ route }) {
         };
       });
 
-      // Agrupamos partidos por jornada y agregamos los logos
       const partidosPorJornada = {};
 
-      partidosConRegistro.forEach(partido => {
+      for (const partido of partidosConRegistro) {
         const jornada = partido.jornada || 'Sin jornada';
         const logos = logosPorId[partido.id] || {};
 
         partido.logoEquipoA = logos.logoEquipoA || '';
         partido.logoEquipoB = logos.logoEquipoB || '';
 
+        try {
+          const campo = await obtenerCampoPorId(partido.campoId);
+         
+          partido.latitud = campo.latitud;
+          partido.longitud = campo.longitud;
+        } catch (error) {
+          console.error('Error al obtener campo:', error);
+        }
+
         if (!partidosPorJornada[jornada]) partidosPorJornada[jornada] = [];
         partidosPorJornada[jornada].push(partido);
-      });
+      }
 
       const jornadasOrdenadas = Object.keys(partidosPorJornada)
         .sort((a, b) => b - a)
@@ -101,8 +125,6 @@ export default function PartidosScreen({ route }) {
     obtenerPartidos();
   }, []);
 
-
-
   const renderPartido = (item) => {
     return (
       <TouchableOpacity
@@ -136,7 +158,6 @@ export default function PartidosScreen({ route }) {
           });
         }}
       >
-
         <View style={styles.row}>
           <Image
             source={{ uri: item.logoEquipoA?.startsWith('http') || item.logoEquipoA?.startsWith('data:image') ? item.logoEquipoA : 'https://via.placeholder.com/60x60?text=L' }}
@@ -164,7 +185,9 @@ export default function PartidosScreen({ route }) {
             <Text style={styles.infoText}>{item.hora}</Text>
             <Text style={styles.arbitro}>{item.nombreArbitro}</Text>
           </View>
-          <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={20} />
+          <TouchableOpacity onPress={() => abrirModalConMapa(item.campoId)}>
+            <Icon name="map-marker-alt" type="font-awesome-5" color="#d80027" size={30} />
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     );
@@ -205,8 +228,6 @@ export default function PartidosScreen({ route }) {
       {loading ? (
         <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 30 }} />
       ) : (
-
-
         <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
           {calendarioCompleto.map(({ jornada, partidos }) => (
             <View key={jornada}>
@@ -220,6 +241,13 @@ export default function PartidosScreen({ route }) {
           ))}
         </ScrollView>
       )}
+
+      <ModalMapa
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        latitud={coordenadas.latitud}
+        longitud={coordenadas.longitud}
+      />
     </View>
   );
 }

@@ -7,16 +7,19 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
-  Linking,
+  Alert,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { obtenerPartidosPorArbitro } from '../../api/api';
+import API, { obtenerPartidosPorArbitro, obtenerCampoPorId } from '../../api/api';
 import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
+import ModalMapa from '../../kernel/components/ModalMapa';
 
 export default function ArbitroHomeScreen({ navigation }) {
   const [partidos, setPartidos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [coordenadas, setCoordenadas] = useState({ latitud: null, longitud: null });
 
   useEffect(() => {
     const fetchPartidos = async () => {
@@ -39,10 +42,16 @@ export default function ArbitroHomeScreen({ navigation }) {
     fetchPartidos();
   }, []);
 
-  const abrirUbicacionEnMaps = (nombreCampo, nombreCancha) => {
-    const query = `Campo ${nombreCampo || ''} ${nombreCancha || ''}`.trim();
-    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
-    Linking.openURL(url);
+  const abrirModalConMapa = async (campoId) => {
+    try {
+      const campo = await obtenerCampoPorId(campoId);
+     
+      setCoordenadas({ latitud: campo.latitud, longitud: campo.longitud });
+      setModalVisible(true);
+    } catch (error) {
+      console.error('Error al obtener campo:', error);
+      Alert.alert('Error', 'No se pudo cargar la ubicación del campo');
+    }
   };
 
   return (
@@ -99,13 +108,13 @@ export default function ArbitroHomeScreen({ navigation }) {
                     )}
                   </View>
                   {!finalizado && (
-                    <TouchableOpacity onPress={() => abrirUbicacionEnMaps(item.nombreCampo, item.nombreCancha)}>
+                    <TouchableOpacity onPress={() => abrirModalConMapa(item.campoId)}>
                       <Icon
                         name="map-marker"
                         type="font-awesome"
                         color="#ff4d4d"
                         size={28}
-                        containerStyle={{ marginLeft: 10 }}
+                        containerStyle={{ marginLeft: 40 }}
                       />
                     </TouchableOpacity>
                   )}
@@ -115,6 +124,13 @@ export default function ArbitroHomeScreen({ navigation }) {
           }}
         />
       )}
+
+      <ModalMapa
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        latitud={coordenadas.latitud}
+        longitud={coordenadas.longitud}
+      />
     </View>
   );
 }
