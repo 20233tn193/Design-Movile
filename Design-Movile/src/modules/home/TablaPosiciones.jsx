@@ -48,9 +48,9 @@ export default function TablaPosiciones({ route }) {
 
       <View style={styles.tableHeader}>
         <Text style={[styles.columnHeader, { flex: 2 }]}>Equipo</Text>
-        <Text style={styles.columnHeader}>PJ</Text>
-        <Text style={styles.columnHeader}>PG</Text>
-        <Text style={styles.columnHeader}>PP</Text>
+        <Text style={styles.columnHeader}>J</Text>
+        <Text style={styles.columnHeader}>G</Text>
+        <Text style={styles.columnHeader}>P</Text>
         <Text style={styles.columnHeader}>GF</Text>
         <Text style={styles.columnHeader}>GC</Text>
         <Text style={styles.columnHeader}>Pts</Text>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
     alignItems: 'center',
-    paddingTop: 30,
+    paddingTop: 50,
     zIndex: 10,
   },
   headerText: {
@@ -146,19 +146,19 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   franjaGrisTop: {
-    top: 120,
+    top: 160,
     left: -width,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
   },
   franjaNegraTop: {
-    top: 90,
+    top: 120,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaRojaTop: {
-    top: 60,
+    top: 80,
     left: -width,
     backgroundColor: '#d80027',
     transform: [{ rotate: '-10deg' }],

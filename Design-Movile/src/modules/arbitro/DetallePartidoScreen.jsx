@@ -338,7 +338,7 @@ export default function DetallePartidoScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: {
-    flexDirection: 'row', alignItems: 'center', padding: 14, paddingTop: 30,
+    flexDirection: 'row', alignItems: 'center', padding: 14, paddingTop: 50,
     backgroundColor: '#000', zIndex: 1,
   },
   headerText: { color: '#FDBA12', fontSize: 16, fontWeight: 'bold' },

@@ -32,9 +32,9 @@ export default function ArbitroTabs() {
         tabBarStyle: {
           backgroundColor: '#1a1a1a',
           borderTopWidth: 0,
-          height: 60,
+          height: 75,
         },
-        tabBarActiveTintColor: '#fff',
+        tabBarActiveTintColor: '#FDBA12',
         tabBarInactiveTintColor: '#fff',
       }}
     >

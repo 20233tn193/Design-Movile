@@ -55,7 +55,7 @@ export default function SplashScreen({ navigation }) {
       }
     };
 
-    setTimeout(verificarSesion, 1000);
+    setTimeout(verificarSesion, 3000);
   }, []);
 
   return (

@@ -8,12 +8,13 @@ import {
   Dimensions,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { Icon } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
-import { obtenerArbitroPorUsuarioId } from '../../api/api'; // ✅ Importación correcta
+import { obtenerArbitroPorUsuarioId } from '../../api/api';
 
 const { width } = Dimensions.get('window');
 
@@ -28,16 +29,12 @@ export default function CuentaArbitroScreen() {
         const usuarioId = await AsyncStorage.getItem('usuarioId');
         const token = await AsyncStorage.getItem('token');
 
-        console.log('📦 usuarioId:', usuarioId);
-        console.log('🔐 token:', token);
-
         if (!usuarioId || !token) {
           Alert.alert('Error', 'No hay sesión activa');
           return;
         }
 
-        const data = await obtenerArbitroPorUsuarioId(usuarioId); // ✅ Llamada correcta
-        console.log('🎯 Datos del árbitro recibidos:', data);
+        const data = await obtenerArbitroPorUsuarioId(usuarioId);
         setArbitro(data);
       } catch (error) {
         console.log('❌ Error al cargar árbitro:', error.response?.data || error.message);
@@ -72,7 +69,7 @@ export default function CuentaArbitroScreen() {
     return (
       <View style={styles.container}>
         <FranjasDecorativas />
-        <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 50 }} />
+        <ActivityIndicator size="large" color="#d80027" style={{ marginTop: 50, zIndex: 2 }} />
       </View>
     );
   }
@@ -81,42 +78,43 @@ export default function CuentaArbitroScreen() {
     <View style={styles.container}>
       <FranjasDecorativas />
 
-      <View style={styles.header}>
-        <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
-        <Text style={styles.headerText}>Cuenta</Text>
-      </View>
+      <View style={styles.foreground}>
+        <View style={styles.header}>
+          <Icon name="user" type="font-awesome" color="#FDBA12" size={20} style={{ marginRight: 8 }} />
+          <Text style={styles.headerText}>Cuenta del Árbitro</Text>
+        </View>
 
-      <View style={styles.content}>
-        <Text style={styles.welcome}>¡Bienvenido, {arbitro?.nombre || 'Árbitro'}!</Text>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.welcome}>¡Hola, {arbitro?.nombre || 'Árbitro'}!</Text>
 
-        <View style={styles.profileContainer}>
-          <Image
-            source={
-              arbitro?.fotoUrl && arbitro.fotoUrl.startsWith('data:image')
-                ? { uri: arbitro.fotoUrl }
-                : require('../../../assets/arbitro.jpg')
-            }
-            style={styles.profileImage}
-          />
-          <TouchableOpacity style={styles.rolBadge}>
-            <Text style={styles.rolText}>Árbitro</Text>
+          <View style={styles.profileContainer}>
+            <Image
+              source={
+                arbitro?.fotoUrl && arbitro.fotoUrl.startsWith('data:image')
+                  ? { uri: arbitro.fotoUrl }
+                  : require('../../../assets/arbitro.jpg')
+              }
+              style={styles.profileImage}
+            />
+            <View style={styles.infoContainer}>
+              <Text style={styles.name}>{arbitro?.nombre} {arbitro?.apellido}</Text>
+              <Text style={styles.email}>{arbitro?.correo}</Text>
+            </View>
+          </View>
+
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>ÁRBITRO</Text>
+          </View>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>
+            <Text style={styles.logoutText}>Cerrar sesión</Text>
           </TouchableOpacity>
-        </View>
 
-        <View style={styles.cardInfo}>
-          <Text style={styles.name}>{arbitro?.nombre} {arbitro?.apellido}</Text>
-          <Text style={styles.text}>{arbitro?.correo}</Text>
-         { /*<Text style={styles.text}>{arbitro?.celular || 'Sin número registrado'}</Text>*/}
-        </View>
-
-        <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
-        </TouchableOpacity>
-
-        <Image
-          source={require('../../../assets/manhattan_logo.jpg')}
-          style={styles.logo}
-        />
+          <Image
+            source={require('../../../assets/ManhattanLogoRojo.png')}
+            style={styles.logo}
+          />
+        </ScrollView>
       </View>
     </View>
   );
@@ -126,91 +124,101 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    position: 'relative',
+    
+  },
+  foreground: {
+    flex: 1,
+    zIndex: 1,
   },
   header: {
     backgroundColor: '#000',
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingTop: 50,
+    paddingBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 30,
-    zIndex: 1,
   },
   headerText: {
     color: '#FDBA12',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   content: {
-    flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 80,
+    paddingBottom: 60,
   },
   welcome: {
-    fontSize: 18,
-    color: '#001F4E',
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#001F4E',
+    marginBottom: 25,
     textAlign: 'center',
-    marginBottom: 20,
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 20,
+    backgroundColor: '#f6f6f6',
+    borderRadius: 12,
+    padding: 15,
+    width: '100%',
+    elevation: 3,
   },
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 15,
-  },
-  rolBadge: {
-    backgroundColor: '#0e1b39',
-    paddingHorizontal: 20,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  rolText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 13,
-  },
-  cardInfo: {
-    backgroundColor: '#fff',
-    padding: 15,
+    width: 120,
+    height: 120,
     borderRadius: 10,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    alignItems: 'center',
-    marginBottom: 20,
+    marginRight: 40,
+    borderWidth: 2,
+    left: 10,
+    borderColor: '#001F4E',
+  },
+  infoContainer: {
+    flex: 1,
   },
   name: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 4,
+    color: '#001F4E',
+    marginTop: 10,
   },
-  text: {
+  email: {
     fontSize: 14,
     color: '#333',
   },
-  logoutButton: {
-    backgroundColor: '#d80027',
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 20,
+  badge: {
+    backgroundColor: '#0e1b39',
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginBottom: 25,
   },
-  logoutText: {
-    color: 'white',
+  badgeText: {
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+    letterSpacing: 1,
+  },
+  logoutButton: {
+    backgroundColor: '#d80027',
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 12,
+    marginBottom: 30,
+  },
+  logoutText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   logo: {
-    width: 140,
-    height: 50,
+    width: 180,
+    height: 60,
     resizeMode: 'contain',
     alignSelf: 'center',
+    marginTop: 10,
   },
 });

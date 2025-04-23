@@ -126,6 +126,13 @@ export default function PartidosScreen({ route }) {
   }, []);
 
   const renderPartido = (item) => {
+    const fecha = item.fecha ? new Date(item.fecha).toLocaleDateString('es-MX', {
+      
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }) : '';
+    
     return (
       <TouchableOpacity
         style={styles.card}
@@ -181,6 +188,7 @@ export default function PartidosScreen({ route }) {
 
         <View style={styles.infoContainer}>
           <View>
+          <Text style={styles.infoText}>{fecha}</Text>
             <Text style={styles.infoText}>{item.nombreCampo} - {item.nombreCancha}</Text>
             <Text style={styles.infoText}>{item.hora}</Text>
             <Text style={styles.arbitro}>{item.nombreArbitro}</Text>
@@ -265,7 +273,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 12,
     alignItems: 'center',
-    paddingTop: 30,
+    paddingTop: 50,
     zIndex: 10,
   },
   headerText: {
@@ -356,19 +364,19 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   franjaGrisTop: {
-    top: 120,
+    top: 180,
     left: -width,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
   },
   franjaNegraTop: {
-    top: 90,
+    top: 130,
     left: -width,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaRojaTop: {
-    top: 60,
+    top: 80,
     left: -width,
     backgroundColor: '#d80027',
     transform: [{ rotate: '-10deg' }],

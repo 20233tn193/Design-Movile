@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingVertical: 12,
     paddingHorizontal: 15,
-    paddingTop: 30,
+    paddingTop: 50,
     zIndex: 10,
   },
   title: {

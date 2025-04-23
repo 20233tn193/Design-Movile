@@ -34,38 +34,38 @@ const styles = StyleSheet.create({
     height: 50,
   },
   franjaRojaTop: {
-    top: 30, // antes 0
+    top: 35, // antes 0
     left: -width / 2,
     backgroundColor: '#d80027',
     height: 80,
     transform: [{ rotate: '-10deg' }],
   },
   franjaNegraTop: {
-    top: 90, // antes 60
+    top: 110, // antes 60
     left: -width / 2,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '-10deg' }],
   },
   franjaGrisTop: {
-    top: 120, // antes 90
+    top: 150, // antes 90
     left: -width / 2,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '-10deg' }],
   },
   franjaGrisBottom: {
-    bottom: 70,
+    bottom: 60,
     left: -width / 2,
     backgroundColor: '#e6e6e6',
     transform: [{ rotate: '10deg' }],
   },
   franjaNegraBottom: {
-    bottom: 35,
+    bottom: 10,
     left: -width / 2,
     backgroundColor: '#1a1a1a',
     transform: [{ rotate: '10deg' }],
   },
   franjaRojaBottom: {
-    bottom: 0,
+    bottom: -40,
     left: -width / 2,
     backgroundColor: '#d80027',
     transform: [{ rotate: '10deg' }],

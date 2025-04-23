@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,38 +14,42 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import API, { obtenerPartidosPorArbitro, obtenerCampoPorId } from '../../api/api';
 import FranjasDecorativas from '../../kernel/components/FranjasDecorativas';
 import ModalMapa from '../../kernel/components/ModalMapa';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ArbitroHomeScreen({ navigation }) {
   const [partidos, setPartidos] = useState([]);
+  const [busqueda, setBusqueda] = useState('');
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [coordenadas, setCoordenadas] = useState({ latitud: null, longitud: null });
 
-  useEffect(() => {
-    const fetchPartidos = async () => {
-      try {
-        const arbitroId = await AsyncStorage.getItem('arbitroId');
-        if (!arbitroId) {
-          console.warn('⚠️ arbitroId no encontrado');
-          return;
+  useFocusEffect(
+    useCallback(() => {
+      const fetchPartidos = async () => {
+        setLoading(true);
+        try {
+          const arbitroId = await AsyncStorage.getItem('arbitroId');
+          if (!arbitroId) {
+            console.warn('⚠️ arbitroId no encontrado');
+            return;
+          }
+
+          const data = await obtenerPartidosPorArbitro(arbitroId);
+          setPartidos(data);
+        } catch (error) {
+          console.log('❌ Error al cargar partidos:', error);
+        } finally {
+          setLoading(false);
         }
+      };
 
-        const data = await obtenerPartidosPorArbitro(arbitroId);
-        setPartidos(data);
-      } catch (error) {
-        console.log('❌ Error al cargar partidos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPartidos();
-  }, []);
+      fetchPartidos();
+    }, [])
+  );
 
   const abrirModalConMapa = async (campoId) => {
     try {
       const campo = await obtenerCampoPorId(campoId);
-     
       setCoordenadas({ latitud: campo.latitud, longitud: campo.longitud });
       setModalVisible(true);
     } catch (error) {
@@ -53,6 +57,12 @@ export default function ArbitroHomeScreen({ navigation }) {
       Alert.alert('Error', 'No se pudo cargar la ubicación del campo');
     }
   };
+
+  const filteredPartidos = partidos.filter((p) =>
+    (p.nombreEquipoA + ' ' + p.nombreEquipoB + ' ' + p.nombreCampo + ' ' + p.nombreCancha)
+      .toLowerCase()
+      .includes(busqueda.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
@@ -68,19 +78,19 @@ export default function ArbitroHomeScreen({ navigation }) {
           placeholder="Buscar"
           placeholderTextColor="#555"
           style={styles.inputBuscar}
+          value={busqueda}
+          onChangeText={setBusqueda}
         />
-        <TouchableOpacity style={styles.btnBuscar}>
-          <Text style={styles.btnBuscarText}>Buscar</Text>
-        </TouchableOpacity>
       </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#001F4E" style={{ marginTop: 30 }} />
       ) : (
         <FlatList
-          data={partidos}
+          data={filteredPartidos}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 100 }}
+          ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20 }}>No hay partidos</Text>}
           renderItem={({ item }) => {
             const finalizado = item.estado === 'finalizado';
             return (
@@ -104,7 +114,9 @@ export default function ArbitroHomeScreen({ navigation }) {
                       {item.fecha}   {item.hora}
                     </Text>
                     {finalizado && (
-                      <Text style={[styles.cardSubText, { fontStyle: 'italic', color: '#bbb' }]}>Partido terminado</Text>
+                      <Text style={[styles.cardSubText, { fontStyle: 'italic', color: '#bbb' }]}>
+                        Partido terminado
+                      </Text>
                     )}
                   </View>
                   {!finalizado && (
@@ -141,7 +153,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingHorizontal: 12,
     paddingVertical: 12,
-    paddingTop: 30,
+    paddingTop: 50,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 10,
@@ -161,18 +173,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-  },
-  btnBuscar: {
-    backgroundColor: '#d80027',
-    marginLeft: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  btnBuscarText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 12,
   },
   card: {
     backgroundColor: '#0e1b39',
